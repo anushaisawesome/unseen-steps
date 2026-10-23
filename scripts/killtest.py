@@ -30,65 +30,160 @@ NOSE, L_SHO, R_SHO, L_WRI, R_WRI, L_HIP, R_HIP, L_KNE, R_KNE, L_ANK, R_ANK = 0, 
 SAMPLE_FPS = 15
 TURN_HOLD = 0.3   # seconds a new facing must last to count as a turn
 APART_GAP = 0.6   # hip distance between partners, in body heights
+MOVING = 0.012    # activity below this (body heights per sampled frame, camera removed) means standing still
+
+
+def appearance(frame, box, xy, conf):
+    """Colour fingerprint of someone's clothes: an HSV histogram of the torso and legs."""
+    x0, y0, x1, y1 = box
+    w, h = x1 - x0, y1 - y0
+    top = y0 + 0.2 * h
+    if conf[L_SHO] > 0.3 and conf[R_SHO] > 0.3:
+        top = max(y0, min(xy[L_SHO][1], xy[R_SHO][1]))
+    region = frame[int(top):int(y1 - 0.08 * h), int(x0 + 0.2 * w):int(x1 - 0.2 * w)]
+    if region.size == 0:
+        return None
+    hsv = cv2.cvtColor(region, cv2.COLOR_BGR2HSV)
+    hist = cv2.calcHist([hsv], [0, 1, 2], None, [18, 4, 4], [0, 180, 0, 256, 0, 256])
+    cv2.normalize(hist, hist)
+    return hist, float(hsv[..., 1].mean())
+
+
+def seated(box, xy, conf):
+    """Spectators are mostly sitting: thighs close to horizontal."""
+    h = box[3] - box[1]
+    if min(conf[L_HIP], conf[R_HIP], conf[L_KNE], conf[R_KNE]) < 0.3:
+        return False
+    thigh = ((xy[L_KNE][1] + xy[R_KNE][1]) - (xy[L_HIP][1] + xy[R_HIP][1])) / 2
+    return thigh < 0.12 * h
 
 
 def detect(video: str):
-    """Every sampled frame: (t, [(box, keypoints xy, keypoint conf), ...])."""
+    """Every sampled frame: (t, [(box, keypoints xy, keypoint conf, (colour hist, saturation), activity), ...]).
+
+    Activity is how much a person moves relative to the crowd as a whole, so a panning camera
+    doesn't make standing spectators look like they're dancing.
+    """
     model = YOLO(str(ROOT / "models/yolo11n-pose.pt"))
     cap = cv2.VideoCapture(video)
     fps = cap.get(cv2.CAP_PROP_FPS)
+    size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
     step = max(1, round(fps / SAMPLE_FPS))
     frames, i = [], 0
+    last_seen, activity = {}, {}
     while True:
         ok, frame = cap.read()
         if not ok:
             break
         if i % step == 0:
-            r = model.predict(frame, imgsz=1280, conf=0.2, verbose=False, device="mps")[0]
-            people = list(zip(r.boxes.xyxy.cpu().numpy(), r.keypoints.xy.cpu().numpy(),
-                              r.keypoints.conf.cpu().numpy()))
+            r = model.track(frame, imgsz=1280, conf=0.2, persist=True, verbose=False, device="mps",
+                            tracker="bytetrack.yaml")[0]
+            ids = r.boxes.id.int().tolist() if r.boxes.id is not None else [None] * len(r.boxes)
+            rows = list(zip(ids, r.boxes.xyxy.cpu().numpy(), r.keypoints.xy.cpu().numpy(), r.keypoints.conf.cpu().numpy()))
+            moves = {tid: centre(box) - last_seen[tid] for tid, box, _, _ in rows if tid in last_seen}
+            camera = np.median(list(moves.values()), axis=0) if moves else np.zeros(2)
+            people = []
+            for tid, box, xy, conf in rows:
+                own = np.linalg.norm(moves[tid] - camera) / height(box) if tid in moves else 0.0
+                activity[tid] = 0.85 * activity.get(tid, own) + 0.15 * own
+                if tid is not None:
+                    last_seen[tid] = centre(box)
+                look = appearance(frame, box, xy, conf)
+                if look is not None and not seated(box, xy, conf):
+                    people.append((box, xy, conf, look, activity[tid]))
             frames.append((i / fps, people))
         i += 1
-    return frames
+    return frames, size
 
 
 def centre(box):
     return np.array([(box[0] + box[2]) / 2, (box[1] + box[3]) / 2])
 
 
-def follow(frames):
-    """Follow one couple through the clip by position, ignoring detector IDs.
+def height(box):
+    return box[3] - box[1]
 
-    Seeds on the frame with the clearest pair of people standing together, then at each
-    frame takes the detections nearest to where the couple was last seen.
-    """
-    seed_t, seed = None, None
+
+def colour_distance(a, b):
+    return cv2.compareHist(a, b, cv2.HISTCMP_BHATTACHARYYA)  # 0 = same colours, 1 = nothing alike
+
+
+def pick_seed(frames, frame_size, seed=None):
+    """The couple to follow: the one nearest a given point, or the most central pair in view."""
+    mid = np.array(frame_size) / 2
+    diag = np.linalg.norm(frame_size)
+    if seed:  # (time in seconds, x and y as fractions of the frame)
+        t0, fx, fy = seed
+        t, people = min(frames, key=lambda f: abs(f[0] - t0))
+        target = np.array([fx * frame_size[0], fy * frame_size[1]])
+        first = min(people, key=lambda p: np.linalg.norm(centre(p[0]) - target))
+        others = [p for p in people if p is not first and np.linalg.norm(centre(p[0]) - centre(first[0])) < height(first[0])]
+        partner = min(others, key=lambda p: np.linalg.norm(centre(p[0]) - centre(first[0]))) if others else None
+        return t, first, partner
+    best = None
     for t, people in frames:
         for a in range(len(people)):
             for b in range(a + 1, len(people)):
                 pa, pb = people[a], people[b]
-                h = pa[0][3] - pa[0][1]
-                if np.linalg.norm(centre(pa[0]) - centre(pb[0])) < 0.8 * h:
-                    score = pa[2].mean() + pb[2].mean()
-                    if seed is None or score > seed[0]:
-                        seed_t, seed = t, (score, pa, pb)
-    if seed is None:  # no couple anywhere: follow the most confident single person
-        seed_t, best = max(((t, max(p, key=lambda q: q[2].mean())) for t, p in frames if p), key=lambda x: x[1][2].mean())
-        last, size, solo = centre(best[0]), best[0][3] - best[0][1], True
-    else:
-        last = (centre(seed[1][0]) + centre(seed[2][0])) / 2
-        size, solo = seed[1][0][3] - seed[1][0][1], False
+                if np.linalg.norm(centre(pa[0]) - centre(pb[0])) < 0.8 * height(pa[0]) and height(pa[0]) > 0.15 * frame_size[1]:
+                    centrality = 1 - np.linalg.norm((centre(pa[0]) + centre(pb[0])) / 2 - mid) / diag
+                    if min(pa[4], pb[4]) < MOVING:
+                        continue
+                    score = centrality + 0.3 * (pa[2].mean() + pb[2].mean()) / 2 + 3 * min(pa[4], pb[4])
+                    if best is None or score > best[0]:
+                        best = (score, t, pa, pb)
+    if best is None:
+        return None
+    _, t, pa, pb = best
+    return t, pa, pb
+
+
+def follow(frames, frame_size, seed=None):
+    """Follow one dancer (and their partner) by the colour of their clothes, with position as a tiebreak.
+
+    The more colourful partner (usually the dress) is followed directly; the other partner is
+    whoever close by best matches their clothes.
+    """
+    picked = pick_seed(frames, frame_size, seed)
+    if picked is None:
+        return {}, True, 0
+    seed_t, a, b = picked
+    primary, partner = (a, b) if b is None or a[3][1] >= b[3][1] else (b, a)
+    solo = partner is None
 
     path = {}
     for direction in (1, -1):  # grow outwards from the seed, forwards then backwards
-        pos = last.copy()
+        ref = primary[3][0].copy()
+        pos, h, lost_since = centre(primary[0]), height(primary[0]), None
         for t, people in sorted([f for f in frames if (f[0] - seed_t) * direction >= 0], key=lambda f: direction * f[0]):
-            near = sorted(people, key=lambda p: np.linalg.norm(centre(p[0]) - pos))
-            near = [p for p in near if np.linalg.norm(centre(p[0]) - pos) < 1.2 * size][: 1 if solo else 2]
-            if near:
-                path[round(t, 3)] = near
-                pos = np.mean([centre(p[0]) for p in near], axis=0)
-    return path, solo, size
+            lost = lost_since is not None and abs(t - lost_since) > 1.5
+            best, best_cost = None, None
+            for p in people:
+                look = colour_distance(ref, p[3][0])
+                dist = np.linalg.norm(centre(p[0]) - pos) / max(h, height(p[0]))
+                if p[4] < (2 * MOVING if lost else MOVING) or look > (0.35 if lost else 0.6) or (dist > 2.5 and not lost):
+                    continue
+                cost = look + 0.3 * min(dist, 3)
+                if best_cost is None or cost < best_cost:
+                    best, best_cost = p, cost
+            if best is None:
+                lost_since = lost_since if lost_since is not None else t
+                continue
+            lost_since = None
+            chosen = [best]
+            if not solo:
+                near = [p for p in people if p is not best and p[4] >= MOVING
+                        and np.linalg.norm(centre(p[0]) - centre(best[0])) < 0.8 * height(best[0])
+                        and abs(height(p[0]) - height(best[0])) < 0.35 * height(best[0])
+                        and colour_distance(partner[3][0], p[3][0]) < 0.6]
+                if near:
+                    chosen.append(min(near, key=lambda p: colour_distance(partner[3][0], p[3][0])))
+            path[round(t, 3)] = chosen
+            pos, h = centre(best[0]), height(best[0])
+            if colour_distance(ref, best[3][0]) < 0.4:
+                ref = 0.9 * ref + 0.1 * best[3][0]
+    sizes = [height(people[0][0]) for people in path.values()]
+    return path, solo, float(np.median(sizes)) if sizes else 0.0
 
 
 def phrase_features(path, size, solo, start, end, phrase):
@@ -100,6 +195,7 @@ def phrase_features(path, size, solo, start, end, phrase):
 
     t = np.array([r[0] for r in rows])
     lead = [r[1][0] for r in rows]
+    size = float(np.median([p[0][3] - p[0][1] for p in lead]))
     hips = np.array([(p[1][L_HIP] + p[1][R_HIP]) / 2 for p in lead])
     centres = np.array([np.mean([(p[1][L_HIP] + p[1][R_HIP]) / 2 for p in people], axis=0) for _, people in rows])
     pairs = [people for _, people in rows if len(people) == 2]
@@ -215,7 +311,7 @@ def render(video, path, results, out_path):
         if len(times):
             nearest = times[np.abs(times - t).argmin()]
             if abs(nearest - t) < 0.15:
-                for box, _, _ in path[nearest]:
+                for box, *_ in path[nearest]:
                     cv2.rectangle(frame, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (230, 160, 255), 2)
         for r in results:
             said = r.get("speech")
@@ -247,14 +343,16 @@ def main():
     parser.add_argument("--beats-per-bar", type=int, default=4)
     parser.add_argument("--bars-per-phrase", type=int, default=4)
     parser.add_argument("--no-frames", action="store_true", help="features only, no close-up crops")
+    parser.add_argument("--seed", help="who to follow: time,x,y with x and y as fractions of the frame, e.g. 18,0.6,0.7")
     args = parser.parse_args()
 
     song = map_song(load_audio(args.clip), beats_per_bar=args.beats_per_bar,
                     bars_per_phrase=args.bars_per_phrase, speech_seconds=2.5)
     print(f"music: {song['bpm']} bpm, {len(song['phrases'])} phrases")
 
-    frames = detect(args.clip)
-    path, solo, size = follow(frames)
+    frames, frame_size = detect(args.clip)
+    seed = tuple(float(x) for x in args.seed.split(",")) if args.seed else None
+    path, solo, size = follow(frames, frame_size, seed)
     print(f"following {'one dancer' if solo else 'a couple'} in {len(path)}/{len(frames)} sampled frames")
 
     results, previous = [], []
