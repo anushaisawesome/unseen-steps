@@ -4,6 +4,7 @@ Usage:
     python server/speech.py "The couple sweeps to the left." out.wav
 """
 
+import io
 import sys
 import wave
 from pathlib import Path
@@ -40,12 +41,21 @@ def speak(line: str, path: Path) -> Path:
                     prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=VOICE))),
         ),
     )
-    pcm = response.candidates[0].content.parts[0].inline_data.data
-    with wave.open(str(path), "wb") as f:
-        f.setnchannels(1)
-        f.setsampwidth(2)
-        f.setframerate(RATE)
-        f.writeframes(pcm)
+    audio = response.candidates[0].content.parts[0].inline_data
+    if audio.mime_type == "audio/wav":
+        # Already a complete WAV (header plus a metadata chunk at the end): read the sound
+        # out of it so the metadata isn't played as noise.
+        with wave.open(io.BytesIO(audio.data)) as src:
+            params, frames = src.getparams(), src.readframes(src.getnframes())
+        with wave.open(str(path), "wb") as f:
+            f.setparams(params)
+            f.writeframes(frames)
+    else:  # raw 16-bit mono PCM
+        with wave.open(str(path), "wb") as f:
+            f.setnchannels(1)
+            f.setsampwidth(2)
+            f.setframerate(RATE)
+            f.writeframes(audio.data)
     return path
 
 
