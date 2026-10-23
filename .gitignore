@@ -4,3 +4,4 @@ clips/
 *.task
 __pycache__/
 .DS_Store
+.obsidian/
