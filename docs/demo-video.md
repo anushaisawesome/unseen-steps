@@ -23,8 +23,8 @@ So: **exactly 3:00 or just under**, real footage, MongoDB visible on screen.
 
 | Time | Shot | On screen | Audio |
 | --- | --- | --- | --- |
-| 0:00–0:15 | Black screen | "This is what a blind audience member hears." | Music with narration only, no picture |
-| 0:15–0:35 | The person it's for | Gerard's dancer: voice note or quote, name if they agreed | Voice note, or narration reading the quote |
+| 0:00–0:20 | Hook (from `SPEC.md` 10a) | 8 s of the dance clip, clear; then the same 8 s heavily blurred, with "What about now?" | Music only |
+| 0:20–0:35 | The person it's for | Gerard's dancer: voice note or quote, name if they agreed | Voice note, or narration reading the quote |
 | 0:35–1:35 | **The product** | Andrii dancing live (backup: waltz clip) with skeletons, captions and voice (see Overlays) | Music plus narration in the clean spaces |
 | 1:35–2:05 | How it works | Architecture diagram, then the checker rejecting a line and the rewrite that passed | Short voiceover |
 | 2:05–2:30 | **MongoDB** | Atlas: vector search matching a phrase's features to dance terms, and the songs collection with clean spaces | Short voiceover |
