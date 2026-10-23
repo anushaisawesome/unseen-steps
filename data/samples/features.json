@@ -1,0 +1,34 @@
+[
+  {
+    "label": "solo, jumps travelling left",
+    "features": {"phrase": 3, "start": 50.5, "end": 67.6, "people": 1, "tracking": "good",
+                 "speed": 0.71, "max_rise": 0.14, "lowest_level": "standing", "travel": "left",
+                 "turns": 0, "arms_up": 0.6, "stillness": 0.05, "separation": null,
+                 "summary": "three high jumps travelling to stage left, arms overhead"},
+    "vocab": ["grand jete", "leap"]
+  },
+  {
+    "label": "couple in hold, turning",
+    "features": {"phrase": 4, "start": 67.6, "end": 85.7, "people": 2, "tracking": "ok",
+                 "speed": 0.48, "max_rise": 0.03, "lowest_level": "standing", "travel": "right",
+                 "turns": 3, "arms_up": 0.1, "stillness": 0.02, "separation": "in hold",
+                 "summary": "couple in hold rotates three times while travelling right, steady rise and fall"},
+    "vocab": ["natural turn", "rise and fall"]
+  },
+  {
+    "label": "solo, slow floor work then still",
+    "features": {"phrase": 5, "start": 85.7, "end": 103.8, "people": 1, "tracking": "good",
+                 "speed": 0.12, "max_rise": 0.0, "lowest_level": "floor", "travel": "none",
+                 "turns": 0, "arms_up": 0.0, "stillness": 0.55, "separation": null,
+                 "summary": "sinks to the floor, rolls slowly, then holds still"},
+    "vocab": []
+  },
+  {
+    "label": "poor tracking",
+    "features": {"phrase": 6, "start": 103.8, "end": 119.9, "people": 2, "tracking": "poor",
+                 "speed": 0.4, "max_rise": 0.02, "lowest_level": "standing", "travel": "unclear",
+                 "turns": 1, "arms_up": 0.2, "stillness": 0.1, "separation": "unclear",
+                 "summary": "two dancers overlap; points unreliable"},
+    "vocab": []
+  }
+]
