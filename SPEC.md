@@ -40,6 +40,11 @@ Two processes exchange messages over a WebSocket.
 - Music map (offline), features, writer, checker, voice, database, orchestration (`app.py`).
 - Reachable from the web page whether the page is served locally or from Vercel.
 
+**Audio routing & sync — done.** Music plays to both the room speakers and the dancer's
+headphones; the website's narration plays to the speakers only. Latency between the Bluetooth
+headphones and the speakers is corrected in **VoiceMeeter Banana** by delaying the speaker bus to
+match, so the dancer and the room stay on the same beat.
+
 ## 3. The live loop (per phrase, ~32 beats / ~15 s)
 
 1. The pose stream sends body points ~15×/sec.
@@ -107,6 +112,7 @@ examples of the Features shape.)
 | Live voice | `server/voice.py` (Gemini Live) | Anusha | To build (MVP) | Speaks the passed line in the next clean space |
 | Orchestration | `server/app.py` | Both | To build (MVP) | WebSocket server wiring the loop together |
 | Web playback page | `web/` | Both | To build (MVP) | Plays song + narration, runs pose, renders the reveal |
+| Audio routing & sync | VoiceMeeter Banana | Both | **Done** | Music → speakers + dancer's headphones; narration → speakers only; speaker bus delayed to match headphone latency |
 | Database | `server/db.py` (MongoDB Atlas) | Andrii | Stretch (Sat) | Vocab vector search, songs, show memory |
 | Multilingual | Deep Research + render | — | Stretch (Sat) | Term names in Hindi + one more language, cited |
 | Dance summarisation | — | — | Stretch | What went wrong across the whole dance |
@@ -210,6 +216,7 @@ through the same system, then a screen recording.
 | Close hold confuses pose tracking (couple test footage) | Describe the couple, not individuals |
 | No Argon credits until Saturday | Build on Flash, switch when credits land |
 | Live demo fails (space, light, WiFi) | Recorded clips, then a screen recording |
+| Bluetooth headphone latency throws the dancer off the room's beat | Resolved — VoiceMeeter Banana delays the speaker bus to match; re-check the offset in rehearsal |
 
 The single-dancer demo path avoids the close-hold tracking problem, which is one reason it is the
 demo target.
