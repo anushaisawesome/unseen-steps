@@ -22,6 +22,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
 from music import load_audio, map_song  # noqa: E402
 from narrate import describe  # noqa: E402
+from speech import speak  # noqa: E402
+import wave  # noqa: E402
 
 # COCO keypoints
 NOSE, L_SHO, R_SHO, L_WRI, R_WRI, L_HIP, R_HIP, L_KNE, R_KNE, L_ANK, R_ANK = 0, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16
@@ -216,15 +218,25 @@ def render(video, path, results, out_path):
                 for box, _, _ in path[nearest]:
                     cv2.rectangle(frame, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (230, 160, 255), 2)
         for r in results:
-            space = r["clean_space"]
-            if r["line"] and space and space[0] <= t < space[1] + 1.0:
+            said = r.get("speech")
+            if said and said["at"] <= t < said["at"] + said["seconds"] + 0.5:
                 cv2.rectangle(frame, (0, h - 40), (w, h), (0, 0, 0), -1)
                 cv2.putText(frame, r["line"], (8, h - 14), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
         writer.write(frame)
         i += 1
     writer.release()
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(silent), "-i", video,
-                    "-map", "0:v", "-map", "1:a?", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-shortest", str(out_path)],
+    # Mix each spoken line into the soundtrack at its clean space, with the music a little lower.
+    said = [r["speech"] for r in results if r.get("speech")]
+    inputs = ["-i", str(silent), "-i", video]
+    graph = ["[1:a]volume=0.6[m]"]
+    for k, sp in enumerate(said):
+        inputs += ["-i", sp["path"]]
+        ms = int(sp["at"] * 1000)
+        graph.append(f"[{k + 2}:a]adelay=delays={ms}:all=1,volume=1.8[n{k}]")
+    graph.append("[m]" + "".join(f"[n{k}]" for k in range(len(said))) +
+                 f"amix=inputs={len(said) + 1}:normalize=0:duration=first[a]")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", ";".join(graph),
+                    "-map", "0:v", "-map", "[a]", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(out_path)],
                    check=True)
     silent.unlink()
 
@@ -262,6 +274,14 @@ def main():
     out_dir = ROOT / "data/killtest"
     out_dir.mkdir(parents=True, exist_ok=True)
     stem = Path(args.clip).stem
+    audio_dir = out_dir / "audio"
+    audio_dir.mkdir(exist_ok=True)
+    for n, r in enumerate(results):
+        if r["line"] and r["clean_space"]:
+            wav = speak(r["line"], audio_dir / f"{stem}-{n}.wav")
+            with wave.open(str(wav)) as f:
+                seconds = f.getnframes() / f.getframerate()
+            r["speech"] = {"path": str(wav), "at": r["clean_space"][0], "seconds": round(seconds, 2)}
     (out_dir / f"{stem}.json").write_text(json.dumps(results, indent=2, default=float))
     render(args.clip, path, results, out_dir / f"{stem}-annotated.mp4")
     print(f"\nannotated video: {out_dir / f'{stem}-annotated.mp4'}")
