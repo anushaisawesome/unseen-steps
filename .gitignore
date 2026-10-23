@@ -5,3 +5,4 @@ clips/
 __pycache__/
 .DS_Store
 .obsidian/
+data/killtest/
