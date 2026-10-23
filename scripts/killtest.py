@@ -294,31 +294,84 @@ def crops(video, path, start, end, n=3):
     return out
 
 
-def render(video, path, results, out_path):
-    """Annotated copy of the clip: the followed dancers boxed, each line shown in its clean space."""
+SKELETON = [(5, 7), (7, 9), (6, 8), (8, 10), (5, 6), (5, 11), (6, 12), (11, 12),
+            (11, 13), (13, 15), (12, 14), (14, 16), (0, 5), (0, 6)]
+LEAD_COLOUR, PARTNER_COLOUR, OTHER_COLOUR = (230, 120, 255), (170, 235, 150), (150, 150, 150)  # BGR
+FONT = "/System/Library/Fonts/HelveticaNeue.ttc"
+
+
+def draw_skeleton(frame, xy, conf, colour, thickness):
+    for a, b in SKELETON:
+        if conf[a] > 0.3 and conf[b] > 0.3:
+            cv2.line(frame, tuple(int(v) for v in xy[a]), tuple(int(v) for v in xy[b]), colour, thickness, cv2.LINE_AA)
+    for k in range(5, 17):
+        if conf[k] > 0.3:
+            cv2.circle(frame, tuple(int(v) for v in xy[k]), thickness + 1, colour, -1, cv2.LINE_AA)
+
+
+def draw_text(frame, caption, note):
+    """Caption bar at the bottom, a small title top left, and an optional checker note top right."""
+    from PIL import Image, ImageDraw, ImageFont
+    h, w = frame.shape[:2]
+    img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).convert("RGBA")
+    layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    small = ImageFont.truetype(FONT, max(14, h // 40))
+    d.text((int(0.02 * w), int(0.02 * h)), "Unseen Steps  ·  live audio description", font=small, fill=(255, 255, 255, 200))
+    if caption:
+        big = ImageFont.truetype(FONT, max(18, h // 20))
+        tw = d.textlength(caption, font=big)
+        pad, bh = int(0.02 * h), int(h / 20 * 1.9)
+        x0, y0 = int((w - tw) / 2) - 2 * pad, h - bh - int(0.05 * h)
+        d.rounded_rectangle((x0, y0, x0 + tw + 4 * pad, y0 + bh), radius=bh // 3, fill=(20, 16, 30, 190))
+        d.text((x0 + 2 * pad, y0 + (bh - h // 20) // 2 - 2), caption, font=big, fill=(255, 255, 255, 255))
+    if note:
+        tw = d.textlength(note, font=small)
+        d.rounded_rectangle((w - tw - int(0.04 * w), int(0.015 * h), w - int(0.015 * w), int(0.015 * h) + h // 40 + 14),
+                            radius=8, fill=(120, 20, 40, 190))
+        d.text((w - tw - int(0.03 * w), int(0.02 * h)), note, font=small, fill=(255, 255, 255, 255))
+    out = Image.alpha_composite(img, layer).convert("RGB")
+    return cv2.cvtColor(np.array(out), cv2.COLOR_RGB2BGR)
+
+
+def render(video, frames, path, results, out_path):
+    """Demo video: skeletons on the dancers (the followed couple highlighted), each line as a caption
+    while it's spoken, any line the checker rejected flagged, and the spoken lines mixed into the music."""
     cap = cv2.VideoCapture(video)
     fps = cap.get(cv2.CAP_PROP_FPS)
     w, h = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     silent = out_path.with_suffix(".silent.mp4")
     writer = cv2.VideoWriter(str(silent), cv2.VideoWriter_fourcc(*"mp4v"), fps, (w, h))
     times = np.array(sorted(path))
+    sample_times = np.array([f[0] for f in frames])
+    thick = max(2, h // 240)
     i = 0
     while True:
         ok, frame = cap.read()
         if not ok:
             break
         t = i / fps
+        followed = []
         if len(times):
             nearest = times[np.abs(times - t).argmin()]
-            if abs(nearest - t) < 0.15:
-                for box, *_ in path[nearest]:
-                    cv2.rectangle(frame, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (230, 160, 255), 2)
+            if abs(nearest - t) < 0.1:
+                followed = path[nearest]
+        k = int(np.abs(sample_times - t).argmin())
+        if abs(sample_times[k] - t) < 0.1:
+            for p in frames[k][1]:
+                if p[4] >= MOVING and not any(p is q for q in followed):
+                    draw_skeleton(frame, p[1], p[2], OTHER_COLOUR, 1)
+        for n, p in enumerate(followed):
+            draw_skeleton(frame, p[1], p[2], LEAD_COLOUR if n == 0 else PARTNER_COLOUR, thick)
+        caption, note = None, None
         for r in results:
             said = r.get("speech")
             if said and said["at"] <= t < said["at"] + said["seconds"] + 0.5:
-                cv2.rectangle(frame, (0, h - 40), (w, h), (0, 0, 0), -1)
-                cv2.putText(frame, r["line"], (8, h - 14), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
-        writer.write(frame)
+                caption = r["line"]
+                rejected = [a for a in r["attempts"] if not a["passed"]]
+                if rejected:
+                    note = f'checker rejected "{rejected[0]["draft"]}": {rejected[0]["reason"]}'
+        writer.write(draw_text(frame, caption, note))
         i += 1
     writer.release()
     # Mix each spoken line into the soundtrack at its clean space, with the music a little lower.
@@ -327,12 +380,12 @@ def render(video, path, results, out_path):
     graph = ["[1:a]volume=0.6[m]"]
     for k, sp in enumerate(said):
         inputs += ["-i", sp["path"]]
-        ms = int(sp["at"] * 1000)
-        graph.append(f"[{k + 2}:a]adelay=delays={ms}:all=1,volume=1.8[n{k}]")
+        graph.append(f"[{k + 2}:a]adelay=delays={int(sp['at'] * 1000)}:all=1,volume=1.8[n{k}]")
     graph.append("[m]" + "".join(f"[n{k}]" for k in range(len(said))) +
                  f"amix=inputs={len(said) + 1}:normalize=0:duration=first[a]")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", ";".join(graph),
-                    "-map", "0:v", "-map", "[a]", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(out_path)],
+                    "-map", "0:v", "-map", "[a]", "-c:v", "libx264", "-crf", "20", "-pix_fmt", "yuv420p",
+                    "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", str(out_path)],
                    check=True)
     silent.unlink()
 
@@ -381,7 +434,7 @@ def main():
                 seconds = f.getnframes() / f.getframerate()
             r["speech"] = {"path": str(wav), "at": r["clean_space"][0], "seconds": round(seconds, 2)}
     (out_dir / f"{stem}.json").write_text(json.dumps(results, indent=2, default=float))
-    render(args.clip, path, results, out_dir / f"{stem}-annotated.mp4")
+    render(args.clip, frames, path, results, out_dir / f"{stem}-annotated.mp4")
     print(f"\nannotated video: {out_dir / f'{stem}-annotated.mp4'}")
 
 
