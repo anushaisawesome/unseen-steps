@@ -57,6 +57,13 @@ def ensure_collections(database):
             print(f"collection '{name}': created")
 
 
+def ensure_standard_indexes(database):
+    name = database.terms.create_index(
+        [("style", 1), ("term", 1)], unique=True, name="term_style_unique"
+    )
+    print(f"terms.{name}: ready")
+
+
 def ensure_search_index(collection, model):
     have = {idx["name"] for idx in collection.list_search_indexes()}
     if model.document["name"] in have:
@@ -94,6 +101,7 @@ def main():
     print(f"connected to '{database.name}'")
 
     ensure_collections(database)
+    ensure_standard_indexes(database)
     try:
         ensure_search_index(database.terms, VECTOR_INDEX)
         ensure_search_index(database.songs, SONG_NAME_INDEX)

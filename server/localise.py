@@ -10,13 +10,14 @@ Usage:
 
 import json
 import sys
-from pathlib import Path
 
-from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+try:
+    from .settings import gemini_api_key
+except ImportError:  # Running as ``python server/localise.py``.
+    from settings import gemini_api_key
 
 MODEL = "gemini-3.8-flash"
 LANGUAGES = {"en": "English", "uk": "Ukrainian", "de": "German", "hi": "Hindi"}
@@ -35,7 +36,7 @@ _client = None
 def client() -> genai.Client:
     global _client
     if _client is None:
-        _client = genai.Client()
+        _client = genai.Client(api_key=gemini_api_key())
     return _client
 
 

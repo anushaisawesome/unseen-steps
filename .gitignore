@@ -6,4 +6,5 @@ __pycache__/
 .DS_Store
 .obsidian/
 data/killtest/
+data/glossary-research/
 *.pt
