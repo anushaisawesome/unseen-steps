@@ -668,3 +668,6 @@ changes to the describer. Steps in `feedback/README.md`.
   script-only tests. Raw clips stay out of this public repo.
 - Aim for a spread: solo, couple and group; lyrical and explosive music; ballet, ballroom, contemporary, hip hop,
   commercial; fixed and handheld camera.
+
+**Pipeline explainer for the team (24 Oct, 19:30):** https://claude.ai/artifact/1YMrgTFi7Dks4vueFZyiKP (diagram, each
+stage, how checking works, pacing rules, what's built vs not, commands). Submission text: https://claude.ai/artifact/9wqknz9gKac4m97zJkZNNj.
