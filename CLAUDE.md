@@ -96,10 +96,16 @@ its translation in one call (the English is still what gets checked).
 
 ## Who owns what
 
-- **Anusha:** music map, writer, checker, voice, translation, live program playback, pitch.
-- **Andrii:** pose model on his laptop, features, dance vocabulary, MongoDB, Deep Research
-  translations. Pose/features are joint (Anusha helps with tracking).
-- Agree who edits which file before splitting up, to avoid merge conflicts.
+- **Anusha:** music map, writer, checker, voice, translation, Argon director, Robotics-ER targeting, live
+  program playback, pitch.
+- **Andrii:** pose model on his laptop, dance glossary (Deep Research + vetting), MongoDB, filming the demo
+  footage, audio routing.
+- **Nastia (joined Sat 24 Oct, morning):** Imperial, bioscience, computer vision in medicine. Works with
+  Anusha on **computer vision quality**: an evaluation set, keypoint filtering, joint-angle features, pose
+  signatures for glossary terms, model benchmark for live. Onboarding: `docs/ONBOARDING.md`.
+- Agree who edits which file before splitting up, to avoid merge conflicts. Computer vision code currently
+  lives in `scripts/killtest.py`; if Nastia and Anusha both work on it, split it into `server/pose.py`
+  (tracking) and `server/features.py` (features) first.
 
 ## Demo footage and ideas (24 Oct, 02:00)
 
