@@ -443,3 +443,14 @@ problem and who it's for, live demo). Rehearsal in the demo spot **Sat 20:00**. 
   2. Optional, **timeboxed to 30 min:** SAM 3 alone (text-prompted tracking) on a 10 s clip for the crowded
      upload path. Drop it if it doesn't install cleanly or runs out of memory.
   3. Full SAM-Body4D (with the diffusion model) probably won't fit in 8 GB; leave it for a cloud GPU later.
+
+## Status 24 Oct 15:45
+
+- **Andrii's footage** (`clips/andrii.mp4`, 2:10, 1080p60, solo, fixed camera, music audible at 86 bpm in 3/4):
+  following now holds him in **1853/1948 frames** (95%). Soloists are now followed as the biggest clear person
+  each frame; the clothing-colour check and the "moving" filter only apply to crowds (plain dark clothes in
+  changing light broke the colour check; glass-door reflections are ignored by size). Render command:
+  `python scripts/killtest.py clips/andrii720.mp4 --beats-per-bar 3` (720p30 copy for speed).
+- **Anusha's Gemini key hit its monthly spending cap** (429 RESOURCE_EXHAUSTED), which blocks writer, Argon,
+  TTS. Fix: DeepMind booth credits, raise the cap in AI Studio billing, or temporarily use a teammate's key.
+- Tip for filming: his feet leave the bottom of the frame when he comes close; start further back.

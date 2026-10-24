@@ -177,6 +177,20 @@ def follow(frames, frame_size, seed=None):
     primary, partner = (a, b) if b is None or a[3][1] >= b[3][1] else (b, a)
     solo = partner is None
 
+    if solo:
+        # One dancer: follow the biggest, clearest person in each frame. Clothing colour is unreliable
+        # for plain or dark clothes in changing light, and reflections in windows are much smaller.
+        path = {}
+        typical = height(primary[0])
+        for t, people in frames:
+            big = [p for p in people if height(p[0]) > 0.5 * typical]
+            if big:
+                best = max(big, key=lambda p: height(p[0]) * p[2].mean())
+                path[round(t, 3)] = [best]
+                typical = 0.9 * typical + 0.1 * height(best[0])
+        sizes = [height(people[0][0]) for people in path.values()]
+        return path, True, float(np.median(sizes)) if sizes else 0.0
+
     path = {}
     for direction in (1, -1):  # grow outwards from the seed, forwards then backwards
         ref = primary[3][0].copy()
@@ -188,7 +202,10 @@ def follow(frames, frame_size, seed=None):
             for p in people:
                 look = colour_distance(ref, p[3][0])
                 dist = np.linalg.norm(centre(p[0]) - pos) / max(h, height(p[0]))
-                if p[4] < (2 * MOVING if lost else MOVING) or look > (0.35 if lost else 0.6) or (dist > 2.5 and not lost):
+                # The "is this person moving" filter is for ignoring spectators in a crowd; a soloist
+                # standing still for a moment is still the dancer.
+                still = p[4] < (2 * MOVING if lost else MOVING) and len(people) > 1
+                if still or look > (0.35 if lost else 0.6) or (dist > 2.5 and not lost):
                     continue
                 cost = look + 0.3 * min(dist, 3)
                 if best_cost is None or cost < best_cost:
