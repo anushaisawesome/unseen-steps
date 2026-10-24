@@ -59,8 +59,9 @@ def _faithful(audio: bytes, mime: str, line: str) -> tuple[bool, str]:
         model="gemini-3.8-flash",
         contents=[types.Part.from_bytes(data=audio, mime_type=mime),
                   f"The caption for this clip is: {line!r}\nListen and write down what is actually said (heard). "
-                  "match is true only if the speech says the caption's words, in order, with nothing added, dropped "
-                  "or replaced (punctuation and pronunciation of dance terms don't matter)."],
+                  "match is true if the speech says the caption's words in order. It is false only if a word is added, "
+                  "dropped or replaced by a different word, or something else is read out (like a stage direction). "
+                  "Plural endings, 'a'/'the', punctuation and the pronunciation of dance terms don't count."],
         config=types.GenerateContentConfig(response_mime_type="application/json", response_schema=MATCH,
                                            thinking_config=types.ThinkingConfig(thinking_level="low")),
     ))

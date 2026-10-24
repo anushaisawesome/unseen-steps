@@ -42,7 +42,9 @@ Watch the whole performance and return JSON with:
   together (unison, canon and the direction it ripples, a soloist against the group, pairs, subgroups trading).
   techniques: [{name, evidence}] the dance techniques used, each with what the body visibly does (e.g. tutting:
   forearms and hands make sharp right angles and boxes; floorwork: rolls, slides, spins on the floor). Be precise
-  about technique versus mime: a geometric hand shape that suggests an image is still the technique.
+  about technique versus mime: a geometric hand shape that suggests an image is still the technique. If the piece
+  fuses styles, name the style each technique comes from (e.g. "popping (hip hop): sharp muscle hits"; "mudra
+  (Bharatanatyam): a precise hand gesture").
 - motifs: [{name, description, times: [seconds]}] movements that recur; give every time each one appears
 - moments: [{time, what, claim}] the most striking moments, described in body terms with direction as
   the audience sees it ("to the left"). claim is one of: jump, turn, floor, still, travel_left,
@@ -95,18 +97,41 @@ def upload(video: str):
     return uploaded
 
 
-def performance_map(video: str, style_hint: str | None = None) -> dict:
+def video_part(video: str, start: float | None = None, end: float | None = None):
+    """A video Gemini can watch: a local file (uploaded) or a public YouTube link (read by Gemini directly,
+    never downloaded), optionally clipped to start..end seconds."""
+    if video.startswith("http"):
+        clip = None
+        if start is not None or end is not None:
+            clip = types.VideoMetadata(start_offset=f"{start or 0:.0f}s", end_offset=f"{end:.0f}s" if end else None)
+        return types.Part(file_data=types.FileData(file_uri=video), video_metadata=clip)
+    return upload(video)
+
+
+def clip_note(start: float | None, end: float | None) -> str:
+    if start is None and end is None:
+        return ""
+    return (f"\nOnly the part of the video from {start or 0:.0f} s to {end:.0f} s is shown. Give every time as the "
+            "time in the full video (seconds from its very beginning), not from the start of the part.")
+
+
+def source_key(video: str) -> bytes:
+    return video.encode() if video.startswith("http") else Path(video).read_bytes()
+
+
+def performance_map(video: str, style_hint: str | None = None, start: float | None = None,
+                    end: float | None = None) -> dict:
     """Argon's map of the whole performance. Cached per video file, since a map only changes with the video."""
     # Keyed on the instructions too, so a changed prompt gets a fresh map.
-    digest = hashlib.sha1(Path(video).read_bytes() + PROMPT.encode() + json.dumps(SCHEMA).encode()
-                          + (style_hint or "").encode()).hexdigest()[:16]
+    digest = hashlib.sha1(source_key(video) + PROMPT.encode() + json.dumps(SCHEMA).encode()
+                          + (style_hint or "").encode() + clip_note(start, end).encode()).hexdigest()[:16]
     cached = CACHE / f"{digest}.json"
     if cached.exists():
         return json.loads(cached.read_text())
 
-    uploaded = upload(video)
+    uploaded = video_part(video, start, end)
     prompt = PROMPT + (f"\nThe person who uploaded it says the style is: {style_hint}. Treat that as a hint, "
-                       "not a fact; if the video clearly shows otherwise, say so in style." if style_hint else "")
+                       "not a fact; if the video clearly shows otherwise, say so in style." if style_hint else "") + clip_note(start, end)
     response = with_retry(lambda: client().models.generate_content(
         model=MODEL,
         contents=[uploaded, prompt],

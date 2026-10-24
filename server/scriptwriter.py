@@ -21,10 +21,10 @@ from pathlib import Path
 from google.genai import types
 
 try:
-    from .director import CACHE, MODEL, client, upload
+    from .director import CACHE, MODEL, clip_note, client, source_key, video_part
     from .retry import with_retry
 except ImportError:
-    from director import CACHE, MODEL, client, upload
+    from director import CACHE, MODEL, clip_note, client, source_key, video_part
     from retry import with_retry
 
 # Words per second at each pace (the voice is time-stretched to fit, up to about 1.35x). There is no slow pace:
@@ -53,6 +53,13 @@ What to say, like the best dance describers:
 - Name the technique, not a mime: sharp geometric hand and arm shapes are tutting even when they suggest an image;
   say the technique, and the image only as a comparison ("tutting, hands framing a crown"). The same goes for
   waacking, voguing, popping, locking, krump and floorwork.
+- In arm-driven choreography (commercial, waacking, tutting, vogue hands, much contemporary) the arms are the
+  content: say the arms' path and dynamics, not just the step: sliced, flicked, snapped, whipped, wrapped, staccato
+  hits or a sustained reach, and where they land (framing the face, across the chest, overhead). Convey sharpness
+  with callouts on the accents ("Slice! Flick! Wrap the face!") rather than a summary line.
+- Fusion: when a piece draws on several styles, pick out each influence as it appears and use that style's own
+  technical language for those moments (popping hits, a Bharatanatyam mudra, a contemporary release into the floor,
+  a vogue duckwalk), and say when the piece shifts from one influence to another.
 - Choose the moments that matter; never repeat a description. Present tense. Only describe what you can see; if
   unsure of a term, describe the shape plainly.
 
@@ -75,8 +82,10 @@ How and when to say it: the music is the star, the description is tasteful comme
 
 For each line give: time, moment_start and moment_end (seconds: the movement it describes), who (solo, pair,
 group or subgroup), kind (description or callout), pace (steady, brisk or rapid), delivery, priority (1 = a listener
-would miss something important without it, 2 = helpful, 3 = optional colour; the opening line that sets the scene
-and starting position, and every named step, are priority 1), and text."""
+would miss something important without it, 2 = helpful, 3 = optional colour). Priority 1 is only for the opening
+line (scene and starting position), the first line of each section, canons or formation changes, and the piece's
+signature: whatever makes this choreography distinctive (intricate, sharp arm work; a recurring motif). Most other
+lines, including ones that name steps, are 2), and text."""
 
 SCHEMA = {
     "type": "object",
@@ -127,10 +136,13 @@ def structure_notes(plan: dict) -> str:
     return "\n".join(out)
 
 
-def write_script(video: str, song: dict, glossary: list[str] = (), style_hint: str | None = None,
-                 plan: dict | None = None) -> dict:
-    """Argon's whole script, cached per video, music map, glossary and performance map."""
-    prompt = BRIEF + "\n\n" + music_notes(song)
+def write_script(video: str, song: dict | None, glossary: list[str] = (), style_hint: str | None = None,
+                 plan: dict | None = None, start: float | None = None, end: float | None = None) -> dict:
+    """Argon's whole script, cached per video, music map, glossary and performance map. Without a music map
+    (a YouTube link we can't analyse), Argon keeps time by ear."""
+    prompt = BRIEF + "\n\n" + (music_notes(song) if song else
+                                "No beat grid is available: listen to the music and start each line on a beat yourself.")
+    prompt += clip_note(start, end)
     if plan:
         prompt += "\n\n" + structure_notes(plan)
     if glossary:
@@ -138,13 +150,13 @@ def write_script(video: str, song: dict, glossary: list[str] = (), style_hint: s
                    + "\n".join(f"- {g}" for g in glossary))
     if style_hint:
         prompt += f"\n\nThe person who uploaded it says the style is {style_hint}; treat that as a hint, not a fact."
-    key = hashlib.sha1(Path(video).read_bytes()[:50_000_000] + prompt.encode()).hexdigest()[:16]
+    key = hashlib.sha1(source_key(video)[:50_000_000] + prompt.encode()).hexdigest()[:16]
     cached = CACHE / f"script-{key}.json"
     if cached.exists():
         return json.loads(cached.read_text())
     response = with_retry(lambda: client().models.generate_content(
         model=MODEL,
-        contents=[upload(video), prompt],
+        contents=[video_part(video, start, end), prompt],
         config=types.GenerateContentConfig(
             thinking_config=types.ThinkingConfig(thinking_level="high"),
             response_mime_type="application/json",
@@ -152,7 +164,8 @@ def write_script(video: str, song: dict, glossary: list[str] = (), style_hint: s
         ),
     ))
     script = json.loads(response.text)
-    script["lines"] = in_meter(script["lines"], song["beats"])
+    script["lines"] = in_meter(script["lines"], song["beats"]) if song else \
+        sorted(script["lines"], key=lambda l: l["time"])
     CACHE.mkdir(parents=True, exist_ok=True)
     cached.write_text(json.dumps(script, indent=2, ensure_ascii=False))
     return script

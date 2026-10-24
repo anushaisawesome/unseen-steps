@@ -704,3 +704,19 @@ section silent, some motion language inaccurate.
   aren't cut, so the cap can be exceeded). Weak spot: the 128–144 s chorus got one line, no callouts.
 - The caption check caught the voice reading "Director's notes: Driving, bold", saying "whacking" for waacking and "one
   leg hype" for "one leg high"; all re-recorded until they matched.
+
+## YouTube demos (24 Oct, ~21:00)
+
+`scripts/youtube_demo.py` makes narration demos for public YouTube videos **without downloading them**: Gemini reads the
+link directly (`director.video_part`, with `start`/`end` clipping through `VideoMetadata`), Argon maps then scripts the
+piece (no music map: it keeps time by ear; no pose: lines are unchecked, and the page says so), each line is voiced,
+checked against its caption and fitted, the 35% cap applies, and `web/youtube-demo/index.html` plays the narration over
+YouTube's own embedded player (captions in a live region, music ducked to 70%, current section, clickable script with cut
+lines struck through). Serve with `cd web/youtube-demo && python -m http.server 8765`.
+- 16 videos in `VIDEOS`: Anusha's 7 links (Paris Cavanagh x2, Ponyboy, Streetstar 2013 vogue femme battle/solos, Saumya
+  Red Bull fusion) plus ballet, contemporary, waacking, tutting, Bharatanatyam, flamenco, amapiano, afrobeats, ballroom.
+- Audio files are named by a hash of their text + tone (a stale file can't pair with a new caption) and reused if present.
+- Gemini clients are created before the worker threads (lazily created clients raced: "client has been closed").
+- Brief additions from Anusha's feedback (`feedback/youtube-demos-anusha.md`): fusion (name each influence and use its
+  vocabulary); arm-driven styles (arms' path and dynamics; callouts on accents for sharpness); the piece's signature is
+  priority 1; `SPEECH_CEILING` 0.40 (essential lines cut only past it).

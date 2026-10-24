@@ -50,6 +50,8 @@ NOSE, L_EYE, R_EYE, L_EAR, R_EAR = 0, 1, 2, 3, 4
 L_SHO, R_SHO, L_WRI, R_WRI, L_HIP, R_HIP, L_KNE, R_KNE, L_ANK, R_ANK = 5, 6, 9, 10, 11, 12, 13, 14, 15, 16
 SAMPLE_FPS = 15
 SPEECH_SHARE = 0.35  # most of the piece belongs to the music
+# Essential lines are only cut past this share, most crowded first.
+SPEECH_CEILING = 0.40
 TURN_HOLD = 0.3   # seconds a new facing must last to count as a turn
 APART_GAP = 0.8   # hip distance between partners, in body heights
 APART_HOLD = 1.0  # seconds a separation (or rejoining) must last to count
@@ -983,6 +985,8 @@ def finish(args, results, frames, path, focus, group, song):
             return -min((abs(t - r["speech"]["at"]) for t in others), default=99)
         while share() > SPEECH_SHARE:
             optional = [r for r in results if r.get("speech") and r.get("kind") != "callout" and r.get("priority", 2) > 1]
+            if not optional and share() > SPEECH_CEILING:
+                optional = [r for r in results if r.get("speech") and r.get("kind") != "callout"]
             if not optional:
                 break
             r = max(optional, key=lambda r: (r.get("priority", 2), crowding(r)))
