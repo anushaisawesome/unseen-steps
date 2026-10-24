@@ -1073,6 +1073,16 @@ def finish(args, results, frames, path, focus, group, song):
         def crowding(r):
             others = [x["speech"]["at"] for x in results if x.get("speech") and x is not r]
             return -min((abs(t - r["speech"]["at"]) for t in others), default=99)
+        if share() > SPEECH_SHARE:  # Argon chooses what to drop first; the cutter below is a safety net
+            from scriptwriter import trim
+            spoken_now = [dict(r, at=r["speech"]["at"], seconds=r["speech"]["seconds"], text=r["line"])
+                          for r in results if r.get("speech")]
+            drop = trim(spoken_now, SPEECH_SHARE * length)
+            for r in results[1:]:
+                if r.get("speech") and round(r["speech"]["at"], 1) in drop:
+                    print(f"   dropped by Argon for space: {r['line']}")
+                    r.pop("speech")
+                    r["status"] = "dropped by Argon for space"
         while share() > SPEECH_SHARE:
             optional = [r for r in results[1:] if r.get("speech") and r.get("kind") != "callout" and r.get("priority", 2) > 1]
             if not optional and share() > SPEECH_CEILING:

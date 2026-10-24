@@ -750,3 +750,9 @@ turn before the vocals), first line cut, nothing on the arm work, 10 s silent wh
   never opens a gap over 8 s and never cuts the opening line.
 - Terms must meet their definitions (plié and ballet positions need turnout); `turnout` measured from knees vs ankles when
   facing the camera; the checker rejects plié/positions when knees measure turned in.
+- **Trimming with taste** (`scriptwriter.trim`): when speech runs over 35%, Argon is given the real line lengths and the
+  allowed time and picks what to drop (keeping opening context, signature, texture changes, big accents, key shapes;
+  never more than ~6 s of silence during new movement). If a gap over 8 s remains, the shortest dropped line inside it
+  comes back. The blunt cutter is only a final safety net. Aquamarine (Anusha's reference, "70% there"): 10 of 17 lines
+  kept at 38%, signature line kept, gaps ~6–7 s.
+- **Pose rule:** at holds, hits and arrivals, give the shape (limbs, line of the body, level, gaze); the reviewer checks it.

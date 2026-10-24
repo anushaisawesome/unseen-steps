@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
 from director import performance_map  # noqa: E402
-from scriptwriter import RATE, budget, review_script, revise, write_script  # noqa: E402
+from scriptwriter import RATE, budget, review_script, revise, trim, write_script  # noqa: E402
 from speech import speak  # noqa: E402
 
 OUT = ROOT / "web" / "youtube-demo"
@@ -100,12 +100,31 @@ def build(video: tuple) -> dict:
         line["seconds"] = round(float(subprocess.run(
             ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(mp3)],
             capture_output=True, text=True, check=True).stdout), 2)
-        line["audio"] = f"audio/{mp3.name}"
+        line["audio"] = line["audio_kept"] = f"audio/{mp3.name}"
         line["at"] = line["time"]
 
-    # The music stays the star: cut optional, then helpful, lines from the most crowded spots past 35%.
+    # The music stays the star: past 35%, Argon chooses what to drop (with taste); the blunt cutter below is
+    # only a safety net if that still doesn't fit.
     def share():
         return sum(l["seconds"] for l in lines if l.get("audio")) / (end - start)
+    if share() > SPEECH_SHARE:
+        spoken_now = [l for l in lines if l.get("audio")]
+        drop = trim(spoken_now, SPEECH_SHARE * (end - start), plan)
+        for l in spoken_now[1:]:  # never the opening line
+            if round(l["at"], 1) in drop:
+                l["status"] = "dropped by Argon for space"
+                l.pop("audio")
+        # If that left a long silence, bring back the shortest dropped line inside it.
+        while True:
+            spoken = [l for l in lines if l.get("audio")]
+            holes = [(a, b) for a, b in zip(spoken, spoken[1:]) if b["at"] - (a["at"] + a["seconds"]) > 8]
+            back = [min((l for l in lines if l.get("status") == "dropped by Argon for space" and a["at"] < l["at"] < b["at"]),
+                        key=lambda l: l["seconds"], default=None) for a, b in holes]
+            back = [l for l in back if l]
+            if not back:
+                break
+            for l in back:
+                l["audio"], l["status"] = l["audio_kept"], "spoken"
     while share() > SPEECH_SHARE:
         # never the opening line, which sets the scene
         optional = [l for l in lines[1:] if l.get("audio") and l["kind"] != "callout" and l.get("priority", 2) > 1]
@@ -142,7 +161,7 @@ def build(video: tuple) -> dict:
                          for s in plan["sections"]],
             "lines": [{"at": l["at"], "text": l["text"], "kind": l["kind"], "pace": l["pace"],
                        "priority": l.get("priority"), "audio": l.get("audio"), "status": l.get("status", "spoken"),
-                       "seconds": l["seconds"]} for l in lines]}
+                       "seconds": l["seconds"]} for l in lines]}  # audio_kept stays internal
 
 
 def main():

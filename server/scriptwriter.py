@@ -283,6 +283,30 @@ def review_script(video: str, script: dict, plan: dict | None, song: dict | None
     return {**script, "lines": lines, "review": review.get("notes", "")}
 
 
+TRIM = """This audio description script runs over its speaking time: the music must stay the main thing. Choose
+which lines to drop so the total fits, the way an expert describer would: keep what a blind listener most needs (the
+opening context, the piece's signature, every change of texture or energy, the big accents, key shapes) and drop what
+is repeated, generic or less important, whether description or callout. Prefer dropping lines that sit close to
+others. Never leave more than about 6 s of silence while new movement is happening, and keep the calls on the
+big accents (a drop, a hit, a turn into a new phrase). Return JSON {"drop": [times of the lines to drop]}.
+
+"""
+
+
+def trim(lines: list[dict], seconds_allowed: float, plan: dict | None = None) -> set[float]:
+    """Argon picks which lines to drop when speech runs over, instead of a blunt cutter. Returns their times."""
+    total = sum(l["seconds"] for l in lines)
+    listing = "\n".join(f"{l['at']:.1f} s ({l['seconds']:.1f} s spoken) [{l['kind']}] {l['text']}" for l in lines)
+    prompt = (TRIM + (structure_notes(plan) + "\n\n" if plan else "")
+              + f"Speaking time allowed: {seconds_allowed:.0f} s. Current total: {total:.0f} s.\n\nScript:\n" + listing)
+    response = with_retry(lambda: client().models.generate_content(
+        model=MODEL, contents=prompt,
+        config=types.GenerateContentConfig(thinking_config=types.ThinkingConfig(thinking_level="low"),
+                                           response_mime_type="application/json"),
+    ))
+    return {round(float(t), 1) for t in json.loads(response.text).get("drop", [])}
+
+
 def budget(lines: list[dict], end: float) -> list[int]:
     """Most words each line can have before the next one starts, at its pace (with 30% stretch allowed)."""
     out = []
