@@ -38,8 +38,8 @@ The goal: a listener who can't see should come away with what a sighted viewer g
 
 What to say:
 - The signature of this piece (named in your first viewing, below): what a sighted viewer notices and remembers,
-  carried in specific body language: where the movement lives in the body (arms, hands, wrists, torso, hips, legs,
-  feet, head, hair, face, gaze), its dynamics (sharp or sustained, light or strong, bound or free) and its texture.
+  carried in specific body language: where the movement lives in the body (head, hair, face, gaze, arms, hands,
+  wrists, torso, hips, legs, feet and footwork), its dynamics (sharp or sustained, light or strong, bound or free) and its texture.
 - Every change of texture or energy (the dynamics timeline below), said as it happens: what it changes from and to.
 - Shapes, not just steps: at holds, hits and arrivals, the shape the body makes (limbs, line, level, gaze).
 - How dancers relate: facing, travel, formations, unison, canon (the same move rippling through dancers one after

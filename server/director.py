@@ -46,7 +46,8 @@ Watch the whole performance and return JSON with:
   fuses styles, name the style each technique comes from.
 - signature: [{quality, body, dynamics, times: [seconds]}] the two to four things a sighted viewer notices and
   remembers most about this particular choreography (not the style in general): what it is, where it lives in the
-  body (arms, hands, head, hair, face, torso, legs...), its dynamics and texture, and the times it is strongest.
+  body (head, hair, face, arms, hands, torso, hips, legs, feet and footwork), its dynamics and texture, and the times
+  it is strongest.
 - dynamics: [{start, end, texture, energy, music}] a timeline of the quality of movement covering the whole piece,
   with a new entry whenever it changes, even inside a section: texture (e.g. sharp staccato hits, fluid sustained
   waves, heavy grounded drops, light suspended), energy (low, building, high, release) and what the music is doing
@@ -173,8 +174,9 @@ def performance_map(video: str, style_hint: str | None = None, start: float | No
 
 ZOOM = """Zoom in on this section of the dance (the rest of the piece is mapped already). Watch closely and describe,
 second by second, with times in the full video: what each dancer does; every technique and which style it comes from
-(name each influence in a fusion); what the arms, hands, wrists, head, hair and face do, including performance
-details such as hand performance, head and hair whips and the face; the texture and dynamics and exactly when they change (sharp to fluid, still to explosive); the shapes at
+(name each influence in a fusion); what the whole body does, from top to bottom: head, hair and face, arms, hands
+and wrists, torso and hips, legs and feet (footwork and its rhythm, stamps, kicks, extensions, turnout, weight
+changes), including performance details such as hand performance and head and hair whips; the texture and dynamics and exactly when they change (sharp to fluid, still to explosive); the shapes at
 holds and hits; formations, unison and canons; the big accents with the music. Only what you can see. Plain text."""
 
 
