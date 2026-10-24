@@ -152,3 +152,14 @@ a motif ("the glissade from the opening returns"), the checker badge, and the ER
 4. `scripts/live.py` (both)
 5. Glossary via Deep Research into MongoDB (Andrii)
 6. If time: announcer transcription, Live ask mode, Lyria music
+
+## Database (MongoDB Atlas)
+
+- Connection string goes in each person's `.env` as `MONGODB_URI` (plus `MONGODB_DB`, default
+  `unseen_steps`); names are in `.env.example`. Never commit the string.
+- Code lives in `server/db.py`. `python server/db.py` pings Atlas and lists each collection with its
+  document count and fields.
+- Atlas Network Access must allow the laptop's IP (at the venue, "allow access from anywhere" for the
+  weekend, then remove it).
+- Planned collections: `terms` (glossary + vector index), `songs` (song maps + Atlas Search on name),
+  `show_memory` (Argon's running memory per performance).
