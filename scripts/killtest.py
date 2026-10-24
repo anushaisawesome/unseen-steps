@@ -29,7 +29,8 @@ import wave  # noqa: E402
 NOSE, L_SHO, R_SHO, L_WRI, R_WRI, L_HIP, R_HIP, L_KNE, R_KNE, L_ANK, R_ANK = 0, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16
 SAMPLE_FPS = 15
 TURN_HOLD = 0.3   # seconds a new facing must last to count as a turn
-APART_GAP = 0.6   # hip distance between partners, in body heights
+APART_GAP = 0.8   # hip distance between partners, in body heights
+APART_HOLD = 1.0  # seconds a separation (or rejoining) must last to count
 MOVING = 0.012    # activity below this (body heights per sampled frame, camera removed) means standing still
 
 
@@ -155,6 +156,7 @@ def follow(frames, frame_size, seed=None):
     for direction in (1, -1):  # grow outwards from the seed, forwards then backwards
         ref = primary[3][0].copy()
         pos, h, lost_since = centre(primary[0]), height(primary[0]), None
+        partner_pos = centre(partner[0]) if partner is not None else None
         for t, people in sorted([f for f in frames if (f[0] - seed_t) * direction >= 0], key=lambda f: direction * f[0]):
             lost = lost_since is not None and abs(t - lost_since) > 1.5
             best, best_cost = None, None
@@ -177,7 +179,13 @@ def follow(frames, frame_size, seed=None):
                         and abs(height(p[0]) - height(best[0])) < 0.35 * height(best[0])
                         and colour_distance(partner[3][0], p[3][0]) < 0.6]
                 if near:
-                    chosen.append(min(near, key=lambda p: colour_distance(partner[3][0], p[3][0])))
+                    # Prefer whoever is where the partner just was, so a passer-by can't take over.
+                    def partner_cost(p):
+                        jump = np.linalg.norm(centre(p[0]) - partner_pos) / height(best[0]) if partner_pos is not None else 0
+                        return colour_distance(partner[3][0], p[3][0]) + 0.5 * min(jump, 2)
+                    mate = min(near, key=partner_cost)
+                    chosen.append(mate)
+                    partner_pos = centre(mate[0])
             path[round(t, 3)] = chosen
             pos, h = centre(best[0]), height(best[0])
             if colour_distance(ref, best[3][0]) < 0.4:
@@ -204,8 +212,10 @@ def phrase_features(path, size, solo, start, end, phrase):
     travel_x = (centres[-1, 0] - centres[0, 0]) / size
     travel = "left" if travel_x < -0.5 else "right" if travel_x > 0.5 else "none"
     rise = (np.median(hips[:, 1]) - hips[:, 1]) / size
-    leg = np.array([(p[1][L_ANK][1] + p[1][R_ANK][1]) / 2 - (p[1][L_HIP][1] + p[1][R_HIP][1]) / 2 for p in lead]) / size
-    lowest = "floor" if leg.min() < 0.15 else "low" if leg.min() < 0.3 else "standing"
+    # Only trust leg length when the ankles are clearly visible (long dresses hide them).
+    leg = np.array([(p[1][L_ANK][1] + p[1][R_ANK][1]) / 2 - (p[1][L_HIP][1] + p[1][R_HIP][1]) / 2
+                    for p in lead if min(p[2][L_ANK], p[2][R_ANK]) > 0.5]) / size
+    lowest = "standing" if len(leg) < 5 else "floor" if np.percentile(leg, 5) < 0.15 else "low" if np.percentile(leg, 5) < 0.3 else "standing"
 
     events = []
 
@@ -243,10 +253,17 @@ def phrase_features(path, size, solo, start, end, phrase):
                         "leg kick or high leg", 0.1)
     separation = None
     if pairs:
-        gaps = [np.linalg.norm((a[1][L_HIP] + a[1][R_HIP]) / 2 - (b[1][L_HIP] + b[1][R_HIP]) / 2) / size for a, b in pairs]
+        # A partner who isn't detected is usually hidden behind the followed dancer, so count
+        # those frames as together rather than leaving gaps that look like a separation.
+        def gap(people):
+            if len(people) < 2:
+                return 0.0
+            a, b = people
+            return float(np.linalg.norm((a[1][L_HIP] + a[1][R_HIP]) / 2 - (b[1][L_HIP] + b[1][R_HIP]) / 2) / size)
+        pair_t = [tt for tt, _ in rows]
+        gaps = [gap(people) for _, people in rows]
         separation = "in hold" if np.median(gaps) < 0.2 else "close" if np.median(gaps) < APART_GAP else "apart"
-        pair_t = [tt for tt, people in rows if len(people) == 2]
-        # Only count a change of separation once it has lasted TURN_HOLD seconds.
+        # Only count a change of separation once it has clearly lasted APART_HOLD seconds.
         state, pending = gaps[0] > APART_GAP, None
         for tt, g in zip(pair_t, gaps):
             now = g > APART_GAP
@@ -254,10 +271,12 @@ def phrase_features(path, size, solo, start, end, phrase):
                 pending = None
             elif pending is None:
                 pending = tt
-            elif tt - pending >= TURN_HOLD:
+            elif tt - pending >= APART_HOLD:
                 state, pending = now, None
                 events.append((tt, "partners break apart" if now else "partners come back together"))
 
+    if separation in ("in hold", "close"):
+        events = [e for e in events if e[1] != "arm raised high"]
     events = sorted(events)[:10]
     conf = np.mean([p[2].mean() for p in lead])
     coverage = len(rows) / expected
@@ -268,7 +287,8 @@ def phrase_features(path, size, solo, start, end, phrase):
         "speed": round(float(np.median(speed)), 2) if len(speed) else 0.0,
         "max_rise": round(float(np.percentile(rise, 95)), 2), "lowest_level": lowest, "travel": travel,
         "turns": turns,
-        "arms_up": round(float(np.mean([min(p[1][L_WRI][1], p[1][R_WRI][1]) < p[1][NOSE][1] for p in lead])), 2),
+        "arms_up": 0.0 if separation in ("in hold", "close") else
+                   round(float(np.mean([min(p[1][L_WRI][1], p[1][R_WRI][1]) < p[1][NOSE][1] for p in lead])), 2),
         "stillness": round(float(np.mean(speed < 0.15)), 2) if len(speed) else 0.0, "separation": separation,
         "events": [f"{tt - start:.1f}s: {label}" for tt, label in events],
     }

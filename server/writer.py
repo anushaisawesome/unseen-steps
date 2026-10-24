@@ -27,7 +27,7 @@ Describe what the dancers did in the phrase that just ended.
 - Be concrete: direction as the audience sees it (say "to the left" or "to the right", never "stage left" or "stage right", which mean the opposite to a listener), level (high, low, on the floor), and quality (sharp, flowing, sweeping, still).
 - Use a dance term only if it appears in the matching terms you are given. Otherwise describe the shape plainly.
 - With two dancers, describe the couple together unless tracking is "good".
-- Never describe the music, and never guess feelings or costumes unless the show notes mention them.
+- Never describe the music, and never guess feelings or costumes unless the show notes mention them. Say "in hold", never "embrace".
 - Don't repeat the wording of previous lines.
 - Only stay silent (line null) when tracking is "poor" or the phrase is a plain repeat of the previous one. Otherwise always describe something."""
 
