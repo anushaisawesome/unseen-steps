@@ -13,6 +13,10 @@ from google import genai
 from google.genai import types
 
 try:
+    from .retry import with_retry
+except ImportError:
+    from retry import with_retry
+try:
     from .settings import gemini_api_key
 except ImportError:  # Running as ``python server/speech.py``.
     from settings import gemini_api_key
@@ -33,7 +37,7 @@ def client() -> genai.Client:
 
 def speak(line: str, path: Path) -> Path:
     """Say the line in a calm describer's voice and save it as a WAV file."""
-    response = client().models.generate_content(
+    response = with_retry(lambda: client().models.generate_content(
         model=MODEL,
         contents=line,
         config=types.GenerateContentConfig(
@@ -42,7 +46,7 @@ def speak(line: str, path: Path) -> Path:
                 voice_config=types.VoiceConfig(
                     prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=VOICE))),
         ),
-    )
+    ))
     audio = response.candidates[0].content.parts[0].inline_data
     if audio.mime_type == "audio/wav":
         # Already a complete WAV (header plus a metadata chunk at the end): read the sound

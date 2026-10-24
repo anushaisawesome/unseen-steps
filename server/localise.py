@@ -15,6 +15,10 @@ from google import genai
 from google.genai import types
 
 try:
+    from .retry import with_retry
+except ImportError:
+    from retry import with_retry
+try:
     from .settings import gemini_api_key
 except ImportError:  # Running as ``python server/localise.py``.
     from settings import gemini_api_key
@@ -47,7 +51,7 @@ def localise(line: str, lang: str, glossary: dict[str, str] | None = None) -> st
     prompt = f"Translate into {LANGUAGES.get(lang, lang)}:\n{line}"
     if glossary:
         prompt += "\n\nGlossary (English: target language):\n" + "\n".join(f"- {en}: {term}" for en, term in glossary.items())
-    response = client().models.generate_content(
+    response = with_retry(lambda: client().models.generate_content(
         model=MODEL,
         contents=prompt,
         config=types.GenerateContentConfig(
@@ -56,7 +60,7 @@ def localise(line: str, lang: str, glossary: dict[str, str] | None = None) -> st
             response_mime_type="application/json",
             response_schema=SCHEMA,
         ),
-    )
+    ))
     return json.loads(response.text)["line"].strip()
 
 

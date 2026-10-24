@@ -13,6 +13,10 @@ from google import genai
 from google.genai import types
 
 try:
+    from .retry import with_retry
+except ImportError:
+    from retry import with_retry
+try:
     from .settings import gemini_api_key
 except ImportError:  # Running as ``python server/writer.py``.
     from settings import gemini_api_key
@@ -68,7 +72,7 @@ def write_line(features: dict, previous: list[str] = (), notes: str = "", vocab:
     """Return one line to speak, or None when it's better to stay silent."""
     contents = [build_prompt(features, list(previous), notes, list(vocab), feedback)]
     contents += [types.Part.from_bytes(data=jpeg, mime_type="image/jpeg") for jpeg in frames]
-    response = client().models.generate_content(
+    response = with_retry(lambda: client().models.generate_content(
         model=MODEL,
         contents=contents,
         config=types.GenerateContentConfig(
@@ -77,7 +81,7 @@ def write_line(features: dict, previous: list[str] = (), notes: str = "", vocab:
             response_mime_type="application/json",
             response_schema=RESPONSE_SCHEMA,
         ),
-    )
+    ))
     line = (json.loads(response.text or "{}").get("line") or "").strip()
     return line or None
 
