@@ -15,12 +15,14 @@ CLAIMS = [
      lambda f: (f.get("max_rise") or 0) >= 0.05,
      "it mentions a jump or lift, but no rise was measured"),
     (r"\b(spin|turn|pirouette|rotat|twirl|whirl)\w*",
-     lambda f: (f.get("turns") or 0) >= 1,
+     # a change of facing ("turns to face the front") is a turn too
+     lambda f: (f.get("turns") or 0) >= 1 or any("now " in e for e in (f.get("events") or [])),
      "it mentions turning, but no turn was measured"),
-    (r"\b((to|on|onto) the floor|floor ?work|kneel|crouch|roll|sink|low)\w*",
+    (r"\b((to|on|onto) the floor|floor ?work|kneel\w*|crouch\w*|roll\w*|sink\w*|low)\b",
      lambda f: f.get("lowest_level") in ("floor", "low"),
      "it mentions going low or to the floor, but the dancer stayed standing"),
-    (r"\b(still|stillness|pause|freez|frozen|motionless|rest)\w*",
+    # "still" only as stopping ("stands still"), not as "continuing" ("still facing us")
+    (r"\b(stands?|holds?|stays?|remains?|keeps?)\s+still\b|\b(stillness|paus\w*|freez\w*|frozen|motionless|rests?|resting)\b",
      lambda f: (f.get("stillness") or 0) >= 0.3,
      "it mentions stillness, but the dancer kept moving"),
 ]
@@ -47,17 +49,18 @@ def check(line: str, features: dict) -> Verdict:
 
     travel = features.get("travel")
     for side in ("left", "right"):
-        # "left"/"right" as a direction of travel, not a body part ("his right arm").
-        rotating = (rf"\b(turn|spin|pivot|rotat|circl|twirl|whirl)\w*\b[^.,;]*?\b(his|her|their)\s+{side}\b"
+        # A turn's side is the dancer's rotation ("turns left", "turns to his right"): check it against rotation.
+        rotating = (rf"\b(turn|spin|pivot|rotat|circl|twirl|whirl)\w*\s+(to\s+)?((his|her|their|the)\s+)?{side}\b"
                     rf"(?!\s+(arm|hand|leg|foot|shoulder|hip|knee|elbow))")
-        if re.search(rotating, text):  # the dancer's own side, about a turn: check against rotation instead
-            if features.get("rotation") != side:
-                measured = features.get("rotation") or "no clear direction"
-                return Verdict(False, f"it says the turn goes to the {side}, but the measured rotation was {measured}")
-            continue
-        moving = rf"\b{side}(ward)?\b(?!\s+(arm|hand|leg|foot|shoulder|hip|knee|elbow|side))"
-        facing = rf"\b(fac\w*|point\w*|look\w*)\s+(to\s+(the\s+)?)?{side}\b"  # facing/pointing isn't travel
-        if re.search(moving, text) and not re.search(facing, text) and travel != side:
+        if re.search(rotating, text) and features.get("rotation") != side:
+            measured = features.get("rotation") or "no clear direction"
+            return Verdict(False, f"it says the turn goes to the {side}, but the measured rotation was {measured}")
+        # Facing, pointing or profile isn't travel either.
+        facing = (rf"\b(fac\w*|point\w*|look\w*)\s+(to\s+(the\s+)?)?{side}\b|\bprofile\s+(to\s+the\s+)?{side}\b"
+                  rf"|\bside-on[^.,;]*\b{side}\b")
+        rest = re.sub(facing, " ", re.sub(rotating, " ", text))
+        moving = rf"\b{side}(ward)?s?\b(?!\s+(arm|hand|leg|foot|shoulder|hip|knee|elbow|side))"
+        if re.search(moving, rest) and travel != side:
             measured = travel if travel in ("left", "right") else "no clear direction"
             return Verdict(False, f"it says {side}, but the measured travel was {measured}")
 
