@@ -337,3 +337,47 @@ was undesigned and **"scan the QR code" is a visual task**; no control over amou
 
 **Testing:** VoiceOver (iPhone) and TalkBack (Android) before the demo; ideally 10 minutes with one blind
 user (one of Gerard's dancers). **Pitch:** 10 seconds of the page driven by VoiceOver.
+
+## Saturday task lists (written 24 Oct, 03:35)
+
+**Deadlines:** checkpoint 2 on the Encode platform by **Sat 18:00** (code link, description, bounties,
+problem and who it's for, live demo). Rehearsal in the demo spot **Sat 20:00**. Final submission **Sun 12:00**.
+
+### Andrii
+1. **Setup (15 min):** `git pull`; `pip install -r requirements.txt`; `.env` with your own Gemini key and your
+   own Atlas database user (see "Database"); `python server/db.py` should say connected.
+   `scripts/get_demo_clip.sh`, then `python scripts/killtest.py clips/ballet.mp4 --bars-per-phrase 2` to check
+   the whole pipeline runs on your laptop. Pose now picks NVIDIA GPU / Apple GPU / CPU automatically, and
+   downloads the YOLO model on first use.
+2. **Pose speed on your laptop:** try `yolo11m-pose.pt` and `yolo11l-pose.pt` on your webcam at `imgsz=640`;
+   keep the biggest one that stays above ~10 fps. Pass it with `--model`. This decides the live demo setup.
+3. **Film yourself (morning, needed for checkpoint 2):** fixed camera on a stand, whole body in frame, 3–4 m
+   back, decent light, your demo song playing out loud, 60–90 s, two takes (one with big clear moves).
+   Put the files in `clips/` and tell Anusha.
+4. **Your demo song:** the audio file, then `python server/music.py <file> --name "<song>" --style waltz
+   --beats-per-bar 3`; that map goes into the `songs` collection.
+5. **Glossary step 1:** Deep Research for the English waltz skeleton glossary (fields in "Glossary pipeline"),
+   saved to MongoDB `terms` as `draft`. Then **vet every term** and mark them `vetted`.
+6. **Glossary step 2 (after vetting):** Deep Research per language (Ukrainian, German) from dancer sources.
+7. **Audio routing:** re-check VoiceMeeter (music to speaker + your headphones, narration to speaker only) at
+   the 20:00 rehearsal.
+8. `SPEC.md`: point readers to this file for decisions since, or fix the out-of-date parts (Gerard is
+   Anusha's tutor; YOLO not MediaPipe; 16-beat phrases; narration to the speaker, not judges' earphones).
+
+### Anusha
+1. **Checkpoint 2 (by 18:00):** submit on the platform with the repo link, description, bounties (DeepMind,
+   MongoDB, The Real World), problem and who it's for, and a demo clip: `ballet-annotated.mp4` now, Andrii's
+   footage once rendered.
+2. **`server/director.py`:** Argon performance map (style, sections, motifs, key moments) plus the cross-check
+   of every claim against the pose data.
+3. **Robotics-ER target selection:** list the dancers it sees as choices; follow the chosen pair; say who it
+   picked.
+4. **Writer upgrades:** use Argon's notes and motif callbacks, and vetted terms from MongoDB
+   (`match_terms`, `find_song`, `save_memory` in `server/db.py`, plus the vector index on `terms`).
+5. **`scripts/live.py` with Andrii (the headline):** camera + song together, pose, phrase boundaries,
+   features → writer → checker → voice, full-screen skeleton and captions. Start writing ~1.5 s before each
+   boundary to hit the clean space.
+6. At the booths: collect the $100 Atlas credit (MongoDB) and Gemini credits (DeepMind; ask Amit or
+   Geneviève about Robotics-ER streaming for live tracking).
+7. **Sunday 08:00–11:00:** demo video per `docs/demo-video.md`, README, submission text. Submit by 12:00.
+8. Upload page and live venue page only after `live.py` works.

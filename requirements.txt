@@ -6,3 +6,4 @@ opencv-python==5.0.0.93
 python-dotenv==1.2.4
 soundfile==0.14.0
 pymongo
+ultralytics

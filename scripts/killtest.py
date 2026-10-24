@@ -26,6 +26,25 @@ from speech import speak  # noqa: E402
 from localise import localise  # noqa: E402
 import wave  # noqa: E402
 
+def pick_device():
+    """NVIDIA GPU on Windows/Linux, Apple GPU on a Mac, otherwise the CPU."""
+    import torch
+    if torch.cuda.is_available():
+        return 0
+    if torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"
+
+
+DEVICE = pick_device()
+
+
+def load_pose(name):
+    """A pose model from models/, downloaded by Ultralytics on first use if it isn't there yet."""
+    path = ROOT / "models" / name
+    return YOLO(str(path) if path.exists() else name)
+
+
 # COCO keypoints
 NOSE, L_SHO, R_SHO, L_WRI, R_WRI, L_HIP, R_HIP, L_KNE, R_KNE, L_ANK, R_ANK = 0, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16
 SAMPLE_FPS = 15
@@ -66,7 +85,7 @@ def detect(video: str):
     Activity is how much a person moves relative to the crowd as a whole, so a panning camera
     doesn't make standing spectators look like they're dancing.
     """
-    model = YOLO(str(ROOT / "models/yolo11n-pose.pt"))
+    model = load_pose("yolo11n-pose.pt")
     cap = cv2.VideoCapture(video)
     fps = cap.get(cv2.CAP_PROP_FPS)
     size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
@@ -78,7 +97,7 @@ def detect(video: str):
         if not ok:
             break
         if i % step == 0:
-            r = model.track(frame, imgsz=1280, conf=0.2, persist=True, verbose=False, device="mps",
+            r = model.track(frame, imgsz=1280, conf=0.2, persist=True, verbose=False, device=DEVICE,
                             tracker="bytetrack.yaml")[0]
             ids = r.boxes.id.int().tolist() if r.boxes.id is not None else [None] * len(r.boxes)
             rows = list(zip(ids, r.boxes.xyxy.cpu().numpy(), r.keypoints.xy.cpu().numpy(), r.keypoints.conf.cpu().numpy()))
@@ -237,7 +256,7 @@ def track_focus(video, seed, model_name="yolo11n-pose.pt"):
     frame glides around the couple, and pose runs only inside that frame (enlarged), so everyone
     else is ignored. Skeletons are smoothed over time. Starts at the seed time.
     """
-    model = YOLO(str(ROOT / "models" / model_name))
+    model = load_pose(model_name)
     cap = cv2.VideoCapture(video)
     fps = cap.get(cv2.CAP_PROP_FPS)
     W, H = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -246,7 +265,7 @@ def track_focus(video, seed, model_name="yolo11n-pose.pt"):
     cap.set(cv2.CAP_PROP_POS_MSEC, t0 * 1000)
     i = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
     ok, frame = cap.read()
-    r = model.predict(frame, imgsz=1280, conf=0.25, verbose=False, device="mps")[0]
+    r = model.predict(frame, imgsz=1280, conf=0.25, verbose=False, device=DEVICE)[0]
     people = list(zip(r.boxes.xyxy.cpu().numpy(), r.keypoints.xy.cpu().numpy(), r.keypoints.conf.cpu().numpy()))
     point = np.array([fx * W, fy * H])
     first = min(people, key=lambda p: np.linalg.norm(centre(p[0]) - point))
@@ -295,7 +314,7 @@ def track_focus(video, seed, model_name="yolo11n-pose.pt"):
                 if best is not None:
                     # Confirm with pose: a standing person there whose clothes match hers.
                     cx, cy = cents[best]
-                    r = model.predict(frame, imgsz=1280, conf=0.3, verbose=False, device="mps")[0]
+                    r = model.predict(frame, imgsz=1280, conf=0.3, verbose=False, device=DEVICE)[0]
                     match = [b for b, xy, conf in zip(r.boxes.xyxy.cpu().numpy(), r.keypoints.xy.cpu().numpy(), r.keypoints.conf.cpu().numpy())
                              if b[0] <= cx <= b[2] and b[1] <= cy <= b[3] and not seated(b, xy, conf)
                              and (look := appearance(frame, b, xy, conf)) is not None and colour_distance(first_look, look[0]) < 0.45]
@@ -324,7 +343,7 @@ def track_focus(video, seed, model_name="yolo11n-pose.pt"):
 
             chosen = []
             if x1 - x0 > 20 and y1 - y0 > 20:
-                r = model.predict(frame[y0:y1, x0:x1], imgsz=640, conf=0.3, verbose=False, device="mps")[0]
+                r = model.predict(frame[y0:y1, x0:x1], imgsz=640, conf=0.3, verbose=False, device=DEVICE)[0]
                 found = []
                 for b, xy, conf in zip(r.boxes.xyxy.cpu().numpy(), r.keypoints.xy.cpu().numpy(), r.keypoints.conf.cpu().numpy()):
                     b = b + np.array([x0, y0, x0, y0]); xy = xy + np.array([x0, y0])
