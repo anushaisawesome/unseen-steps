@@ -861,7 +861,13 @@ def scripted(args, song, frames, path, solo, size, group):
         for t in db()["terms"].find({"style": args.style, "status": {"$in": ["vetted", "translated"]}}):
             if name := spoken_name(t, args.terms):
                 glossary.append(f"{name}: {t['description']}")
-    script = write_script(args.clip, song, glossary, args.style)
+    # First pass: Argon maps the piece (sections, formations, group structure, techniques, motifs);
+    # second pass: it writes the script from that map, so no section or canon is lost.
+    from director import performance_map
+    plan = performance_map(args.clip, style_hint=args.style)
+    print(f"Argon map: {plan['style']['name']}, " + "; ".join(
+        f"{s['start']:.0f}-{s['end']:.0f}s {s['label']}" for s in plan["sections"]))
+    script = write_script(args.clip, song, glossary, args.style, plan)
     lines = script["lines"]
     end = song["beats"][-1] + 2
     words = budget(lines, end)

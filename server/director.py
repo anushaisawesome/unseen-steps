@@ -37,7 +37,12 @@ CACHE = Path(__file__).resolve().parents[1] / "data" / "director"
 PROMPT = """You are directing live audio description of this dance for blind audience members.
 Watch the whole performance and return JSON with:
 - style: {name, confidence 0 to 1, evidence: short visible cues, e.g. "pointe shoes", "closed hold"}
-- sections: [{start, end, label, description}] the structure of the piece, in seconds
+- sections: [{start, end, label, description, formation, group, techniques}] the structure of the piece, in seconds.
+  formation: where dancers are (lines, wedge, V, circle, clusters, scattered; which side). group: how they move
+  together (unison, canon and the direction it ripples, a soloist against the group, pairs, subgroups trading).
+  techniques: [{name, evidence}] the dance techniques used, each with what the body visibly does (e.g. tutting:
+  forearms and hands make sharp right angles and boxes; floorwork: rolls, slides, spins on the floor). Be precise
+  about technique versus mime: a geometric hand shape that suggests an image is still the technique.
 - motifs: [{name, description, times: [seconds]}] movements that recur; give every time each one appears
 - moments: [{time, what, claim}] the most striking moments, described in body terms with direction as
   the audience sees it ("to the left"). claim is one of: jump, turn, floor, still, travel_left,
@@ -54,8 +59,11 @@ SCHEMA = {
             "required": ["name", "confidence", "evidence"]},
         "sections": {"type": "array", "items": {"type": "object", "properties": {
             "start": {"type": "number"}, "end": {"type": "number"},
-            "label": {"type": "string"}, "description": {"type": "string"}},
-            "required": ["start", "end", "label"]}},
+            "label": {"type": "string"}, "description": {"type": "string"},
+            "formation": {"type": "string"}, "group": {"type": "string"},
+            "techniques": {"type": "array", "items": {"type": "object", "properties": {
+                "name": {"type": "string"}, "evidence": {"type": "string"}}, "required": ["name", "evidence"]}}},
+            "required": ["start", "end", "label", "description", "formation", "group", "techniques"]}},
         "motifs": {"type": "array", "items": {"type": "object", "properties": {
             "name": {"type": "string"}, "description": {"type": "string"},
             "times": {"type": "array", "items": {"type": "number"}}},
@@ -89,7 +97,9 @@ def upload(video: str):
 
 def performance_map(video: str, style_hint: str | None = None) -> dict:
     """Argon's map of the whole performance. Cached per video file, since a map only changes with the video."""
-    digest = hashlib.sha1(Path(video).read_bytes()).hexdigest()[:16]
+    # Keyed on the instructions too, so a changed prompt gets a fresh map.
+    digest = hashlib.sha1(Path(video).read_bytes() + PROMPT.encode() + json.dumps(SCHEMA).encode()
+                          + (style_hint or "").encode()).hexdigest()[:16]
     cached = CACHE / f"{digest}.json"
     if cached.exists():
         return json.loads(cached.read_text())

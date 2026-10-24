@@ -688,3 +688,19 @@ the captions are saying".
 - **Voice vs caption:** `speech._faithful` now asks Gemini Flash whether the clip says exactly the caption (nothing added,
   dropped or swapped; dance-term pronunciation allowed) and re-records up to three takes (tone note twice, then plain),
   printing what was heard on each mismatch and a WARNING if all three fail.
+
+### Two-pass Argon (24 Oct, ~20:15)
+
+Anusha's Judas feedback (`feedback/judas-anusha.md`): canons missing, tutting called "miming crowns", a whole floorwork
+section silent, some motion language inaccurate.
+- Script mode now calls `director.performance_map` first. Its sections now carry `formation`, `group` (unison, canon and
+  its direction, soloists, pairs) and `techniques` [{name, evidence}]; the map cache is keyed on the prompt and schema.
+  `scriptwriter.structure_notes` feeds the map into the script prompt.
+- Brief: every section gets a line and its first line is priority 1; canons and group-structure changes are priority 1;
+  name the technique, not a mime ("tutting, hands framing a crown").
+- Judas result: 7 sections mapped (canon at 69–90 s, floorwork at 90–122 s, tutting at 122–144 s); script now has "Canon, a
+  wave left to right, dropping to sit!", "Tight central block, tutting, geometric hand frames.", "Floorwork in the
+  center, seated leg extensions left.", "Kneeling waacking, fast overhead arm circles." Speech 41% (priority-1 lines
+  aren't cut, so the cap can be exceeded). Weak spot: the 128–144 s chorus got one line, no callouts.
+- The caption check caught the voice reading "Director's notes: Driving, bold", saying "whacking" for waacking and "one
+  leg hype" for "one leg high"; all re-recorded until they matched.

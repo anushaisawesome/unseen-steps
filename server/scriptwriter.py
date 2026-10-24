@@ -45,6 +45,14 @@ What to say, like the best dance describers:
 - Say where dancers are and how they relate: facing, travel, and for groups the formation (lines, circles,
   diagonals, wedge), unison or canon, a soloist breaking out, pairs forming. Directions as the audience sees them
   ("to the left"), never "stage left" or "stage right".
+- Follow the structure of the piece given below (from your first viewing). Every section gets at least one line,
+  and the first line of each section is priority 1: a listener must hear when the piece changes (into floorwork,
+  into a chorus, into pairs).
+- Group structure is priority 1: unison, a canon (the same move rippling through dancers one after another: say it
+  is a canon and which way it travels), a soloist breaking out, pairs forming, formation changes.
+- Name the technique, not a mime: sharp geometric hand and arm shapes are tutting even when they suggest an image;
+  say the technique, and the image only as a comparison ("tutting, hands framing a crown"). The same goes for
+  waacking, voguing, popping, locking, krump and floorwork.
 - Choose the moments that matter; never repeat a description. Present tense. Only describe what you can see; if
   unsure of a term, describe the shape plainly.
 
@@ -107,9 +115,24 @@ def music_notes(song: dict) -> str:
             f"Strongest hits (seconds): {hits}")
 
 
-def write_script(video: str, song: dict, glossary: list[str] = (), style_hint: str | None = None) -> dict:
-    """Argon's whole script, cached per video, music map and glossary."""
+def structure_notes(plan: dict) -> str:
+    """The director's performance map as text: sections with formation, group structure and techniques; motifs."""
+    out = [f"Structure of the piece (style: {plan['style']['name']}):"]
+    for sec in plan["sections"]:
+        techniques = "; ".join(f"{t['name']} ({t['evidence']})" for t in sec.get("techniques", []))
+        out.append(f"- {sec['start']:.0f}-{sec['end']:.0f} s, {sec['label']}: {sec.get('description', '')} "
+                   f"Formation: {sec.get('formation', '')}. Group: {sec.get('group', '')}. Techniques: {techniques}.")
+    for motif in plan.get("motifs", []):
+        out.append(f"- Motif \"{motif['name']}\" ({motif['description']}) at " + ", ".join(f"{t:.0f} s" for t in motif["times"]))
+    return "\n".join(out)
+
+
+def write_script(video: str, song: dict, glossary: list[str] = (), style_hint: str | None = None,
+                 plan: dict | None = None) -> dict:
+    """Argon's whole script, cached per video, music map, glossary and performance map."""
     prompt = BRIEF + "\n\n" + music_notes(song)
+    if plan:
+        prompt += "\n\n" + structure_notes(plan)
     if glossary:
         prompt += ("\n\nGlossary vetted by dancers for this style (use these names where they fit):\n"
                    + "\n".join(f"- {g}" for g in glossary))
