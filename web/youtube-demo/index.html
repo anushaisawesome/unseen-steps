@@ -37,6 +37,7 @@
   .caption:empty::before { content: "\00a0"; }
   .controls { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; font-size: 14px; color: var(--muted); }
   .controls label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+  .controls input[type="range"] { width: 120px; accent-color: var(--accent); }
   .note { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
   .transcript { margin-top: 16px; }
   .transcript ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
@@ -72,6 +73,8 @@
       <div class="controls">
         <label><input type="checkbox" id="narrate" checked> Narration</label>
         <label><input type="checkbox" id="duck" checked> Lower the music while a line is spoken</label>
+        <label for="music-vol">Music volume <input type="range" id="music-vol" min="0" max="100" value="100" step="5"></label>
+        <label for="voice-vol">Narration volume <input type="range" id="voice-vol" min="0" max="100" value="100" step="5"></label>
       </div>
       <p class="note">These lines are written from the YouTube video and haven't been checked against pose tracking (that needs the video file). Struck-through lines were cut so the music stays the main thing.</p>
     </div>
@@ -82,13 +85,19 @@
     </div>
   </section>
 </main>
-<script>document.write(`<script src="data.js?v=${Date.now()}"><\/script>`);</script>
+<script>document.write(`<script src="${location.search.includes("key") ? "data-keymoments.js" : "data.js"}?v=${Date.now()}"><\/script>`);</script>
 <script>
 const demos = window.DEMOS || [];
 const list = document.getElementById("list"), linesEl = document.getElementById("lines");
 const caption = document.getElementById("caption"), sectionEl = document.getElementById("section");
 const narrate = document.getElementById("narrate"), duck = document.getElementById("duck");
 const voice = new Audio();
+const musicVol = document.getElementById("music-vol"), voiceVol = document.getElementById("voice-vol");
+// The music's level as set by the slider; while a line is spoken it dips to 70% of that, never above it.
+const music = () => Number(musicVol.value);
+const setMusic = dipped => { if (player && player.setVolume) player.setVolume(Math.round(music() * (dipped ? 0.7 : 1))); };
+musicVol.addEventListener("input", () => setMusic(!voice.paused && duck.checked));
+voiceVol.addEventListener("input", () => { voice.volume = Number(voiceVol.value) / 100; });
 let player, demo, played = new Set(), lastT = 0, captionTimer;
 
 const mmss = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
@@ -130,18 +139,19 @@ function choose(i) {
   if (player) player.loadVideoById({ videoId: demo.id, startSeconds: demo.start, endSeconds: demo.end });
 }
 
-function stopVoice() { voice.pause(); caption.textContent = ""; if (player && player.setVolume) player.setVolume(100); }
+function stopVoice() { voice.pause(); caption.textContent = ""; setMusic(false); }
 
 function say(l) {
   played.add(l);
   if (!narrate.checked) return;
   clearTimeout(captionTimer);
   caption.textContent = l.text;
-  if (duck.checked) player.setVolume(70);  // a dip, not a takeover: the music stays the main thing
+  voice.volume = Number(voiceVol.value) / 100;
+  if (duck.checked) setMusic(true);  // a dip, not a takeover: the music stays the main thing
   voice.src = l.audio; voice.play();
 }
 voice.addEventListener("ended", () => {
-  player.setVolume(100);
+  setMusic(false);
   captionTimer = setTimeout(() => { caption.textContent = ""; }, 600);
 });
 
