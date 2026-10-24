@@ -155,11 +155,42 @@ a motif ("the glissade from the opening returns"), the checker badge, and the ER
 
 ## Database (MongoDB Atlas)
 
-- Connection string goes in each person's `.env` as `MONGODB_URI` (plus `MONGODB_DB`, default
-  `unseen_steps`); names are in `.env.example`. Never commit the string.
-- Code lives in `server/db.py`. `python server/db.py` pings Atlas and lists each collection with its
-  document count and fields.
-- Atlas Network Access must allow the laptop's IP (at the venue, "allow access from anywhere" for the
-  weekend, then remove it).
-- Planned collections: `terms` (glossary + vector index), `songs` (song maps + Atlas Search on name),
-  `show_memory` (Argon's running memory per performance).
+**Status (24 Oct, 02:40):** free M0 cluster `unseen-steps` (AWS Paris) in the **Unseen Steps** project of the
+**Unseen Steps** Atlas organisation. Database name `unseen_steps`. Anusha is connected; no collections yet.
+
+**Andrii, to connect (do this once, in order):**
+1. In Atlas, switch to the Unseen Steps organisation and project.
+2. **Database Access → Add New Database User**: create *your own* user and password (don't reuse
+   Anusha's). Role: "Read and write to any database" (or Atlas admin) is fine for the weekend.
+3. **Network Access → Add IP Address → Add Current IP Address** (or "Allow access from anywhere" for the
+   weekend only; remove it after).
+4. Copy `.env.example` to `.env` if you haven't, and fill in:
+   ```
+   MONGODB_USER=<your database user>
+   MONGODB_PASSWORD=<your database password>
+   MONGODB_HOST=unseen-steps.mp9b0or.mongodb.net
+   MONGODB_DB=unseen_steps
+   ```
+   (Or set a single `MONGODB_URI=mongodb+srv://...` instead of the three parts.)
+5. Test: `python server/db.py` should print `connected to 'unseen_steps'` and list collections.
+
+**Gotchas:**
+- Never commit `.env` or paste the password into chat or docs. Each person has their own database user.
+- If `.env` is open in TextEdit while something else edits it, TextEdit can save its old copy back over
+  it. Close the editor window without saving after any automated change.
+- Free tier allows up to 3 Atlas Search / Vector Search indexes in total, so plan: one vector index on
+  `terms`, one search index on `songs`, one spare.
+
+**Collections to create (shapes match `SPEC.md` section 4):**
+- `terms`: the glossary, one document per move:
+  `{"term": "arabesque", "style": "ballet", "description": "standing on one leg, the other extended straight behind",`
+  `"names": {"en": "arabesque", "uk": "...", "de": "..."}, "sources": ["url"], "embedding": [...]}`.
+  The `description` (what the move looks like in body terms) is what vector search matches against each
+  phrase's features summary, so write it in plain body language. Vector index on `embedding`
+  (`gemini-embedding-2`, or Atlas Automated Embedding on `description` for extra MongoDB points).
+- `songs`: song maps from `server/music.py` (`name`, `style`, `bpm`, `beats`, `phrases`, `clean_spaces`),
+  with an Atlas Search index on `name` so an announced dance name finds its map.
+- `show_memory`: Argon's running memory, one document per performance.
+
+**Next code (Anusha):** lookup functions in `server/db.py` (`match_terms(summary, style)`,
+`find_song(name)`, `save_memory(...)`), then the writer reads real vocabulary from `terms`.
