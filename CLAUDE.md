@@ -432,3 +432,9 @@ problem and who it's for, live demo). Rehearsal in the demo spot **Sat 20:00**. 
   girl in the red dress". Roadmap line for the pitch.
 - **Sapiens2:** rejected Friday, too heavy to run live.
 - **Live demo stays on YOLO-pose** (`yolo11n/m/l-pose`, pick the biggest that holds 10+ fps on the demo laptop).
+- **Andrii's laptop has an RTX 4070 (laptop card: 8 GB VRAM).** Order of work on it:
+  1. Benchmark `yolo11n/m/l/x-pose` at `imgsz=640` on his webcam and our clips; pick the biggest holding ~15 fps
+     (likely `l` or `x`). That's the live model: a big accuracy gain over the `n` model used on the Mac.
+  2. Optional, **timeboxed to 30 min:** SAM 3 alone (text-prompted tracking) on a 10 s clip for the crowded
+     upload path. Drop it if it doesn't install cleanly or runs out of memory.
+  3. Full SAM-Body4D (with the diffusion model) probably won't fit in 8 GB; leave it for a cloud GPU later.
