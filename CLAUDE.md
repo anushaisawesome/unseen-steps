@@ -507,3 +507,25 @@ YOLO benchmark and keypoint filtering.**
   predictor API before writing much code. Output should replace `track_focus`'s per-frame person boxes, then pose
   runs inside the tracked mask's box as now.
 - Colab is the fallback for SAM 3 (free T4 for images; A100/L4 for video costs money, Anusha's call).
+
+## Richer narration (24 Oct, 17:45)
+
+Feedback from Anusha: lines sounded like a vision model listing what it sees ("hand pointed up, stepping"), not a
+dance describer; facing was missing; turn directions were sometimes wrong; box steps weren't named.
+
+- **Footwork per beat** (`footwork` in `scripts/killtest.py`): fb / side / close / hold from the feet, with body-height
+  change counting as forward/back when facing the camera; "box step" = forward or back, side, close (twice, or half
+  plus another forward/back step in a 2-bar phrase). Thresholds tuned on Andrii's clip only.
+- **Turn direction** (`turn_direction`): the face leads the shoulders into a turn; `rotation` is the dancer's own side.
+  Writer says "turns to his right" for rotation and "moves to the left" (audience view) for travel; the checker rejects
+  a turn side that doesn't match the measured rotation.
+- **Facing** (`facing_of`): front / back / side-on left or right from shoulder order, face visibility and nose
+  direction; changes become events ("now with back to the audience").
+- **Argon director wired in** (`--director`): on Andrii's clip it identified solo ballroom shadow work (waltz / slow
+  foxtrot, 0.9), five sections, and motifs, and recognised the raised arm as his **ballroom frame for an imaginary
+  partner**. Each phrase gets notes (section, recurring motifs with first appearance, verified key moments).
+- **Writer rewritten as an audio describer:** knowledgeable about the style, uses the director's notes, explains a term
+  the first time, says when facing changes, never repeats (says what changed or stays silent), skips incidental
+  gestures, varies openings. Up to 12 words (checker limit 14).
+- Demo render: `python scripts/killtest.py clips/andrii720.mp4 --beats-per-bar 3 --bars-per-phrase 2 --style waltz
+  --terms professional --director`
