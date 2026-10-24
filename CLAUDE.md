@@ -490,3 +490,20 @@ problem and who it's for, live demo). Rehearsal in the demo spot **Sat 20:00**. 
 - Timing fix: 2-bar phrases (`--bars-per-phrase 2`, a line every ~4 s), the writer favours the last few seconds,
   and lines go in the earliest acceptable gap (`map_song(..., earliest=True)`). The checker's "floor" rule now only
   fires on going down ("to/on the floor", floor work, kneel...), not "across the floor".
+
+## SAM for crowded clips: what to try (24 Oct, 16:45, for Nastia's Claude)
+
+Goal: follow one named dancer/couple through crowded, handheld competition footage (the upload path, not the
+live demo, which is a solo dancer YOLO already tracks in 95% of frames). **Timebox: one hour, then switch to the
+YOLO benchmark and keypoint filtering.**
+
+- **SAM 3 is unlikely to fit the 4070 laptop (8 GB).** Third-party install guides put it at ~10–12 GB for images and
+  ~18–25 GB for short video. Its checkpoints are **gated on Hugging Face** (request access at
+  huggingface.co/facebook/sam3, then `hf auth login` with a read token), and Meta recommends **WSL (Ubuntu)** on
+  Windows rather than native builds.
+- **Recommended instead: Robotics-ER + SAM 2.1 tiny.** `gemini-robotics-er-2-preview` turns words ("the girl in
+  the red dress") into a box on one frame (tested, works); SAM 2.1 tiny (~40M parameters, fits easily in 8 GB)
+  tracks that box through the video. Ultralytics (already a dependency) ships SAM 2 models; check its video
+  predictor API before writing much code. Output should replace `track_focus`'s per-frame person boxes, then pose
+  runs inside the tracked mask's box as now.
+- Colab is the fallback for SAM 3 (free T4 for images; A100/L4 for video costs money, Anusha's call).
