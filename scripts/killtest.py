@@ -83,7 +83,8 @@ def detect(video: str):
             ids = r.boxes.id.int().tolist() if r.boxes.id is not None else [None] * len(r.boxes)
             rows = list(zip(ids, r.boxes.xyxy.cpu().numpy(), r.keypoints.xy.cpu().numpy(), r.keypoints.conf.cpu().numpy()))
             moves = {tid: centre(box) - last_seen[tid] for tid, box, _, _ in rows if tid in last_seen}
-            camera = np.median(list(moves.values()), axis=0) if moves else np.zeros(2)
+            # Camera pan = how the crowd moves as a whole; with fewer than 3 people there's no crowd to measure.
+            camera = np.median(list(moves.values()), axis=0) if len(moves) >= 3 else np.zeros(2)
             people = []
             for tid, box, xy, conf in rows:
                 own = np.linalg.norm(moves[tid] - camera) / height(box) if tid in moves else 0.0
@@ -147,8 +148,12 @@ def follow(frames, frame_size, seed=None):
     whoever close by best matches their clothes.
     """
     picked = pick_seed(frames, frame_size, seed)
-    if picked is None:
-        return {}, True, 0
+    if picked is None:  # no couple anywhere: follow the clearest moving person on their own
+        candidates = [(t, p) for t, people in frames for p in people if p[4] >= MOVING]
+        if not candidates:
+            return {}, True, 0
+        seed_t, best = max(candidates, key=lambda c: c[1][2].mean() + c[1][4])
+        picked = (seed_t, best, None)
     seed_t, a, b = picked
     primary, partner = (a, b) if b is None or a[3][1] >= b[3][1] else (b, a)
     solo = partner is None
@@ -511,9 +516,9 @@ def draw_text(frame, caption, note):
         d.text((x0 + 2 * pad, y0 + (bh - h // 20) // 2 - 2), caption, font=big, fill=(255, 255, 255, 255))
     if note:
         tw = d.textlength(note, font=small)
-        d.rounded_rectangle((w - tw - int(0.04 * w), int(0.015 * h), w - int(0.015 * w), int(0.015 * h) + h // 40 + 14),
-                            radius=8, fill=(120, 20, 40, 190))
-        d.text((w - tw - int(0.03 * w), int(0.02 * h)), note, font=small, fill=(255, 255, 255, 255))
+        top = int(0.065 * h)  # its own line, under the title
+        d.rounded_rectangle((int(0.015 * w), top, int(0.035 * w) + tw, top + h // 40 + 14), radius=8, fill=(120, 20, 40, 190))
+        d.text((int(0.025 * w), top + 5), note, font=small, fill=(255, 255, 255, 255))
     out = Image.alpha_composite(img, layer).convert("RGB")
     return cv2.cvtColor(np.array(out), cv2.COLOR_RGB2BGR)
 
