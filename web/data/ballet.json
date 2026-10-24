@@ -1,0 +1,142 @@
+{
+ "clip": "ballet",
+ "duration": 22.79,
+ "bpm": 112.3,
+ "beats_per_bar": 4,
+ "beats": [
+  0.627,
+  1.161,
+  1.695,
+  2.252,
+  2.81,
+  3.32,
+  3.878,
+  4.389,
+  4.923,
+  5.457,
+  5.991,
+  6.525,
+  7.059,
+  7.593,
+  8.127,
+  8.661,
+  9.195,
+  9.706,
+  10.263,
+  10.82,
+  11.355,
+  11.889,
+  12.446,
+  13.003,
+  13.56,
+  14.118,
+  14.652,
+  15.209,
+  15.766,
+  16.324,
+  16.858,
+  17.369,
+  17.903,
+  18.437,
+  18.947,
+  19.482,
+  19.992,
+  20.526,
+  21.037,
+  21.571
+ ],
+ "phrases": [
+  [
+   0.63,
+   4.92
+  ],
+  [
+   4.92,
+   9.2
+  ],
+  [
+   9.2,
+   13.56
+  ],
+  [
+   13.56,
+   17.9
+  ],
+  [
+   17.9,
+   22.76
+  ]
+ ],
+ "lines": [
+  {
+   "text": "A silhouetted ballerina stands in fifth position, feet neatly crossed.",
+   "at": 0.2,
+   "seconds": 4.15,
+   "moment": [
+    0.0,
+    2.2
+   ],
+   "pace": "measured",
+   "delivery": "poised, clear, setting the scene",
+   "rejected": [],
+   "measured": []
+  },
+  {
+   "text": "She springs straight up in a soubresaut, feet together, one arm sweeping high.",
+   "at": 4.55,
+   "seconds": 5.24,
+   "moment": [
+    2.5,
+    5.2
+   ],
+   "pace": "measured",
+   "delivery": "light, buoyant, lifting with the jump",
+   "rejected": [],
+   "measured": []
+  },
+  {
+   "text": "Gliding, she leaps again, arms opening wide like wings.",
+   "at": 9.99,
+   "seconds": 3.83,
+   "moment": [
+    7.5,
+    10.5
+   ],
+   "pace": "brisk",
+   "delivery": "bright, airy, riding the woodwinds",
+   "rejected": [
+    {
+     "draft": "Gliding left, she leaps again, arms opening wide like wings.",
+     "reason": "it says left, but the measured travel was no clear direction"
+    }
+   ],
+   "measured": []
+  },
+  {
+   "text": "From a deep plié bend, she launches into a soaring sissonne split leap.",
+   "at": 14.02,
+   "seconds": 4.95,
+   "moment": [
+    11.5,
+    15.2
+   ],
+   "pace": "brisk",
+   "delivery": "expansive, suspended, matching the high leap",
+   "rejected": [],
+   "measured": []
+  },
+  {
+   "text": "Flowing through a graceful port de bras, she arches toward the light.",
+   "at": 19.17,
+   "seconds": 5.24,
+   "moment": [
+    16.0,
+    22.5
+   ],
+   "pace": "measured",
+   "delivery": "warm, lyrical, unhurried",
+   "rejected": [],
+   "measured": []
+  }
+ ]
+}
