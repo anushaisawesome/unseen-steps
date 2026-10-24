@@ -1,10 +1,17 @@
 """Turn a checked line into spoken audio with Gemini text-to-speech.
 
+Delivery: an optional director's note sets the tone ("hushed, tender" or "punchy, explosive"). The TTS model
+sometimes reads such notes aloud, so every clip is transcribed and compared with the line, and regenerated
+plainly if extra words crept in. Speed is set by time-stretching the audio (pitch kept) to fit the time the
+line has before the next one, rather than trusting the model's pace.
+
 Usage:
     python server/speech.py "The couple sweeps to the left." out.wav
 """
 
 import io
+import re
+import subprocess
 import sys
 import wave
 from pathlib import Path
@@ -35,11 +42,43 @@ def client() -> genai.Client:
     return _client
 
 
-def speak(line: str, path: Path) -> Path:
-    """Say the line in a calm describer's voice and save it as a WAV file."""
+def _words(text: str) -> list[str]:
+    return re.findall(r"[a-z']+", text.lower())
+
+
+def _faithful(audio: bytes, mime: str, line: str) -> bool:
+    """True if the clip says the line and nothing else (no director's note read aloud)."""
+    heard = with_retry(lambda: client().models.generate_content(
+        model="gemini-3.8-flash",
+        contents=[types.Part.from_bytes(data=audio, mime_type=mime), "Transcribe exactly what is spoken. Nothing else."],
+    )).text
+    return len(_words(heard)) <= len(_words(line)) + 2
+
+
+def speak(line: str, path: Path, delivery: str | None = None, max_seconds: float | None = None) -> Path:
+    """Say the line (in the delivery's tone, if given), fit it into max_seconds, and save it as a WAV file."""
+    if delivery:
+        _synthesise(f"# DIRECTOR'S NOTES\n{delivery}\n\n# TRANSCRIPT\n{line}", path)
+        if not _faithful(path.read_bytes(), "audio/wav", line):
+            _synthesise(line, path)
+    else:
+        _synthesise(line, path)
+    if max_seconds:
+        with wave.open(str(path)) as f:
+            seconds = f.getnframes() / f.getframerate()
+        if seconds > max_seconds:  # speed up to fit, up to 1.35x (beyond that it stops sounding natural)
+            factor = min(1.35, seconds / max_seconds)
+            stretched = path.with_suffix(".fit.wav")
+            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(path), "-filter:a", f"atempo={factor:.3f}",
+                            str(stretched)], check=True)
+            stretched.replace(path)
+    return path
+
+
+def _synthesise(contents: str, path: Path) -> Path:
     response = with_retry(lambda: client().models.generate_content(
         model=MODEL,
-        contents=line,
+        contents=contents,
         config=types.GenerateContentConfig(
             response_modalities=["AUDIO"],
             speech_config=types.SpeechConfig(

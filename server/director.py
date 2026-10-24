@@ -78,6 +78,15 @@ def client() -> genai.Client:
     return _client
 
 
+def upload(video: str):
+    """Upload a video to the Files API and wait until Gemini can watch it."""
+    uploaded = client().files.upload(file=video)
+    while uploaded.state.name == "PROCESSING":
+        time.sleep(2)
+        uploaded = client().files.get(name=uploaded.name)
+    return uploaded
+
+
 def performance_map(video: str, style_hint: str | None = None) -> dict:
     """Argon's map of the whole performance. Cached per video file, since a map only changes with the video."""
     digest = hashlib.sha1(Path(video).read_bytes()).hexdigest()[:16]
@@ -85,11 +94,7 @@ def performance_map(video: str, style_hint: str | None = None) -> dict:
     if cached.exists():
         return json.loads(cached.read_text())
 
-    uploaded = client().files.upload(file=video)
-    while uploaded.state.name == "PROCESSING":
-        time.sleep(2)
-        uploaded = client().files.get(name=uploaded.name)
-
+    uploaded = upload(video)
     prompt = PROMPT + (f"\nThe person who uploaded it says the style is: {style_hint}. Treat that as a hint, "
                        "not a fact; if the video clearly shows otherwise, say so in style." if style_hint else "")
     response = with_retry(lambda: client().models.generate_content(

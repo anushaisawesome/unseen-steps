@@ -53,6 +53,9 @@ TURN_HOLD = 0.3   # seconds a new facing must last to count as a turn
 APART_GAP = 0.8   # hip distance between partners, in body heights
 APART_HOLD = 1.0  # seconds a separation (or rejoining) must last to count
 MOVING = 0.012    # activity below this (body heights per sampled frame, camera removed) means standing still
+# People that detect() set aside as seated, by sample time. In an audience they're spectators; in a group piece
+# they're dancers kneeling or sitting on the floor, which group_features needs to see.
+SEATED = {}
 
 
 def appearance(frame, box, xy, conf):
@@ -112,7 +115,9 @@ def detect(video: str):
                 if tid is not None:
                     last_seen[tid] = centre(box)
                 look = appearance(frame, box, xy, conf)
-                if look is not None and not seated(box, xy, conf):
+                if look is not None and seated(box, xy, conf):
+                    SEATED.setdefault(i / fps, []).append((box, xy, conf, look, activity[tid]))
+                elif look is not None:
                     people.append((box, xy, conf, look, activity[tid]))
             frames.append((i / fps, people))
         i += 1
@@ -527,6 +532,32 @@ def phrase_features(path, size, solo, start, end, phrase, beats=None):
     }
 
 
+def group_features(frames, start, end):
+    """What can be checked for a group without following individuals: how many dancers, and whether anyone
+    goes to the floor. Jumps, turns, stillness and travel are left unmeasured (None), so the checker skips
+    those claims instead of judging a group by one person."""
+    rows = [people + SEATED.get(t, []) for t, people in frames if start <= t < end]
+    base = {"people": int(np.median([len(p) for p in rows])) if rows else 0, "max_rise": None, "turns": None,
+            "stillness": None, "travel": None, "rotation": None}
+    if len(rows) < 3:
+        return {**base, "tracking": "poor"}
+
+    def low(p):  # lying or crouching (box wider than tall), kneeling or sitting (legs folded under the hips)
+        box, xy, conf = p[0], p[1], p[2]
+        if seated(box, xy, conf):
+            return True
+        if box[2] - box[0] > box[3] - box[1]:
+            return True
+        torso = (xy[L_HIP][1] + xy[R_HIP][1]) / 2 - (xy[L_SHO][1] + xy[R_SHO][1]) / 2
+        if min(conf[L_ANK], conf[R_ANK], conf[L_HIP], conf[R_HIP]) < 0.5 or torso <= 0:
+            return False
+        leg = (xy[L_ANK][1] + xy[R_ANK][1]) / 2 - (xy[L_HIP][1] + xy[R_HIP][1]) / 2
+        return leg < 0.6 * torso
+    floor_frames = sum(1 for people in rows if any(low(p) for p in people))
+    return {**base, "tracking": "good" if base["people"] >= 3 else "ok",
+            "lowest_level": "floor" if floor_frames >= 2 else "standing"}
+
+
 FACING_WORDS = {"front": "facing the audience", "back": "with back to the audience",
                 "left": "side-on, facing the audience's left", "right": "side-on, facing the audience's right"}
 
@@ -680,7 +711,7 @@ def draw_text(frame, caption, note):
     return cv2.cvtColor(np.array(out), cv2.COLOR_RGB2BGR)
 
 
-def render(video, frames, path, results, out_path, focus=None):
+def render(video, frames, path, results, out_path, focus=None, everyone=False):
     """Demo video: skeletons on the dancers (the followed couple highlighted), each line as a caption
     while it's spoken, any line the checker rejected flagged, and the spoken lines mixed into the music."""
     cap = cv2.VideoCapture(video)
@@ -705,7 +736,10 @@ def render(video, frames, path, results, out_path, focus=None):
         k = int(np.abs(sample_times - t).argmin())
         if abs(sample_times[k] - t) < 0.1:
             ref_h = height(followed[0][0]) if followed else 0.25 * h
-            for p in frames[k][1]:
+            for p in frames[k][1] + (SEATED.get(frames[k][0], []) if everyone else []):
+                if everyone:  # a group piece: every dancer is part of the description
+                    draw_skeleton(frame, p[1], p[2], LEAD_COLOUR, max(1, thick - 1))
+                    continue
                 # Other dancers only: moving, standing on the floor (feet in the lower part of the
                 # picture) and about the size of the followed dancer. Spectators at the edges get none.
                 on_floor = p[0][3] > 0.55 * h and 0.6 * ref_h < height(p[0]) < 1.6 * ref_h
@@ -758,11 +792,13 @@ def main():
                         help="which names to speak (SPEC.md 5b); beginner falls back to plain description")
     parser.add_argument("--include-drafts", action="store_true", help="preview with unvetted glossary terms (never for the demo)")
     parser.add_argument("--lang", default="en", help="narration language: en, uk, de, hi")
+    parser.add_argument("--script", action="store_true",
+                        help="Argon writes the whole timed description; pose and music check and time it")
     parser.add_argument("--seed", help="who to follow: time,x,y with x and y as fractions of the frame, e.g. 18,0.6,0.7")
     args = parser.parse_args()
 
     song = map_song(load_audio(args.clip), beats_per_bar=args.beats_per_bar,
-                    bars_per_phrase=args.bars_per_phrase, speech_seconds=2.5, earliest=True)
+                    bars_per_phrase=args.bars_per_phrase, speech_seconds=3.0 if args.script else 2.5, earliest=True)
     print(f"music: {song['bpm']} bpm, {len(song['phrases'])} phrases")
 
     seed = tuple(float(x) for x in args.seed.split(",")) if args.seed else None
@@ -774,6 +810,69 @@ def main():
         path, solo, size = follow(frames, frame_size, seed)
     print(f"following {'one dancer' if solo else 'a couple'} in {len(path)}/{len(frames)} sampled frames")
 
+    group = bool(frames) and np.median([len(people) for _, people in frames]) >= 3
+    if args.script:
+        results = scripted(args, song, frames, path, solo, size, group)
+    else:
+        results = phrased(args, song, frames, path, solo, size)
+    finish(args, results, frames, path, focus, group)
+
+
+def scripted(args, song, frames, path, solo, size, group):
+    """Argon writes the whole timed description (pace and delivery included); each line is checked against the
+    pose measurements for the moment it describes; rejected lines go back to Argon once, then stay silent."""
+    from checker import check
+    from scriptwriter import budget, revise, write_script
+    glossary = []
+    if args.style:
+        from db import db, spoken_name
+        for t in db()["terms"].find({"style": args.style, "status": {"$in": ["vetted", "translated"]}}):
+            if name := spoken_name(t, args.terms):
+                glossary.append(f"{name}: {t['description']}")
+    script = write_script(args.clip, song, glossary, args.style)
+    lines = script["lines"]
+    end = song["beats"][-1] + 2
+    words = budget(lines, end)
+    print(f"Argon: {script['style']}, {len(lines)} lines ({'group' if group else 'solo' if solo else 'couple'})")
+
+    results, rejected = [], []
+    for n, line in enumerate(lines):
+        start, stop = line["moment_start"], max(line["moment_end"], line["moment_start"] + 2.0)
+        features = group_features(frames, start, stop) if group else \
+            phrase_features(path, size, solo, start, stop, n, beats=song["beats"])
+        until = lines[n + 1]["time"] if n + 1 < len(lines) else end
+        r = {"n": n, "time": line["time"], "moment": [start, stop], "who": line["who"], "kind": line["kind"],
+             "pace": line["pace"], "delivery": line["delivery"], "features": features, "max_words": words[n],
+             "clean_space": [line["time"], until], "fit": round(until - line["time"] - 0.15, 2)}
+        if features["tracking"] == "poor":  # nothing measured for this moment: can't confirm or contradict
+            r.update(line=line["text"], attempts=[{"draft": line["text"], "passed": True, "reason": "unchecked: not tracked"}])
+        else:
+            v = check(line["text"], features, words[n])
+            r.update(line=line["text"] if v.passed else None,
+                     attempts=[{"draft": line["text"], "passed": v.passed, "reason": v.reason}])
+            if not v.passed:
+                rejected.append({"time": line["time"], "text": line["text"], "reason": v.reason})
+        results.append(r)
+
+    for when, text in revise(rejected).items():  # Argon's one revision of every rejected line
+        r = next((r for r in results if abs(r["time"] - when) < 0.05 and r["line"] is None), None)
+        if r is None or not text:
+            continue
+        v = check(text, r["features"], r["max_words"])
+        r["attempts"].append({"draft": text, "passed": v.passed, "reason": v.reason})
+        r["line"] = text if v.passed else None
+
+    for r in results:
+        print(f"{r['time']:6.1f}s [{r['pace']}; {r['delivery']}] ({r['who']}, {r['features']['tracking']})")
+        for a in r["attempts"]:
+            if not a["passed"]:
+                print(f"         rejected: \"{a['draft']}\" ({a['reason']})")
+        print(f"         -> {r['line'] or '(silent)'}")
+    return results
+
+
+def phrased(args, song, frames, path, solo, size):
+    """The original pipeline: one line per phrase from that phrase's pose features, written by Flash."""
     all_features = [phrase_features(path, size, solo, start, end, n, beats=song["beats"])
                     for n, (start, end) in enumerate(song["phrases"])]
     plan = None
@@ -815,23 +914,41 @@ def main():
             if not a["passed"]:
                 print(f"   rejected: \"{a['draft']}\" ({a['reason']})")
         print(f"   -> {result.line or '(silent)'}" + (f"  [spoken at {space[0]:.1f}s]" if result.line and space else ""))
+    return results
 
+
+def finish(args, results, frames, path, focus, group):
+    """Translate, voice, and render the annotated video."""
     out_dir = ROOT / "data/killtest"
     out_dir.mkdir(parents=True, exist_ok=True)
-    stem = Path(args.clip).stem
+    stem = Path(args.clip).stem + ("-script" if args.script else "")
     audio_dir = out_dir / "audio"
     audio_dir.mkdir(exist_ok=True)
     for n, r in enumerate(results):
         if r["line"] and r["clean_space"]:
             r["line_en"] = r["line"]
             r["line"] = localise(r["line"], args.lang)  # checked in English, then translated
-            wav = speak(r["line"], audio_dir / f"{stem}-{args.lang}-{n}.wav")
+            wav = speak(r["line"], audio_dir / f"{stem}-{args.lang}-{n}.wav", r.get("delivery"), r.get("fit"))
             with wave.open(str(wav)) as f:
                 seconds = f.getnframes() / f.getframerate()
             r["speech"] = {"path": str(wav), "at": r["clean_space"][0], "seconds": round(seconds, 2)}
+    # Never talk over the previous line: start after it, or drop the line if that's over 2 s late.
+    end = 0.0
+    for r in results:
+        sp = r.get("speech")
+        if not sp:
+            continue
+        late = 0.6 if r.get("kind") == "callout" else 2.0  # a callout late by more than ~a beat misses its hit
+        if sp["at"] < end + 0.2:
+            if end + 0.2 - sp["at"] > late:
+                print(f"   dropped (no room to speak): {r['line']}")
+                r.pop("speech")
+                continue
+            sp["at"] = round(end + 0.2, 2)
+        end = sp["at"] + sp["seconds"]
     (out_dir / f"{stem}.json").write_text(json.dumps(results, indent=2, default=float))
     name = f"{stem}-annotated.mp4" if args.lang == "en" else f"{stem}-annotated-{args.lang}.mp4"
-    render(args.clip, frames, path, results, out_dir / name, focus)
+    render(args.clip, frames, path, results, out_dir / name, focus, everyone=group)
     print(f"\nannotated video: {out_dir / name}")
 
 

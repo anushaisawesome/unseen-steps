@@ -79,12 +79,22 @@ def map_song(y: np.ndarray, beats_per_bar: int = 4, bars_per_phrase: int = 8,
         clean_spaces.append([float(beats[best]), float(beats[best + window])])
     clean_spaces.append(None)  # nothing to speak into after the last phrase
 
+    # Energy per bar (0 = the quietest bar, 1 = the loudest) and the strongest accents ("hits"), so the
+    # describer can tell lyrical stretches from explosive ones and call hits on time.
+    bar_starts = list(range(0, len(beats), beats_per_bar))
+    bar_loud = np.array([loudness[b:b + beats_per_bar].mean() for b in bar_starts])
+    span = float(bar_loud.max() - bar_loud.min()) or 1.0
+    energy = [[round(float(beats[b]), 2), round(float((l - bar_loud.min()) / span), 2)] for b, l in zip(bar_starts, bar_loud)]
+    hits = [round(float(beats[k]), 2) for k in np.flatnonzero(accent >= np.percentile(accent, 85))]
+
     return {
         "bpm": round(float(np.atleast_1d(tempo)[0]), 1),
         "beats_per_bar": beats_per_bar,
         "beats": [round(float(b), 3) for b in beats],
         "phrases": [[round(s, 3), round(e, 3)] for s, e in phrases],
         "clean_spaces": [[round(c[0], 3), round(c[1], 3)] if c else None for c in clean_spaces],
+        "energy": energy,
+        "hits": hits,
     }
 
 

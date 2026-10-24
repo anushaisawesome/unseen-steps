@@ -571,3 +571,40 @@ from rehearsal recordings and deliver it live in time with the performance.
 - **Improvised live:** short clips to Gemini as they happen; lower ceiling.
 - The glossary becomes context that teaches the vocabulary (and the beginner/professional names and translations),
   not a whitelist; the checker keeps vetoing contradicted claims (jump with no rise, wrong travel direction).
+
+## Decided: Argon writes the script (24 Oct, evening)
+
+Anusha approved the Argon-as-describer direction after hearing the test lines. **This replaces per-phrase Flash
+writing as the main pipeline** (`--script` in `scripts/killtest.py`; the old path stays as the fallback).
+
+- **`server/scriptwriter.py`:** Argon watches and listens to the whole video with the music map and the style's
+  vetted glossary, and writes timed lines: `time`, `moment_start/end` (the movement described), `who`
+  (solo/pair/group/subgroup), `kind` (description or callout), `pace` (calm 2.0, measured 2.5, brisk 3.0, rapid 3.6
+  words/s) and `delivery` (a short tone note). It picks its own timing: fuller lines in quiet gaps, and in explosive
+  sections rapid callouts on the hits (Anusha's example: "Hit above the head! To the side! Fold to the right!").
+  Cached in `data/director/script-<hash>.json`.
+- **Music map** (`server/music.py`) now also returns `energy` per bar (0 to 1) and `hits` (strongest accents).
+- **Checking:** each line is checked against pose features for its moment window (solo/couple: `phrase_features`;
+  group of 3+: `group_features`, which only measures headcount and whether anyone is on the floor; jumps, turns,
+  travel are `None` = unchecked in groups). The checker skips claims whose measurement is `None`, knows ballet jump
+  and turn names (jeté, sissonne, soubresaut, entrechat, fouetté, chaîné...), ignores "turnout" and "gaze lifted",
+  and the word limit is per line from its time budget. Rejected lines go back to Argon once (`revise`), else silent.
+  Group pieces draw every dancer's skeleton; kneeling/sitting dancers (set aside as "seated" for spectator
+  filtering) are kept in `SEATED` for group checks.
+- **Voice** (`server/speech.py`): Gemini TTS **doesn't support a system instruction**, and in-text directions are
+  unreliable ("Say fast...:" gets read aloud; a `# DIRECTOR'S NOTES / # TRANSCRIPT` prompt mostly isn't, and worked
+  for calm lines). So: the delivery note goes in the director's-notes format, each clip is transcribed with Flash and
+  regenerated plainly if extra words were spoken, and **speed comes from ffmpeg `atempo`** (up to 1.35x) to fit the
+  time before the next line. Lines never overlap: a late line shifts, or is dropped if > 2 s late (callouts > 0.6 s).
+- **Where the glossary goes now:** (1) into Argon's prompt as the style's vocabulary with the listener's
+  beginner/professional names, teaching rather than gating; (2) translation names for `localise.py`; (3) next: per-term
+  `signature` rules in the checker, terms Argon uses that aren't in the glossary saved as `auto` drafts for review,
+  and Atlas Vector Search to map Argon's wording to the canonical entry. Ballet etc. without a glossary use Argon's own
+  knowledge.
+- **Live demo implication (team decision needed):** a script needs a recording first. For the live demo, Andrii
+  dances a set routine that matches a rehearsal recording to the same song (the script is written from it, and live
+  pose keeps it in step), or live falls back to the per-phrase Flash path.
+- Ballet result: "stands in fifth, feet crossed" / "bends in plié and springs straight up" / "pas de bourrée, she
+  leaps again" / "a soaring sissonne, legs split wide in the air"; the checker caught "gliding left" (no travel
+  measured) and Argon's revision dropped the direction.
+- Competition test clip `clips/judas.mp4` (Anusha's own download, not in any repo): 20-dancer commercial piece.
