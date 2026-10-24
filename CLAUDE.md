@@ -67,6 +67,14 @@ python scripts/killtest.py clips/waltz.mp4 --beats-per-bar 3 --seed 17,0.42,0.7 
 - **Gerard Canal is Anusha's personal tutor** (robotics, KCL), not Andrii's.
 - **Before claiming "just in time for Google's intelligent eyewear" in the pitch,** verify it's a
   real announced product.
+- **Uploaded-video style trust:** Gemini classifies the broad dance style and, for ballroom, its subtype
+  from representative frames. At confidence >= 0.90 the system may use that style's vetted glossary;
+  below 0.90 or for mixed/unknown styles it uses plain observable body language only. Style confidence
+  selects candidates but never replaces the per-term pose and visual checks.
+- **Uploaded-video target selection:** one dancer/couple is selected automatically. If several are found,
+  pause on a representative frame with numbered clickable boxes; expose the same choices as descriptive
+  keyboard/screen-reader buttons. The selected box seeds the tracker; if identity is lost, go silent and
+  ask for reselection rather than switching people.
 
 ## Live demo plan (`scripts/live.py`, to build Saturday)
 
@@ -115,10 +123,11 @@ its translation in one call (the English is still what gets checked).
   white room", free Mixkit licence) + librosa's Sugar Plum Fairy excerpt (Kevin MacLeod, CC BY; credit
   it). Render: `python scripts/killtest.py clips/ballet.mp4 --bars-per-phrase 2`. Solo, fixed camera:
   works well, including a visible checker rejection. Andrii's own footage replaces it on Saturday.
-- **Planned: upload page.** Anyone uploads a dance clip and picks its style; we narrate it. Guard against
-  a wrong style choice: Gemini classifies the style from 3 frames into a fixed list; if it disagrees
-  confidently, ask the user ("This looks like ballet, not hip hop. Use ballet terms?"); if unsure, use
-  plain descriptions with no style terms. Only the chosen style's vocabulary is offered to the writer.
+- **Planned: upload page.** Anyone uploads a dance clip; Gemini classifies the broad style (ballet,
+  ballroom, hip hop, etc.) and any relevant ballroom subtype from representative frames. Confidence >=
+  0.90 unlocks that style's vetted glossary as candidate vocabulary. Below 0.90 or for mixed/unknown
+  footage, narration uses plain body descriptions only. Deep Research may top up a missing glossary in
+  the background but never delays the current upload.
 - **Planned: style glossaries from Deep Research.** Per style: move names, what each looks like in body
   terms (that description is what vector search matches against the phrase's features summary), names in
   uk/de/hi, and source links. Stored in MongoDB `terms`.
@@ -149,8 +158,9 @@ performance in one context, find its structure and recurring motifs, and direct 
    data at that time (a jump measured at 9 s); disagreements go back to Argon to revise or drop.
 3. Robotics-ER spot-checks that the focus frame is still on the right dancers.
 
-**People stay in control:** the user confirms the style if Argon disagrees with their choice; a describer
-can edit the performance map and glossary before the show.
+**People stay in control:** the detected style, confidence and selected target are shown/spoken back; a
+sighted operator can correct the target or style label, and a describer can edit the performance map and
+glossary before the show. Corrections do not bypass the per-term verification checks.
 
 **On screen in the demo:** the performance map panel (sections, motifs), at least one line that calls back
 a motif ("the glissade from the opening returns"), the checker badge, and the ER-chosen target.
@@ -218,26 +228,27 @@ a motif ("the glissade from the opening returns"), the checker badge, and the ER
 1. **Upload checks first** (Gemini on a few frames): is there dancing; how many dancers (1–2 fine; a crowd
    means Robotics-ER asks "who should I follow?"); length cap 3 min; is there music (if not, fixed 6 s
    phrases instead of the music map).
-2. **Argon proposes the style per section**, with the evidence spoken and shown ("pointe shoes, tutu,
-   turnout"). Choices are a **fixed list of buttons plus "Not sure / mixed"**: never free text, which would
-   let someone inject instructions. Confirming is optional (the uploader may be blind and can't check by
-   sight); the default is safe mode below.
+2. **Argon classifies the style per section**, with the evidence and confidence spoken and shown ("ballet,
+   94%: pointe shoes, tutu, turnout"). At >= 0.90 use that style's vetted glossary as candidate vocabulary;
+   below 0.90 or for mixed/unknown footage use plain body terms only. A fixed-list correction control is
+   available to a sighted describer, but it does not bypass the confidence or per-term safety checks.
 3. **Argon builds this video's performance glossary** (moves, times, body-terms descriptions), reusing
    MongoDB `terms` and saving new ones. Deep Research tops terms up with sources in the background (too slow
    per upload).
 4. Pipeline: music map → pose → features → writer → checker → voice → video with skeleton and captions.
 5. Uploads are deleted after processing; faces of everyone except the followed dancers are blurred.
 
-### Input sanitising: verify each term, not the style
-"Gemini guesses, user picks" is weak on its own: users rubber-stamp the top option, blind users can't check,
-pieces mix styles, and model confidence numbers aren't calibrated. So the style is a **hint, not a gate**:
-- Terms from the likely styles (top few, or the confirmed one) are allowed into the candidate list.
+### Input sanitising: confidence gate plus per-term verification
+Style confidence is the first gate: only a classification at or above 0.90 may select a style-specific
+glossary. Below that threshold, narration uses plain body language. Passing the style gate is still not
+enough to speak a technical term because confidence numbers are not perfectly calibrated and pieces mix styles:
+- Terms from the high-confidence style are allowed into the candidate list.
 - **Every dance term must pass two checks before it's spoken:** (1) a body-shape check against the pose data
   (e.g. arabesque: one leg extended behind, standing leg straight; store a `signature` per term), and (2) a
   visual check, a second Gemini call on the frame at that moment: "Is she doing an arabesque? yes/no".
 - If either fails, drop the term and describe the shape plainly ("balances on one leg, the other stretched
   behind"). A wrong style label then can't put a wrong term in anyone's ear.
-- "Not sure / mixed" means plain descriptions plus only terms that pass both checks.
+- "Not sure / mixed" or confidence below 0.90 means plain descriptions only; no technical terms.
 
 ## Glossary pipeline (decided 24 Oct, 03:00)
 
@@ -280,7 +291,7 @@ Gemini runs every style end to end; a human expert only raises the ceiling.
 | Level | Styles | How terms get in | When a term is spoken |
 | --- | --- | --- | --- |
 | `vetted` | Ballroom (Andrii vets) | Deep Research, then an expert checks | When the pose and visual checks pass |
-| `auto` | Everything else (ballet, hip hop, contemporary...) | Deep Research, kept only if 2+ independent sources agree on the term and its description, and Argon's own understanding matches | Only when both checks pass with high confidence; otherwise plain description |
+| `auto` | Everything else (ballet, hip hop, contemporary...) | Deep Research, kept only if 2+ independent sources agree on the term and its description, and Argon's own understanding matches | Only when style confidence is >= 0.90 and both term checks pass; otherwise plain description |
 | none | Unknown style or "Not sure / mixed" | No terms | Plain body-language description only |
 
 - Plain descriptions work for any dance with no glossary at all; terms are a bonus layer, so unvetted
@@ -293,12 +304,13 @@ Gemini runs every style end to end; a human expert only raises the ceiling.
 
 ## Choosing who to follow, and accessibility (decided 24 Oct, 03:10)
 
-**Pick the dancers in words (Andrii's request).** For videos with several dancers, the user says or types
-who to follow ("follow the girl in the red dress", "couple number 8", "the soloist nearest the camera").
-`gemini-robotics-er-2-preview` finds them; narration is **only about that pair** (other dancers are ignored
-unless they directly affect the pair, e.g. "another couple passes in front"). Because a blind user can't see
-the box, Robotics-ER also **says who it picked** in words, read back by TTS: "I'll follow the couple on the
-left: girl in a red dress, boy in black. Is that right?" Yes / no / describe again.
+**Pick the dancers from a representative frame.** If one dancer/couple is found, select them automatically.
+If several are found, show a paused frame with a numbered selectable box around each candidate; a sighted
+operator clicks the person or couple to follow. The exact same detections are exposed as descriptive,
+keyboard- and screen-reader-accessible buttons ("Couple 2: red dress and black suit, centre") and read back
+by TTS for confirmation. `gemini-robotics-er-2-preview` initializes the chosen box and the fast tracker keeps
+the focus frame around that target. Narration is only about the selected dancer/couple. If identity confidence
+is lost, go silent and ask for reselection rather than silently switching to someone else.
 
 **The web app must be properly accessible (it's an accessibility tool):**
 - WCAG 2.2 AA as the bar. Semantic HTML, full keyboard use with visible focus, no information by colour
@@ -346,10 +358,12 @@ was undesigned and **"scan the QR code" is a visual task**; no control over amou
 
 **Upload page (one action, sensible defaults):**
 1. One labelled native button "Choose or record a dance video" (+ Android share target).
-2. Only if there are several dancers: Robotics-ER **lists who it sees as buttons** ("1. Red dress and black
-   suit, centre. 2. Yellow dress, left. 3. Everyone"). No free text: also closes the injection risk.
-3. Style detected automatically; shown as "Style: waltz (detected)" with a "Change" link for sighted
-   describers. Unsure means plain descriptions.
+2. Only if there are several dancers: show a representative frame with numbered clickable boxes. Expose the
+   same candidates as descriptive buttons for keyboard/screen-reader users ("1. Red dress and black suit,
+   centre. 2. Yellow dress, left. 3. Everyone"). No free text: also closes the injection risk.
+3. Style detected automatically and shown with confidence ("Style: waltz, 94% detected"). At >= 0.90 the
+   vetted style glossary is eligible; below 0.90 or unsure/mixed means plain descriptions. A "Change" control
+   is available for sighted describers but cannot bypass the term-verification checks.
 4. Progress announced only at milestones via a polite live region; focus moves to the result when ready.
 5. Result controls: language, brief / detailed, speech speed, **"Pause the video for descriptions"**
    (extended audio description, the standard for recorded media), separate narration volume, transcript and

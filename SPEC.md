@@ -119,6 +119,31 @@ examples of the Features shape.)
 
 > Agree who edits which file before splitting up, to avoid merge conflicts.
 
+### 5a. Uploaded-video style trust and target selection
+
+For an uploaded recording, Gemini first classifies the broad dance style (for example ballet,
+ballroom or hip hop) and, where relevant, the ballroom subtype (for example waltz) directly from
+representative video frames. It returns a confidence score. The initial trust threshold is **0.90**
+(tune it on the evaluation clips rather than treating the number as calibrated forever):
+
+- **At or above 0.90:** select that style's vetted glossary. If the glossary does not exist yet,
+  queue Deep Research to build a sourced draft for later human/automatic review; do not block the
+  current upload waiting for research.
+- **Below 0.90 or mixed/unknown:** use plain observable body language only. For example, say
+  "extends one leg behind" rather than guessing "arabesque".
+- Passing the style threshold only selects candidate vocabulary. Every technical term must still
+  pass the pose/body-signature check and a visual confirmation before it can be spoken.
+
+Target selection happens before tracking:
+
+- With one detected dancer or couple, select them automatically and state who was selected.
+- With several dancers or couples, pause on a clear representative frame and draw a numbered
+  selectable box around each candidate. A sighted operator can click the person or couple to follow.
+- The same choices must be available as descriptive, keyboard- and screen-reader-accessible buttons
+  (for example, "Couple 2: red dress and black suit, centre"), with spoken confirmation.
+- The selected box seeds the focus tracker. If identity confidence is lost, go silent and request
+  reselection rather than silently switching to another dancer.
+
 ## 6. Checker rules (the verification loop)
 
 A line passes only if it obeys all of these:
