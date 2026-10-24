@@ -529,3 +529,45 @@ dance describer; facing was missing; turn directions were sometimes wrong; box s
   gestures, varies openings. Up to 12 words (checker limit 14).
 - Demo render: `python scripts/killtest.py clips/andrii720.mp4 --beats-per-bar 3 --bars-per-phrase 2 --style waltz
   --terms professional --director`
+
+## Raw clips for the team (24 Oct, 18:00)
+
+Unannotated test footage is in the **private** repo https://github.com/anushaisawesome/unseen-steps-clips (Nastia and
+Andrii invited). Clone it and copy the files into `clips/` here. The 1080p60 `andrii.mp4` is a release asset (too big
+for git). **Never put clips in this repo:** it's public, clip1–4 show other couples at a competition, and Mixkit's
+licence doesn't allow redistributing the raw stock.
+
+## Why narration was crude, and the fix being tested (24 Oct, 18:00)
+
+Anusha's feedback: the ballet render named none of the moves (missed starting in fifth, the grand jeté); lines carry no
+expression or emotion; "how is this better for a blind person than the music alone?"; groups (formations, unison, a
+central soloist, breaking into pairs, travelling across the stage) aren't handled at all.
+
+**Diagnosis:** the information flows the wrong way round.
+1. The **writer barely sees the dance**: coarse 2D stick-figure numbers and three stills per phrase. That can't show
+   turnout, fifth position, pointed feet, épaulement, jump height or emotion.
+2. The **glossary gates instead of teaching**: only vetted terms may be spoken and only waltz exists, so "grand jeté"
+   was effectively forbidden on ballet.
+3. The **checker only knows ~6 words**, which pushes lines towards bland mechanics.
+4. **Metronome timing**: a line per phrase whether or not anything happened, not at the moments that matter.
+5. **Single-dancer design**: no idea of formations, unison, canon or soloists.
+
+**Test: Argon as the describer** (`scripts/argon_script.py`, whole video + an expert-describer brief, thinking high):
+- **Ballet clip (27 s to run):** "a ballerina stands in fifth position, feet neatly crossed" / "glides sideways in a
+  glissade, then springs into a soubresaut" / "hopping open in an échappé" / "from a deep plié … soars in a split
+  sissonne, arms crowned overhead" / "arches back in a lyrical cambré, gaze lifted serenely skyward".
+- **Group competition piece** (public YouTube link given to Gemini directly, not downloaded; 69 s): 24 timed lines
+  covering formations (wedge, V, split groups), unison vs canon, soloists, lifts, floorwork, travel and named street
+  styles (tutting, waacking, krump-style chest hits, body waves), with dynamics ("fierce, grounded weight",
+  "defiant swagger", "reach up yearningly"). Not yet verified by a dancer.
+- Saved outputs: `data/experiments/*.json` (gitignored).
+
+**Proposed architecture (awaiting Anusha's decision):** Argon writes the description; pose and music become the
+fact-checker and the timekeeper. This matches how real dance audio description works: describers prepare a script
+from rehearsal recordings and deliver it live in time with the performance.
+- **Rehearsed live show:** Argon writes a timed script from the rehearsal video (a describer can edit it); live, pose +
+  music track where we are, deliver each line on cue, and check the live dancer matches (direction, jumps).
+- **Upload:** Argon describes the video directly (richest), pose checks claims and draws the skeleton.
+- **Improvised live:** short clips to Gemini as they happen; lower ceiling.
+- The glossary becomes context that teaches the vocabulary (and the beginner/professional names and translations),
+  not a whitelist; the checker keeps vetoing contradicted claims (jump with no rise, wrong travel direction).
