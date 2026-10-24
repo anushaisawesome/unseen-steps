@@ -98,3 +98,17 @@ its translation in one call (the English is still what gets checked).
 - **Andrii:** pose model on his laptop, features, dance vocabulary, MongoDB, Deep Research
   translations. Pose/features are joint (Anusha helps with tracking).
 - Agree who edits which file before splitting up, to avoid merge conflicts.
+
+## Demo footage and ideas (24 Oct, 02:00)
+
+- **Current demo clip:** `clips/ballet.mp4` = Mixkit stock video 956 ("A young ballerina dancing in a
+  white room", free Mixkit licence) + librosa's Sugar Plum Fairy excerpt (Kevin MacLeod, CC BY; credit
+  it). Render: `python scripts/killtest.py clips/ballet.mp4 --bars-per-phrase 2`. Solo, fixed camera:
+  works well, including a visible checker rejection. Andrii's own footage replaces it on Saturday.
+- **Planned: upload page.** Anyone uploads a dance clip and picks its style; we narrate it. Guard against
+  a wrong style choice: Gemini classifies the style from 3 frames into a fixed list; if it disagrees
+  confidently, ask the user ("This looks like ballet, not hip hop. Use ballet terms?"); if unsure, use
+  plain descriptions with no style terms. Only the chosen style's vocabulary is offered to the writer.
+- **Planned: style glossaries from Deep Research.** Per style: move names, what each looks like in body
+  terms (that description is what vector search matches against the phrase's features summary), names in
+  uk/de/hi, and source links. Stored in MongoDB `terms`.
