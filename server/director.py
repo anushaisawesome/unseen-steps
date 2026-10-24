@@ -43,7 +43,10 @@ Watch the whole performance and return JSON with:
   techniques: [{name, evidence}] the dance techniques used, each with what the body visibly does (e.g. tutting:
   forearms and hands make sharp right angles and boxes; floorwork: rolls, slides, spins on the floor). Be precise
   about technique versus mime: a geometric hand shape that suggests an image is still the technique. If the piece
-  fuses styles, name the style each technique comes from.
+  fuses styles, name the style each technique comes from, the way an expert dancer would: consider the traditions it
+  could come from worldwide (classical and folk as well as street and studio), weigh the visible evidence (hands,
+  stance, footwork, head and eyes, torso) and the context in the video (on-screen names, flags, music, costume), and
+  name the one the evidence supports best rather than the first label that roughly fits.
 - signature: [{quality, body, dynamics, times: [seconds]}] the two to four things a sighted viewer notices and
   remembers most about this particular choreography (not the style in general): what it is, where it lives in the
   body (head, hair, face, arms, hands, torso, hips, legs, feet and footwork), its dynamics and texture, and the times
@@ -177,7 +180,13 @@ second by second, with times in the full video: what each dancer does; every tec
 (name each influence in a fusion); what the whole body does, from top to bottom: head, hair and face, arms, hands
 and wrists, torso and hips, legs and feet (footwork and its rhythm, stamps, kicks, extensions, turnout, weight
 changes), including performance details such as hand performance and head and hair whips; the texture and dynamics and exactly when they change (sharp to fluid, still to explosive); the shapes at
-holds and hits; formations, unison and canons; the big accents with the music. Only what you can see. Plain text."""
+holds and hits; formations, unison and canons; the big accents with the music. Only what you can see. Plain text.
+
+Name influences the way an expert dancer would: before settling on a style for a movement or pose, consider the dance
+traditions it could come from worldwide (classical and folk forms as well as street and studio styles), weigh the
+visible evidence for each (the hand shapes, the stance and its turnout, the footwork, the head, neck and eyes, the
+torso), and the context in the video itself (on-screen names, flags, the music, the costume). Name the influence the
+evidence supports best, in that tradition's own terms, rather than the first label that roughly fits."""
 
 
 def zoom(video: str, plan: dict, start: float | None, end: float | None) -> dict:
