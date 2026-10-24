@@ -24,7 +24,7 @@ commit.
 | Who-is-followed contact sheet | `scripts/track_debug.py` | Works |
 | Live demo program | `scripts/live.py` | **Not built yet** (see below) |
 | MongoDB (vocab, songs, show memory) | `server/db.py`, `server/setup_db.py` | Connected; collections and search indexes ready |
-| Dance vocabulary + Deep Research translations | `server/glossary_research.py` | 17 sourced waltz drafts embedded and imported; Andrii must vet them |
+| Dance vocabulary + Deep Research translations | `server/glossary_research.py` | 17 sourced drafts plus expert-vetted reverse turn; Andrii must vet the remaining drafts |
 
 Run the kill test / demo render:
 ```
@@ -280,6 +280,9 @@ uk: [...], de: [...]}, status (draft | vetted | translated), vetted_by, embeddin
 - English Mongo imports require `gemini-embedding-2` vectors (3072 dimensions). All 17 waltz drafts are now
   in Atlas with embeddings; the vector and song-name search indexes report `READY`. Imports atomically protect
   `vetted`/`translated` terms and translations marked vetted per language.
+- Andrii expert-vetted `reverse turn` from five years of ballroom experience. It is stored with aliases
+  `left box turn` / `left turn box`; `natural turn` has `right box turn` / `right turn box`. The Gemini
+  spending cap blocked the new reverse-turn embedding, so that one record is marked `pending_billing_cap`.
 - Ukrainian/German jobs refuse to start until English terms exist in MongoDB with status `vetted` or
   `translated`. A localized name can be protected from later reruns by setting
   `translations.<lang>.status` to `vetted`.
