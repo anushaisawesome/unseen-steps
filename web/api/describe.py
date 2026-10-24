@@ -3,7 +3,7 @@
 The browser runs YOLO pose on the camera and sends only the measurements for the phrase that just ended
 (no video). This runs the same loop as the rest of Unseen Steps (server/narrate.py), with a faster model so it keeps up
 live: Gemini writes a line, checker.py tests it against the measurements, one rewrite, else silence. With voice "gemini" the line is
-also spoken by Gemini TTS (server/speech.py) and returned as WAV.
+also spoken by Gemini TTS (server/speech.py's synthesis step) and returned as WAV.
 
 Needs GEMINI_API_KEY in the Vercel project's environment variables. The page is open to anyone, so every
 line is billed to that key: keep a spending cap on its Google billing account.
@@ -20,7 +20,9 @@ sys.path.insert(0, str(Path(__file__).parent / "_unseen"))
 import writer  # noqa: E402
 from checker import check  # noqa: E402
 from google.genai import types  # noqa: E402
-from speech import speak  # noqa: E402
+# Live voice: one Gemini TTS call. speech.speak() also trims silences with ffmpeg (not on Vercel) and
+# transcribes each clip to check it (another second per line): right for recorded renders, too slow live.
+from speech import _synthesise  # noqa: E402
 
 # Live needs a line within about a second, so it uses the lite model without extended thinking (about 0.5 s a
 # line, against about 2 s for writer.py's model). Same instructions, prompt, checker and one rewrite.
@@ -92,7 +94,7 @@ class handler(BaseHTTPRequestHandler):
             out = {"line": line, "attempts": attempts}
             if line and body.get("voice") == "gemini":
                 with tempfile.TemporaryDirectory() as d:
-                    wav = speak(line, Path(d) / "line.wav")
+                    wav = _synthesise(line, Path(d) / "line.wav")
                     out["audio"] = base64.b64encode(wav.read_bytes()).decode()
         except Exception as e:  # Gemini quota, network: tell the page, which stays silent for this phrase
             return self.reply(502, {"error": f"Narration failed: {type(e).__name__}: {str(e)[:200]}"})
