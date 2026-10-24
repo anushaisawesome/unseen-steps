@@ -77,8 +77,11 @@ SCHEMA = {
 }
 
 REVISE = """These lines from your audio description script contradict the pose measurements for the moments they
-describe. Revise each so it only says what is consistent with the measurement, keeping its expressiveness and
-length, or return null for it if you can't. Return JSON: {"lines": [{"time": t, "text": "..." or null}]}.
+describe. Revise each with the smallest change that fixes the stated problem: change or drop only the words the
+reason names (e.g. a direction), and keep every other dance term, image and detail exactly as written, since those
+weren't contradicted. Where measurements for the moment are given, you may use them to say something more precise
+instead. Keep its expressiveness and length, or return null for it if you can't.
+Return JSON: {"lines": [{"time": t, "text": "..." or null}]}.
 
 """
 
@@ -94,9 +97,20 @@ def music_notes(song: dict) -> str:
             f"Strongest hits (seconds): {hits}")
 
 
-def write_script(video: str, song: dict, glossary: list[str] = (), style_hint: str | None = None) -> dict:
-    """Argon's whole script, cached per video, music map and glossary."""
+def write_script(video: str, song: dict, glossary: list[str] = (), style_hint: str | None = None,
+                 measured: str = "") -> dict:
+    """Argon's whole script, cached per video, music map, glossary and 3D measurements."""
     prompt = BRIEF + "\n\n" + music_notes(song)
+    if measured:
+        prompt += ("\n\nMeasurements from a 3D body model of the dancer (server/body3d.py). Use them to make the "
+                   "description more precise, not more cautious: keep the full vocabulary, imagery and feeling the "
+                   "brief asks for, and let the numbers sharpen the details you'd otherwise guess (which leg or arm, "
+                   "how high, how far she rotates and which way, when both feet leave the floor). Only these terms "
+                   "are checked against the measurements, so use them when the timeline below agrees: jumps (jeté, "
+                   "sissonne, soubresaut, leap...), pirouette/fouetté/chaîné, arabesque, attitude, passé/retiré, "
+                   "développé, relevé/pointe, plié. Everything else (positions of the feet, port de bras, glissade, "
+                   "épaulement, quality and mood) isn't measured: describe it from what you see, as usual. Times are "
+                   "seconds; left and right are the dancer's own:\n" + measured)
     if glossary:
         prompt += ("\n\nGlossary vetted by dancers for this style (use these names where they fit):\n"
                    + "\n".join(f"- {g}" for g in glossary))

@@ -1,0 +1,11 @@
+{
+  "cleanUrls": true,
+  "functions": {
+    "api/describe.py": { "maxDuration": 60, "excludeFiles": "{media,models,data}/**" }
+  },
+  "headers": [
+    { "source": "/media/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }] },
+    { "source": "/models/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, immutable" }] },
+    { "source": "/listen", "headers": [{ "key": "Permissions-Policy", "value": "camera=(self)" }] }
+  ]
+}

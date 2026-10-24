@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unseen Steps: live audio description of dance</title>
+<meta name="description" content="Unseen Steps describes dance out loud for blind and partially sighted audiences, in the gaps in the music, and checks every line against the measured movement first.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&family=Atkinson+Hyperlegible+Next:wght@400;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="11" cy="19" rx="5" ry="8" fill="currentColor"/><ellipse cx="22" cy="12" rx="5" ry="8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="3 3"/></svg>
+      Unseen Steps
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="#watch">Watch and listen</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="listen.html">Live venue demo</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="hero" aria-labelledby="title">
+    <p class="eyebrow">Live audio description for dance</p>
+    <h1 id="title">Every dance performance, described.</h1>
+    <p class="lede measure">Audio description usually covers one or two shows in a run, and small shows get none. Unseen Steps describes the movement out loud for blind and partially sighted audiences, in the gaps in the music, and checks every line against the measured movement before it's spoken.</p>
+  </section>
+
+  <section id="watch" aria-labelledby="watch-title">
+    <h2 id="watch-title">Hear it on a ballet solo</h2>
+    <p class="measure">A 23-second ballet solo with Unseen Steps' narration. Music and narration have their own volume controls, and the narration is also shown as large captions and as a transcript below.</p>
+
+    <div class="player" id="player">
+      <div class="screen">
+        <video id="video" src="media/ballet.mp4" poster="media/ballet-poster.jpg" preload="metadata" playsinline
+               aria-label="Ballet solo, with music">
+          <track kind="captions" src="media/ballet.vtt" srclang="en" label="Narration" default>
+          <track kind="descriptions" src="media/ballet.vtt" srclang="en" label="Narration">
+        </video>
+      </div>
+      <audio id="narration" src="media/ballet-narration.m4a" preload="auto"></audio>
+      <p class="caption" id="caption" aria-hidden="true"></p>
+
+      <div class="transport">
+        <button type="button" class="primary" id="play" aria-keyshortcuts="Space">Play</button>
+        <div>
+          <label class="sr-only" for="seek">Position</label>
+          <input type="range" id="seek" min="0" max="23" step="0.1" value="0" aria-valuetext="0 seconds of 23">
+        </div>
+        <span class="time" id="time" aria-hidden="true">0:00 / 0:23</span>
+      </div>
+
+      <div class="settings">
+        <div>
+          <label for="vol-narration">Narration volume</label>
+          <input type="range" id="vol-narration" min="0" max="1" step="0.05" value="1">
+        </div>
+        <div>
+          <label for="vol-music">Music volume</label>
+          <input type="range" id="vol-music" min="0" max="1" step="0.05" value="0.7">
+        </div>
+        <div>
+          <label for="caption-size">Caption size</label>
+          <select id="caption-size">
+            <option value="1.2rem">Medium</option>
+            <option value="1.5rem" selected>Large</option>
+            <option value="2rem">Extra large</option>
+          </select>
+        </div>
+        <div>
+          <label class="check"><input type="checkbox" id="show-captions" checked> Show captions</label>
+          <label class="check"><input type="checkbox" id="announce"> Also send lines to my screen reader</label>
+          <p class="hint">Off by default, because the narration is already spoken aloud.</p>
+        </div>
+      </div>
+      <p class="hint">Keyboard: Space plays or pauses when the player has focus; the arrow keys on the position slider move 5 seconds.</p>
+    </div>
+    <div class="sr-only" aria-live="polite" id="live"></div>
+
+    <h3 id="transcript-title">Transcript</h3>
+    <ol class="lines" id="transcript" aria-labelledby="transcript-title"></ol>
+    <div class="downloads">
+      <a class="button" href="media/ballet.vtt" download="unseen-steps-ballet.vtt">Download captions (WebVTT)</a>
+      <a class="button" href="#" id="download-text" download="unseen-steps-ballet.txt">Download transcript (text)</a>
+    </div>
+  </section>
+
+  <section id="how" aria-labelledby="how-title">
+    <h2 id="how-title">How it works</h2>
+    <ol class="steps">
+      <li><h3>Watch</h3><p>A fixed camera follows the dancer and measures the body many times a second: where the limbs are, how high, which way she turns.</p></li>
+      <li><h3>Map the music</h3><p>The song is mapped in advance into beats, phrases and the quiet gaps where a line can be spoken without covering the music.</p></li>
+      <li><h3>Write</h3><p>Gemini watches the whole performance and writes a short, vivid line for each moment, timed to the music.</p></li>
+      <li><h3>Check</h3><p>Claims about movement are tested against the measurements. A line that says "turns left" when nobody turned is rewritten once, or dropped.</p></li>
+      <li><h3>Speak</h3><p>The line is voiced and played in the next gap in the music, a beat or two after the movement.</p></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="reveal-title">
+    <h2 id="reveal-title">The reveal: what the system saw and said</h2>
+    <p class="measure">The same performance with the tracked skeleton drawn on. The counter follows the music; the list shows each line as it's spoken, with the drafts the checker rejected and why.</p>
+    <div class="reveal">
+      <div style="display:grid;gap:1rem">
+        <video id="reveal-video" src="media/ballet-reveal.mp4" poster="media/ballet-poster.jpg" controls preload="metadata" playsinline
+               aria-label="The same ballet solo with the tracked skeleton, captions and narration"></video>
+        <div class="counter" aria-hidden="true">
+          <div><b id="bar">1</b><span>Bar</span></div>
+          <div><b id="beat-n">1</b><span>Beat</span></div>
+          <div><b id="phrase">1</b><span>Phrase</span></div>
+          <div class="beats" id="beat-dots" style="align-self:center"></div>
+        </div>
+        <p class="hint" id="tempo"></p>
+      </div>
+      <ol class="lines" id="log" aria-label="Narration lines and checker decisions"></ol>
+    </div>
+  </section>
+
+  <section aria-labelledby="trust-title">
+    <h2 id="trust-title">Built to be trusted</h2>
+    <div class="facts">
+      <div><h3>Checked, not guessed</h3><p>Words like jump, turn, left, floor or still must match the measured movement, and with the 3D body model so must ballet terms such as plié, relevé, arabesque and attitude. A line that fails is rewritten once, or dropped.</p></div>
+      <div><h3>Next: plain words first</h3><p>We're working on describing the shape before naming it ("feet crossed tightly, heel to toe: fifth position"), with a choice of plain, learning or fluent terminology, so newcomers can picture every move.</p></div>
+      <div><h3>Private by design</h3><p>Video frames are never stored, only body points. Narration goes to the listener's own earphones, never over the room's music.</p></div>
+      <div><h3>Describers stay in charge</h3><p>It covers the performances that would otherwise get no description. A human describer can correct the style, the dancer to follow and the glossary.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <p>Unseen Steps, built at Encode London, 23–25 October 2026.</p>
+    <p>This page replays a recorded run of the system; nothing here is live. Video: Mixkit stock clip 956, "A young ballerina dancing in a white room" (Mixkit free licence). Music: "Dance of the Sugar Plum Fairy", Kevin MacLeod (incompetech.com), licensed under Creative Commons: By Attribution 4.0.</p>
+  </div>
+</footer>
+
+<script src="app.js" type="module"></script>
+</body>
+</html>

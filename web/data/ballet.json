@@ -1,0 +1,171 @@
+{
+ "clip": "ballet",
+ "duration": 22.79,
+ "bpm": 112.3,
+ "beats_per_bar": 4,
+ "beats": [
+  0.627,
+  1.161,
+  1.695,
+  2.252,
+  2.81,
+  3.32,
+  3.878,
+  4.389,
+  4.923,
+  5.457,
+  5.991,
+  6.525,
+  7.059,
+  7.593,
+  8.127,
+  8.661,
+  9.195,
+  9.706,
+  10.263,
+  10.82,
+  11.355,
+  11.889,
+  12.446,
+  13.003,
+  13.56,
+  14.118,
+  14.652,
+  15.209,
+  15.766,
+  16.324,
+  16.858,
+  17.369,
+  17.903,
+  18.437,
+  18.947,
+  19.482,
+  19.992,
+  20.526,
+  21.037,
+  21.571
+ ],
+ "phrases": [
+  [
+   0.63,
+   4.92
+  ],
+  [
+   4.92,
+   9.2
+  ],
+  [
+   9.2,
+   13.56
+  ],
+  [
+   13.56,
+   17.9
+  ],
+  [
+   17.9,
+   22.76
+  ]
+ ],
+ "lines": [
+  {
+   "text": "Backlit in a white studio, a ballerina stands in fifth, feet crossed.",
+   "at": 0.2,
+   "seconds": 4.97,
+   "moment": [
+    0.0,
+    2.5
+   ],
+   "pace": "measured",
+   "delivery": "warm, poised, unhurried",
+   "rejected": [],
+   "measured": [
+    "2.1-2.5s plié: both knees bent to 117 degrees"
+   ]
+  },
+  {
+   "text": "Knees bending in plié, she glides and jumps, right arm sweeping high.",
+   "at": 5.37,
+   "seconds": 4.86,
+   "moment": [
+    2.1,
+    5.3
+   ],
+   "pace": "measured",
+   "delivery": "light, buoyant, graceful",
+   "rejected": [],
+   "measured": [
+    "2.1-2.5s plié: both knees bent to 117 degrees",
+    "3.5-3.7s plié: both knees bent to 134 degrees",
+    "3.8-4.1s développé: right leg raised 66 degrees side, knee 158 degrees",
+    "4.2-5.0s jump: both feet off the floor, up to 26 cm",
+    "5.1-5.3s relevé: heels lifted, on the balls of the feet or pointe"
+   ]
+  },
+  {
+   "text": "From plié, she glides and jumps, arms spread wide.",
+   "at": 10.43,
+   "seconds": 4.16,
+   "moment": [
+    6.0,
+    10.2
+   ],
+   "pace": "measured",
+   "delivery": "airy, flowing, expressive",
+   "rejected": [
+    {
+     "draft": "From plié, she glides right and jumps, arms spread wide.",
+     "reason": "it says right, but the measured travel was no clear direction"
+    }
+   ],
+   "measured": [
+    "6.0-7.2s plié: both knees bent to 115 degrees",
+    "6.3-6.7s relevé: heels lifted, on the balls of the feet or pointe",
+    "7.5-7.8s relevé: heels lifted, on the balls of the feet or pointe",
+    "8.9-9.2s développé: left leg raised 52 degrees side, knee 161 degrees",
+    "9.2-10.2s jump: both feet off the floor, up to 20 cm"
+   ]
+  },
+  {
+   "text": "She soars in a grand jeté, a split leap, arms overhead.",
+   "at": 14.79,
+   "seconds": 4.33,
+   "moment": [
+    11.1,
+    15.2
+   ],
+   "pace": "brisk",
+   "delivery": "soaring, lifted, breathless",
+   "rejected": [
+    {
+     "draft": "She soars left in a grand jeté, a split leap, arms overhead.",
+     "reason": "it says left, but the measured travel was no clear direction"
+    }
+   ],
+   "measured": [
+    "11.1-11.5s plié: both knees bent to 124 degrees",
+    "11.5-11.9s développé: right leg raised 57 degrees side, knee 159 degrees",
+    "11.9-12.2s jump: both feet off the floor, up to 16 cm",
+    "12.3-12.7s plié: both knees bent to 114 degrees",
+    "12.8-15.2s arms overhead: both hands above the head",
+    "12.9-14.8s jump: both feet off the floor, up to 57 cm",
+    "14.6-15.0s attitude: left leg raised 109 degrees back, knee 130 degrees"
+   ]
+  },
+  {
+   "text": "On relevé, heels lifted, she arches into the light.",
+   "at": 19.32,
+   "seconds": 4.64,
+   "moment": [
+    15.3,
+    22.8
+   ],
+   "pace": "measured",
+   "delivery": "serene, radiant, sustained",
+   "rejected": [],
+   "measured": [
+    "17.4-22.8s relevé: heels lifted, on the balls of the feet or pointe"
+   ]
+  }
+ ]
+}

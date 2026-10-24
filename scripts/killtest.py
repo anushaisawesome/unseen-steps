@@ -48,7 +48,12 @@ def load_pose(name):
 # COCO keypoints
 NOSE, L_EYE, R_EYE, L_EAR, R_EAR = 0, 1, 2, 3, 4
 L_SHO, R_SHO, L_WRI, R_WRI, L_HIP, R_HIP, L_KNE, R_KNE, L_ANK, R_ANK = 5, 6, 9, 10, 11, 12, 13, 14, 15, 16
-SAMPLE_FPS = 15
+SAMPLE_FPS = 12  # every video, every model (YOLO here, SAM-Body4D in scripts/sam_body4d/): same moments in time
+
+
+def sampled(i, fps):
+    """Whether frame i is the one nearest a 1/SAMPLE_FPS tick, so any source frame rate gives the same moments."""
+    return fps <= SAMPLE_FPS or i == round(round(i * SAMPLE_FPS / fps) * fps / SAMPLE_FPS)
 TURN_HOLD = 0.3   # seconds a new facing must last to count as a turn
 APART_GAP = 0.8   # hip distance between partners, in body heights
 APART_HOLD = 1.0  # seconds a separation (or rejoining) must last to count
@@ -93,14 +98,13 @@ def detect(video: str):
     cap = cv2.VideoCapture(video)
     fps = cap.get(cv2.CAP_PROP_FPS)
     size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-    step = max(1, round(fps / SAMPLE_FPS))
     frames, i = [], 0
     last_seen, activity = {}, {}
     while True:
         ok, frame = cap.read()
         if not ok:
             break
-        if i % step == 0:
+        if sampled(i, fps):
             r = model.track(frame, imgsz=1280, conf=0.2, persist=True, verbose=False, device=DEVICE,
                             tracker="bytetrack.yaml")[0]
             ids = r.boxes.id.int().tolist() if r.boxes.id is not None else [None] * len(r.boxes)
@@ -283,7 +287,6 @@ def track_focus(video, seed, model_name="yolo11n-pose.pt"):
     cap = cv2.VideoCapture(video)
     fps = cap.get(cv2.CAP_PROP_FPS)
     W, H = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    step = max(1, round(fps / SAMPLE_FPS))
     t0, fx, fy = seed
     cap.set(cv2.CAP_PROP_POS_MSEC, t0 * 1000)
     i = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
@@ -307,7 +310,7 @@ def track_focus(video, seed, model_name="yolo11n-pose.pt"):
     frames, path, focus = [], {}, {}
     term = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
     while ok:
-        if i % step == 0:
+        if sampled(i, fps):
             t = round(i / fps, 3)
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             back = cv2.calcBackProject([hsv], [0, 1], dress, [0, 180, 0, 256], 1)
@@ -674,7 +677,9 @@ def crops(video, path, start, end, n=3):
 SKELETON = [(5, 7), (7, 9), (6, 8), (8, 10), (5, 6), (5, 11), (6, 12), (11, 12),
             (11, 13), (13, 15), (12, 14), (14, 16), (0, 5), (0, 6)]
 LEAD_COLOUR, PARTNER_COLOUR, OTHER_COLOUR = (230, 120, 255), (170, 235, 150), (150, 150, 150)  # BGR
-FONT = "/System/Library/Fonts/HelveticaNeue.ttc"
+FONT = next((f for f in ["/System/Library/Fonts/HelveticaNeue.ttc", "C:/Windows/Fonts/segoeui.ttf",
+                          "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"] if Path(f).exists()),
+            "/System/Library/Fonts/HelveticaNeue.ttc")
 
 
 def draw_skeleton(frame, xy, conf, colour, thickness):
@@ -795,6 +800,8 @@ def main():
     parser.add_argument("--script", action="store_true",
                         help="Argon writes the whole timed description; pose and music check and time it")
     parser.add_argument("--seed", help="who to follow: time,x,y with x and y as fractions of the frame, e.g. 18,0.6,0.7")
+    parser.add_argument("--body3d", help="SAM-Body4D results zip (with --script): Argon sees the 3D measured timeline "
+                                         "and lines are also checked against it (server/body3d.py)")
     args = parser.parse_args()
 
     song = map_song(load_audio(args.clip), beats_per_bar=args.beats_per_bar,
@@ -829,7 +836,13 @@ def scripted(args, song, frames, path, solo, size, group):
         for t in db()["terms"].find({"style": args.style, "status": {"$in": ["vetted", "translated"]}}):
             if name := spoken_name(t, args.terms):
                 glossary.append(f"{name}: {t['description']}")
-    script = write_script(args.clip, song, glossary, args.style)
+    body, measured = None, []
+    if args.body3d:
+        import body3d
+        body = body3d.measure(body3d.load(args.body3d))
+        measured = body3d.events(body)
+        print(f"3D body: {len(measured)} measured events")
+    script = write_script(args.clip, song, glossary, args.style, measured=body3d.timeline(measured) if body else "")
     lines = script["lines"]
     end = song["beats"][-1] + 2
     words = budget(lines, end)
@@ -840,6 +853,8 @@ def scripted(args, song, frames, path, solo, size, group):
         start, stop = line["moment_start"], max(line["moment_end"], line["moment_start"] + 2.0)
         features = group_features(frames, start, stop) if group else \
             phrase_features(path, size, solo, start, stop, n, beats=song["beats"])
+        if body:
+            features.update(body3d.features(body, measured, start, stop))
         until = lines[n + 1]["time"] if n + 1 < len(lines) else end
         r = {"n": n, "time": line["time"], "moment": [start, stop], "who": line["who"], "kind": line["kind"],
              "pace": line["pace"], "delivery": line["delivery"], "features": features, "max_words": words[n],
@@ -848,10 +863,17 @@ def scripted(args, song, frames, path, solo, size, group):
             r.update(line=line["text"], attempts=[{"draft": line["text"], "passed": True, "reason": "unchecked: not tracked"}])
         else:
             v = check(line["text"], features, words[n])
+            if v.passed and body and (why := body3d.check_3d(line["text"], features)):
+                v.passed, v.reason = False, why
             r.update(line=line["text"] if v.passed else None,
                      attempts=[{"draft": line["text"], "passed": v.passed, "reason": v.reason}])
             if not v.passed:
-                rejected.append({"time": line["time"], "text": line["text"], "reason": v.reason})
+                reason = v.reason
+                if features.get("timeline_3d"):  # tell Argon what was measured, so it can say that instead
+                    reason += "; measured in 3D for this moment: " + "; ".join(features["timeline_3d"])
+                elif features.get("body3d"):
+                    reason += f"; measured in 3D: {features['facing_3d']}, no jumps, turns or leg shapes"
+                rejected.append({"time": line["time"], "text": line["text"], "reason": reason})
         results.append(r)
 
     for when, text in revise(rejected).items():  # Argon's one revision of every rejected line
@@ -859,6 +881,8 @@ def scripted(args, song, frames, path, solo, size, group):
         if r is None or not text:
             continue
         v = check(text, r["features"], r["max_words"])
+        if v.passed and body and (why := body3d.check_3d(text, r["features"])):
+            v.passed, v.reason = False, why
         r["attempts"].append({"draft": text, "passed": v.passed, "reason": v.reason})
         r["line"] = text if v.passed else None
 
@@ -921,7 +945,7 @@ def finish(args, results, frames, path, focus, group):
     """Translate, voice, and render the annotated video."""
     out_dir = ROOT / "data/killtest"
     out_dir.mkdir(parents=True, exist_ok=True)
-    stem = Path(args.clip).stem + ("-script" if args.script else "")
+    stem = Path(args.clip).stem + ("-script" if args.script else "") + ("-3d" if args.body3d else "")
     audio_dir = out_dir / "audio"
     audio_dir.mkdir(exist_ok=True)
     for n, r in enumerate(results):

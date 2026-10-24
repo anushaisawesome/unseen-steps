@@ -24,12 +24,14 @@ def load_audio(path: str) -> np.ndarray:
     if Path(path).suffix.lower() in AUDIO_EXTS:
         y, _ = librosa.load(path, sr=SR, mono=True)
         return y
-    with tempfile.NamedTemporaryFile(suffix=".wav") as tmp:
+    # A temp directory, not NamedTemporaryFile: Windows won't let ffmpeg write to a file Python holds open.
+    with tempfile.TemporaryDirectory() as d:
+        wav = str(Path(d) / "audio.wav")
         subprocess.run(
-            ["ffmpeg", "-y", "-loglevel", "error", "-i", path, "-ac", "1", "-ar", str(SR), tmp.name],
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", path, "-ac", "1", "-ar", str(SR), wav],
             check=True,
         )
-        y, _ = librosa.load(tmp.name, sr=SR, mono=True)
+        y, _ = librosa.load(wav, sr=SR, mono=True)
     return y
 
 
