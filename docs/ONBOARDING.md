@@ -101,6 +101,14 @@ ballroom hold, long dresses hide ankles, handheld camera pans distort "travel".
 The live demo is one dancer (Andrii) in front of a fixed camera, which is the easy case, so items 1–3 and 5
 matter most today.
 
+**Design of the demo web pages** (you have design experience, so this is yours to lead):
+- **Live venue page** (most important): one big "Start listening" button, keeps playing with the phone
+  locked, language, brief/detailed, speech speed; reachable without sight (a short spoken URL as well as a QR).
+- **Upload page:** one native "Choose or record a dance video" button, dancers to follow listed as buttons,
+  progress announced aloud, a result player with narration controls.
+- Bar: WCAG 2.2 AA, VoiceOver and TalkBack, large high-contrast captions. Details in `CLAUDE.md`
+  ("Accessibility review").
+
 ## Getting set up
 
 1. Accept the GitHub invite to `anushaisawesome/unseen-steps` (send Anusha your GitHub username).

@@ -102,7 +102,9 @@ its translation in one call (the English is still what gets checked).
   footage, audio routing.
 - **Nastia (joined Sat 24 Oct, morning):** Imperial, bioscience, computer vision in medicine. Works with
   Anusha on **computer vision quality**: an evaluation set, keypoint filtering, joint-angle features, pose
-  signatures for glossary terms, model benchmark for live. Onboarding: `docs/ONBOARDING.md`.
+  signatures for glossary terms, model benchmark for live. **Also has design experience: leads the design of the live venue page and the
+  upload page** (accessibility requirements below). Onboarding: `docs/ONBOARDING.md` and the shareable doc
+  https://claude.ai/artifact/EPUve2GLzGbzjPyf8zVGmm.
 - Agree who edits which file before splitting up, to avoid merge conflicts. Computer vision code currently
   lives in `scripts/killtest.py`; if Nastia and Anusha both work on it, split it into `server/pose.py`
   (tracking) and `server/features.py` (features) first.
