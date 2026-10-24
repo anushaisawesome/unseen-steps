@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
 from director import performance_map  # noqa: E402
-from scriptwriter import RATE, budget, review_script, revise, write_script  # noqa: E402
+from scriptwriter import RATE, budget, review_script, revise, verify_lines, write_script  # noqa: E402
 from speech import speak  # noqa: E402
 
 OUT = ROOT / "web" / "youtube-demo"
@@ -59,6 +59,7 @@ def build(video: tuple) -> dict:
     plan = performance_map(url, style_hint=style, start=start, end=end)
     script = write_script(url, None, style_hint=style, plan=plan, start=start, end=end)
     script = review_script(url, script, plan, None, start, end)  # a second describer: what would a listener miss?
+    script["lines"] = verify_lines(url, script["lines"], start, end)  # every line checked against its moment
     lines = [l for l in script["lines"] if start - 1 <= l["time"] <= end]
     if lines and max(l["time"] for l in lines) < start:  # times came back relative to the clip
         for l in lines:

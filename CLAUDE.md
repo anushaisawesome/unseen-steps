@@ -800,3 +800,24 @@ Anusha: "don't rehearse it, that's the same as hardcoding. We want to show how G
   (`--record out.mp4` saves the session with music and narration; `--camera <video file>` stands in for a camera;
   `--mute` keeps time silently for tests). Needs `pip install sounddevice` and ffmpeg on PATH. Press q to stop.
 - Known: Argon without the style hint read Andrii's waltz frame as "mime-like, marionette arms"; pass `--style`.
+
+### Live on the Gemini Live API; zoom-in; per-line visual check (25 Oct, ~00:30)
+
+- **Live latency 5 s -> 0.9 s.** Measured: Flash writer 2.8–4 s (can't think less; frame count barely matters), Flash TTS
+  2.45 s whole clip. The Live API (`gemini-3.8-live`, audio out only) watches streamed frames and speaks: first sound
+  0.5–1.0 s after each "Now" prompt. `scripts/live.py` now uses one Live session for the whole performance (frames at
+  2 fps, a prompt at each phrase end with the pose measurements, director notes and the checker's feedback; audio
+  streamed into the mixer; `context_window_compression` and auto-reconnect). The checker can't veto a line already
+  being spoken, so it flags it on screen and tells Gemini in the next prompt to put it right. Test on Andrii's clip:
+  13 lines in 60 s, median 0.88 s to first sound. `--engine flash` keeps the old write-then-speak path.
+- Anusha on Track 10 (again): "absolutely nothing on the armwork". Traced: Argon's first script had 5 arm lines; the
+  density edit deleted them as repetition. Root: a piece's signature is continuous, so trimming reads it as redundant.
+  Fix: the reviewer merges rather than drops the signature, and `scriptwriter.keep_signature` compares the edit with the
+  original per signature quality and restores lines it lost (Track 10 now: arm detail in 5 of 10 lines).
+- Saumya: Bharatanatyam posing in the second song never named, early waacking lost, "waacking rapidly" over still arms.
+  Leiomy: hand performance at the start, arms into a freeze, constant head/hair whips all missing. Root: one pass over a
+  3-minute piece skims detail, and nothing checked a YouTube line against its moment. Fixes:
+  `director.zoom` (each section re-watched at 8 fps, second by second: techniques by style, arms/hands/head/hair/face,
+  exact texture changes, shapes, canons, accents) feeds the script; `scriptwriter.verify_lines` checks every line against
+  its moment at 10 fps (right movement, time, technique, speed) and corrects or drops it. Head, hair and face added to
+  the body parts Argon attends to.

@@ -16,6 +16,7 @@ Press q to stop.
 """
 
 import argparse
+import asyncio
 import json
 import subprocess
 import sys
@@ -41,7 +42,8 @@ import director  # noqa: E402
 import speech  # noqa: E402
 
 RATE = 44100
-WRITER = "gemini-3.8-flash"
+LIVE_MODEL = "gemini-3.8-live"  # watches the frames and speaks: first sound ~0.5-0.8 s after each prompt
+WRITER = "gemini-3.8-flash"     # fallback engine (--engine flash): writes, then TTS speaks; ~5 s
 DIRECTOR = "gemini-4-argon"
 CLIP_SECONDS = 4.0   # how much the writer sees for each line
 CLIP_FPS = 2         # frames a second sent to the writer (more slows the reply)
@@ -62,6 +64,87 @@ the last stretch are attached (oldest first, times in the song). Update your run
 at most 5 short bullet points: the style; the signature of this dancer's movement (what a sighted viewer notices most:
 where it lives in the body, its dynamics); recurring motifs and when they return; what just changed. Keep what is
 still true from your previous notes. Plain text bullets only."""
+
+
+LIVE_SYSTEM = """You are an expert live audio describer for dance, speaking to blind and partially sighted listeners
+while they hear the music. You watch the camera frames as they arrive. Each time you are prompted with "Now", say ONE
+short line (3 to 8 words; a callout on a hit, 2 to 5) about what the dancer just did that a sighted viewer would notice
+most: the step by its name (only if every part of its definition is visible), the shape the body makes, the texture or
+dynamics (sharp or sustained, light or heavy), or a change in energy. Directions as the audience sees them. Use the
+measurements in the prompt: never claim a turn, jump, floor work or direction they don't support, and if you're told
+a line was wrong, put it right in the next one. Never repeat yourself: don't name the same step twice in a row, and
+don't start lines the same way ("He performs", "He executes"); if the movement repeats, say something new about it
+(its texture, the arms, the shape, the feeling) or just a few words. Speak briskly and warmly, like commentary inside
+the music. Say only the line."""
+
+
+class LiveEngine:
+    """One Gemini Live session for the whole performance: frames stream in continuously; at each phrase end a short
+    "Now" prompt (with the pose measurements, the checker's feedback and the director's notes) makes it speak, and
+    its audio streams straight into the mixer."""
+
+    def __init__(self, live):
+        self.live, self.loop, self.queue, self.ready = live, None, None, threading.Event()
+        self.busy, self.turn = False, None
+
+    def start(self):
+        threading.Thread(target=lambda: asyncio.run(self.main()), daemon=True).start()
+        if not self.ready.wait(20):
+            raise RuntimeError("couldn't connect to Gemini Live")
+
+    def send(self, kind, payload):
+        if self.loop:
+            self.loop.call_soon_threadsafe(self.queue.put_nowait, (kind, payload))
+
+    async def main(self):
+        self.loop, self.queue = asyncio.get_running_loop(), asyncio.Queue()
+        system = LIVE_SYSTEM + (f"\nThe style is {self.live.args.style}." if self.live.args.style else "")
+        if self.live.glossary:
+            system += "\nVocabulary vetted by dancers (use a term only if what you see matches it):\n" + "\n".join(self.live.glossary)
+        config = {"response_modalities": ["AUDIO"], "output_audio_transcription": {},
+                  "speech_config": {"voice_config": {"prebuilt_voice_config": {"voice_name": "Kore"}}},
+                  "context_window_compression": {"sliding_window": {}},  # keeps long performances going
+                  "system_instruction": system}
+        while True:  # reconnect if the session drops; the performance carries on
+            try:
+                async with director.client().aio.live.connect(model=LIVE_MODEL, config=config) as session:
+                    self.ready.set()
+                    receiver = asyncio.create_task(self.receive(session))
+                    while True:
+                        kind, payload = await self.queue.get()
+                        if kind == "frame":
+                            await session.send_realtime_input(video=types.Blob(data=payload, mime_type="image/jpeg"))
+                        elif not self.busy:  # a line still being said means this phrase passes in silence
+                            self.busy, self.turn = True, {**payload, "phrase_end": payload["end"],
+                                                          "asked": time.perf_counter(), "words": "",
+                                                          "at": None, "end": None, "pcm": bytearray()}
+                            await session.send_client_content(
+                                turns={"role": "user", "parts": [{"text": payload["prompt"]}]}, turn_complete=True)
+                        if receiver.done():
+                            receiver.result()
+            except Exception as e:
+                print(f"live session dropped ({type(e).__name__}: {str(e)[:80]}); reconnecting")
+                self.busy = False
+                await asyncio.sleep(1)
+
+    async def receive(self, session):
+        while True:
+            async for m in session.receive():
+                turn, content = self.turn, m.server_content
+                if turn is None:
+                    continue
+                if m.data:
+                    if turn["at"] is None:
+                        turn["at"] = self.live.mixer.now() + 0.03
+                        turn["latency"] = round(time.perf_counter() - turn["asked"], 2)
+                    turn["end"] = self.live.mixer.push(m.data, 24000, turn["end"])
+                    turn["pcm"] += m.data
+                if content and content.output_transcription and content.output_transcription.text:
+                    turn["words"] += content.output_transcription.text
+                    self.live.caption = (turn["words"].strip(), turn["at"] or 0, (turn["end"] or 0) + 0.4)
+                if content and content.turn_complete:
+                    self.busy = False
+                    self.live.spoken(turn)
 
 
 class Mixer:
@@ -121,6 +204,19 @@ class Mixer:
         return start / RATE, len(voice) / RATE
 
 
+    def push(self, pcm16: bytes, sr: int, start_after: float | None) -> float:
+        """Stream a chunk of spoken audio: it plays straight after the previous chunk of the same line (start_after,
+        in song time), or now if this is the line's first chunk. Returns where the chunk ends, in song time."""
+        mono = np.frombuffer(pcm16, dtype=np.int16).astype(np.float32) / 32768
+        mono = np.interp(np.arange(0, len(mono), sr / RATE), np.arange(len(mono)), mono).astype(np.float32)
+        now = int(self.now() * RATE)
+        with self.lock:
+            start = int(start_after * RATE) if start_after is not None else now + int(0.03 * RATE)
+            start = max(start, now)
+            self.voices.append((start, np.stack([mono, mono], axis=1)))
+        return (start + len(mono)) / RATE
+
+
 def decode(path: str) -> np.ndarray:
     """The song as float32 stereo at RATE (ffmpeg reads mp3, wav, mp4...)."""
     raw = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-f", "f32le", "-ac", "2", "-ar", str(RATE), "-"],
@@ -157,6 +253,8 @@ class Live:
             except Exception as e:
                 print(f"glossary unavailable ({type(e).__name__}); Gemini uses its own vocabulary")
         print(f"glossary: {len(self.glossary)} terms")
+        self.feedback = ""   # the checker's verdict on the last line, for the next prompt
+        self.engine = LiveEngine(self) if args.engine == "live" else None
 
     # ---------- per frame ----------
     def track(self, frame, t):
@@ -173,13 +271,16 @@ class Live:
         with self.lock:
             if not self.frames or t - self.frames[-1][0] >= 1 / CLIP_FPS:
                 self.frames.append((t, jpeg(frame)))
+                if self.engine:
+                    self.engine.send("frame", jpeg(frame, 384))
             self.frames = [(ft, f) for ft, f in self.frames if ft > t - max(CLIP_SECONDS, NOTES_EVERY) - 2]
             self.path = {pt: p for pt, p in self.path.items() if pt > t - 30}
 
     def schedule(self, t):
         """At each phrase end, think about that phrase (in the background so the video never stalls)."""
         for n, (start, end) in enumerate(self.song_map["phrases"]):
-            if end - 0.5 <= t and n not in self.done_phrases and end > t - 2:  # start thinking just before it ends
+            lead = 0.0 if self.engine else 0.5  # the fallback starts thinking just before the phrase ends
+            if end - lead <= t and n not in self.done_phrases and end > t - 2:
                 self.done_phrases.add(n)
                 threading.Thread(target=self.describe, args=(n, start, end), daemon=True).start()
         if t - self.last_notes >= NOTES_EVERY and t > NOTES_EVERY / 2:
@@ -197,6 +298,18 @@ class Live:
         if not clip or not sizes:
             return
         features = phrase_features(path, float(np.median(sizes)), True, start, end, n, beats=self.song_map["beats"])
+        if self.engine:  # Gemini Live speaks straight away; the checker reviews the line as it's said
+            measured = {k: features.get(k) for k in ("travel", "turns", "rotation", "facing", "max_rise", "lowest_level",
+                                                    "stillness", "footwork") if features.get(k) not in (None, "")}
+            prompt = f"Now ({start:.0f}-{end:.0f} s in the song). Measured: {json.dumps(measured, default=float)}."
+            if self.feedback:
+                prompt += " " + self.feedback
+            if notes and notes != getattr(self, "notes_sent", ""):
+                prompt += f" Director's notes: {notes}"
+                self.notes_sent = notes
+            self.feedback = ""
+            self.engine.send("turn", {"n": n, "start": start, "end": end, "features": features, "prompt": prompt})
+            return
         parts = []
         for ft, f in clip:
             parts += [f"{ft:.1f} s:", types.Part.from_bytes(data=f, mime_type="image/jpeg")]
@@ -244,6 +357,26 @@ class Live:
         print(f"phrase {n} ({start:.0f}-{end:.0f}s): \"{line}\"  ready in {time.perf_counter() - asked:.1f}s, "
               f"spoken at {at:.1f}s")
 
+    def spoken(self, turn):
+        """A Live line has been said: check it against the measurements; a wrong claim is flagged on screen and fed
+        back so the next line puts it right."""
+        line = turn["words"].strip()
+        if not line or turn["at"] is None:
+            return
+        verdict = check(line, turn["features"], max_words=12)
+        if not verdict.passed:
+            self.badge = (f'checker flagged "{line}": {verdict.reason}', self.mixer.now() + 4)
+            self.feedback = f'Your last line ("{line}") was wrong: {verdict.reason}.'
+        wav = Path(tempfile.gettempdir()) / f"unseen-live-{turn['n']}.wav"
+        with wave.open(str(wav), "wb") as f:
+            f.setnchannels(1), f.setsampwidth(2), f.setframerate(24000), f.writeframes(bytes(turn["pcm"]))
+        with self.lock:
+            self.said.append(line)
+            self.log.append({"phrase": turn["n"], "line": line, "at": turn["at"], "seconds": turn["end"] - turn["at"],
+                             "wav": str(wav), "latency": turn["latency"], "checker": verdict.reason or "ok"})
+        print(f"phrase {turn['n']} ({turn['start']:.0f}-{turn['phrase_end']:.0f}s): \"{line}\"  first sound "
+              f"{turn['latency']:.2f}s after asking" + ("" if verdict.passed else f"  [checker: {verdict.reason}]"))
+
     def direct(self, t):
         with self.lock:
             stretch = [(ft, f) for ft, f in self.frames if ft > t - NOTES_EVERY]  # 2 frames a second
@@ -272,6 +405,9 @@ class Live:
         from_file = not isinstance(source, int)
         file_fps = cap.get(cv2.CAP_PROP_FPS) or 30
         writer, frame_no, shown = None, 0, 0
+        if self.engine:
+            self.engine.start()
+            print("connected to Gemini Live")
         self.mixer.start()
         print(f"music: {self.song_map['bpm']} bpm, {len(self.song_map['phrases'])} phrases. Press q to stop.")
         try:
@@ -318,7 +454,7 @@ class Live:
                 self.mux(t)
             cv2.destroyAllWindows()
             print(f"\n{len(self.log)} lines spoken; median latency "
-                  f"{np.median([l['latency'] for l in self.log]) if self.log else 0:.1f} s from phrase end to ready")
+                  f"{np.median([l['latency'] for l in self.log]) if self.log else 0:.2f} s from asking to the first sound")
 
     def mux(self, until):
         """The recording with the song and every spoken line mixed in, as it was heard."""
@@ -350,6 +486,8 @@ def main():
     parser.add_argument("--headless", action="store_true", help="no window (for testing)")
     parser.add_argument("--seconds", type=float, help="stop after this many seconds")
     parser.add_argument("--mute", action="store_true", help="keep time without playing sound (for tests)")
+    parser.add_argument("--engine", choices=["live", "flash"], default="live",
+                        help="live: Gemini Live watches and speaks (~0.7 s); flash: write then TTS (~5 s)")
     Live(parser.parse_args()).run()
 
 

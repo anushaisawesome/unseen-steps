@@ -21,7 +21,8 @@ from retry import with_retry  # noqa: E402
 # From feedback/*.md: what a dancer said was missing or wrong.
 MUST = {
     "ponyboy": ["describes the canon: the dancers doing the same move one after another"],
-    "track10": ["describes the arm work (the main element of this choreography) in detail",
+    "track10": ["describes the arm work (the main element of this choreography) in detail: several lines, across the "
+                "piece, specifically about what the arms, hands and wrists do (not just one passing mention)",
                 "conveys the sharpness of the movement",
                 "conveys the texture change from sharp to fluid for the build-up, around 12 s",
                 "calls the clap and the turn round just before the vocals come in",
@@ -29,6 +30,12 @@ MUST = {
                 "opens with a line that gives context (who is dancing, how they start)"],
     "arcamarine": ["describes the texture of the movement (e.g. sinuous, sharp, heavy), not just the steps",
                    "describes poses: the shape the body makes at holds and hits"],
+    "saumya": ["describes her waacking early in the piece",
+               "describes the Bharatanatyam (Indian classical) posing in the second song",
+               "identifies the different style influences of this fusion and uses each style's vocabulary"],
+    "leiomy": ["describes the hand performance at the start",
+               "describes the arm performance into a freeze",
+               "describes her head and hair whipping, which she does constantly"],
     "judas": ["describes a canon (the same move rippling through dancers one after another)",
               "names tutting as tutting, not as miming an object such as crowns",
               "describes the floorwork section (about 90-122 s)"],

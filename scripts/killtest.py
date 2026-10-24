@@ -930,7 +930,7 @@ def scripted(args, song, frames, path, solo, size, group):
     """Argon writes the whole timed description (pace and delivery included); each line is checked against the
     pose measurements for the moment it describes; rejected lines go back to Argon once, then stay silent."""
     from checker import check
-    from scriptwriter import budget, review_script, revise, write_script
+    from scriptwriter import budget, review_script, revise, verify_lines, write_script
     glossary = []
     if args.style:
         from db import db, spoken_name
@@ -948,6 +948,7 @@ def scripted(args, song, frames, path, solo, size, group):
         f"{s['start']:.0f}-{s['end']:.0f}s {s['label']}" for s in plan["sections"]))
     script = write_script(args.clip, song, glossary, args.style, plan)
     script = review_script(args.clip, script, plan, song)  # a second describer: what would a listener miss?
+    script["lines"] = verify_lines(args.clip, script["lines"])  # every line checked against its moment
     print(f"Second describer: {script.get('review', '')}")
     lines = script["lines"]
     end = song["beats"][-1] + 2

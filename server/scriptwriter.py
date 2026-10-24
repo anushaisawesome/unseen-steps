@@ -38,8 +38,8 @@ The goal: a listener who can't see should come away with what a sighted viewer g
 
 What to say:
 - The signature of this piece (named in your first viewing, below): what a sighted viewer notices and remembers,
-  carried in specific body language: where the movement lives in the body (arms, hands, torso, hips, legs, feet,
-  head, gaze), its dynamics (sharp or sustained, light or strong, bound or free) and its texture.
+  carried in specific body language: where the movement lives in the body (arms, hands, wrists, torso, hips, legs,
+  feet, head, hair, face, gaze), its dynamics (sharp or sustained, light or strong, bound or free) and its texture.
 - Every change of texture or energy (the dynamics timeline below), said as it happens: what it changes from and to.
 - Shapes, not just steps: at holds, hits and arrivals, the shape the body makes (limbs, line, level, gaze).
 - How dancers relate: facing, travel, formations, unison, canon (the same move rippling through dancers one after
@@ -92,10 +92,19 @@ change of texture or energy is said as it happens; that key shapes, arm and body
 canon, formations) and the big accents are there; that every line is accurate and at the right time (the movement
 really happens then, and every technical term meets its definition); and that no words go on generic filler.
 
-Fix only what needs fixing: replace a weak or wrong line, add a missing moment, drop a wrong or empty one. Keep lines
-short (most 3 to 8 words; callouts 2 to 5), at the right moment, and never overlapping.
+Then the density. The music is the main thing: the description is commentary inside it, and a listener should hear
+the music on its own for most of the piece. If the script speaks for much more than about a third of the running time
+(its measured density is below), edit it down: drop what is repeated, generic or less important, merge neighbours,
+and keep the signature, the texture changes, the big accents, key shapes and group structure. Keep the lines that are
+the best-chosen, not the ones that happen to come first. The signature is usually continuous (it runs through the
+piece, so many lines mention it): that is not repetition. Never drop it to save words; when you shorten, merge lines
+so the signature detail rides along with the step ("Wide stance, chests lifted; curved arms frame heads, wrists
+ticking").
 
-Return JSON {"notes": "one or two sentences on what was missing or wrong", "edits": [...]}, at most 12 edits, each:
+Fix only what needs fixing: replace a weak or wrong line, add a missing moment, drop a wrong, empty or surplus one.
+Keep lines short (most 3 to 8 words; callouts 2 to 5), at the right moment, and never overlapping.
+
+Return JSON {"notes": "one or two sentences on what was missing or wrong", "edits": [...]}, each:
 {"action": "replace", "time": t, "text": "...", ...} (the line starting nearest t),
 {"action": "add", "time": t, "moment_start": s, "moment_end": e, "text": "...", ...},
 {"action": "drop", "time": t}.
@@ -142,6 +151,8 @@ def structure_notes(plan: dict) -> str:
         techniques = "; ".join(f"{t['name']} ({t['evidence']})" for t in sec.get("techniques", []))
         out.append(f"- {sec['start']:.0f}-{sec['end']:.0f} s, {sec['label']}: {sec.get('description', '')} "
                    f"Formation: {sec.get('formation', '')}. Group: {sec.get('group', '')}. Techniques: {techniques}.")
+        if sec.get("detail"):
+            out.append(f"  Close look, second by second:\n  " + sec["detail"].replace("\n", "\n  "))
     for motif in plan.get("motifs", []):
         out.append(f"- Motif \"{motif['name']}\" ({motif['description']}) at " + ", ".join(f"{t:.0f} s" for t in motif["times"]))
     return "\n".join(out)
@@ -201,10 +212,15 @@ def in_meter(lines: list[dict], beats: list[float]) -> list[dict]:
 
 
 def review_script(video: str, script: dict, plan: dict | None, song: dict | None = None,
-                  start: float | None = None, end: float | None = None) -> dict:
+                  start: float | None = None, end: float | None = None, passes: int = 2) -> dict:
     """A second Argon pass watches the video with the script and fixes what a blind listener would miss. Cached."""
     listing = "\n".join(f"{l['time']:.1f} s [{l['kind']}, {l['pace']}] {l['text']}" for l in script["lines"])
-    prompt = REVIEW + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n" + listing + clip_note(start, end)
+    length = (song["beats"][-1] - song["beats"][0]) if song else (end - (start or 0)) if end else None
+    spoken = sum(len(l["text"].split()) / RATE.get(l["pace"], 2.8) + 0.4 for l in script["lines"])
+    density = (f"\nMeasured density: about {spoken:.0f} s of speech in {length:.0f} s ({spoken / length:.0%})."
+               if length else "")
+    prompt = (REVIEW + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n" + listing + density
+              + clip_note(start, end))
     key = hashlib.sha1(source_key(video)[:50_000_000] + prompt.encode()).hexdigest()[:16]
     cached = CACHE / f"review-{key}.json"
     if cached.exists():
@@ -223,7 +239,7 @@ def review_script(video: str, script: dict, plan: dict | None, song: dict | None
         cached.write_text(json.dumps(review, indent=2, ensure_ascii=False))
 
     lines = [dict(l) for l in script["lines"]]
-    for edit in review.get("edits", [])[:12]:
+    for edit in review.get("edits", []):
         near = min(lines, key=lambda l: abs(l["time"] - edit.get("time", 0)), default=None)
         if edit.get("action") in ("replace", "drop") and (near is None or abs(near["time"] - edit["time"]) > 1.5):
             continue
@@ -239,8 +255,87 @@ def review_script(video: str, script: dict, plan: dict | None, song: dict | None
                           "pace": edit.get("pace", "steady"), "delivery": edit.get("delivery", ""),
                           "text": edit["text"], "reviewed": True})
     lines = [l for l in lines if l.get("pace") in RATE] + [dict(l, pace="steady") for l in lines if l.get("pace") not in RATE]
+    lines = keep_signature(script["lines"], lines, plan)
     lines = in_meter(lines, song["beats"]) if song else sorted(lines, key=lambda l: l["time"])
-    return {**script, "lines": lines, "review": review.get("notes", "")}
+    reviewed = {**script, "lines": lines, "review": review.get("notes", "")}
+    if length and passes > 1:  # still far too dense: one more editing pass, watching the video again
+        spoken = sum(len(l["text"].split()) / RATE.get(l["pace"], 2.8) + 0.4 for l in lines)
+        if spoken / length > 0.45:
+            again = review_script(video, reviewed, plan, song, start, end, passes=passes - 1)
+            again["review"] = reviewed["review"] + " " + again["review"]
+            return again
+    return reviewed
+
+
+VERIFY = {"type": "object", "properties": {"accurate": {"type": "boolean"}, "issue": {"type": "string"},
+          "fix": {"type": "string", "nullable": True}}, "required": ["accurate", "issue", "fix"]}
+
+
+def verify_lines(video: str, lines: list[dict], start: float | None = None, end: float | None = None) -> list[dict]:
+    """Check every line against the moment it's spoken, at 10 frames a second: the right movement, at the right time,
+    the right technique, and nothing that isn't there. Wrong lines are corrected or dropped. The visual counterpart of
+    the pose checker, so it works on any video and style (including YouTube links, which have no pose)."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    def check_one(line):
+        a = max(start or 0, min(line.get("moment_start", line["time"] - 3), line["time"] - 3))
+        b = min(line["time"] + 1.5, end) if end else line["time"] + 1.5
+        prompt = (f"An audio describer says this at {line['time']:.1f} s in the video: \"{line['text']}\"\n"
+                  f"It should describe what happens between {a:.1f} s and {line['time'] + 1:.1f} s (the clip shown). "
+                  "Is it accurate: the right movement, at this time, the right technique or style term, the right "
+                  "speed and dynamics, and nothing that isn't there? If not, give a corrected line of about the same "
+                  "length that is accurate for this moment, or null to drop it.")
+        try:
+            r = with_retry(lambda: client().models.generate_content(
+                model=MODEL, contents=[video_part(video, a, b, fps=10), prompt],
+                config=types.GenerateContentConfig(response_mime_type="application/json", response_schema=VERIFY,
+                                                   thinking_config=types.ThinkingConfig(thinking_level="low"))))
+            return json.loads(r.text)
+        except Exception:
+            return {"accurate": True, "issue": "unchecked", "fix": None}
+
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        verdicts = list(pool.map(check_one, lines))
+    out = []
+    for line, v in zip(lines, verdicts):
+        if v["accurate"]:
+            out.append(dict(line, verified="yes"))
+        elif v.get("fix"):
+            print(f"   seen wrong at {line['time']:.1f}s: \"{line['text']}\" ({v['issue'][:80]}) -> \"{v['fix']}\"")
+            out.append(dict(line, text=v["fix"], verified="corrected", was=line["text"], issue=v["issue"]))
+        else:
+            print(f"   seen wrong at {line['time']:.1f}s, dropped: \"{line['text']}\" ({v['issue'][:80]})")
+    return out
+
+
+KEEP = {"type": "object", "properties": {"restore": {"type": "array", "items": {"type": "integer"}}},
+        "required": ["restore"]}
+
+
+def keep_signature(before: list[dict], after: list[dict], plan: dict | None) -> list[dict]:
+    """Editing for density must never erase the piece's signature (on Track 10 it deleted nearly every line about the
+    arm work). Compare the edited script with the original, quality by quality from the map's signature, and restore
+    the original lines that carried a quality the edit lost or thinned out."""
+    if not plan or not plan.get("signature") or not before:
+        return after
+    qualities = "\n".join(f"- {q['quality']} ({q['body']})" for q in plan["signature"])
+    original = "\n".join(f"{n}. {l['time']:.1f} s: {l['text']}" for n, l in enumerate(before))
+    edited = "\n".join(f"{l['time']:.1f} s: {l['text']}" for l in after)
+    prompt = (f"The signature of this dance piece:\n{qualities}\n\nOriginal script (numbered):\n{original}\n\n"
+              f"Edited script:\n{edited}\n\nFor each signature quality: does the edited script carry it as fully as "
+              "the original (about as many lines, in the same parts of the piece)? Where the edit lost or thinned a "
+              "quality, list the numbers of the original lines that best restore it (at most 4 in total). "
+              "Return JSON {\"restore\": [numbers]} (empty if nothing was lost).")
+    response = with_retry(lambda: client().models.generate_content(
+        model="gemini-3.8-flash", contents=prompt,
+        config=types.GenerateContentConfig(response_mime_type="application/json", response_schema=KEEP,
+                                           thinking_config=types.ThinkingConfig(thinking_level="low"))))
+    restore = [before[n] for n in json.loads(response.text)["restore"] if 0 <= n < len(before)]
+    times = {round(l["time"], 1) for l in after}
+    back = [dict(l, restored=True) for l in restore if round(l["time"], 1) not in times]
+    if back:
+        print(f"   signature guard restored: {[l['text'] for l in back]}")
+    return sorted(after + back, key=lambda l: l["time"])
 
 
 def budget(lines: list[dict], end: float) -> list[int]:

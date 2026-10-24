@@ -46,7 +46,7 @@ Watch the whole performance and return JSON with:
   fuses styles, name the style each technique comes from.
 - signature: [{quality, body, dynamics, times: [seconds]}] the two to four things a sighted viewer notices and
   remembers most about this particular choreography (not the style in general): what it is, where it lives in the
-  body, its dynamics and texture, and the times it is strongest.
+  body (arms, hands, head, hair, face, torso, legs...), its dynamics and texture, and the times it is strongest.
 - dynamics: [{start, end, texture, energy, music}] a timeline of the quality of movement covering the whole piece,
   with a new entry whenever it changes, even inside a section: texture (e.g. sharp staccato hits, fluid sustained
   waves, heavy grounded drops, light suspended), energy (low, building, high, release) and what the music is doing
@@ -102,23 +102,29 @@ def client() -> genai.Client:
     return _client
 
 
+_uploads = {}
+
+
 def upload(video: str):
-    """Upload a video to the Files API and wait until Gemini can watch it."""
+    """Upload a video to the Files API (once per file) and wait until Gemini can watch it."""
+    if video in _uploads:
+        return _uploads[video]
     uploaded = client().files.upload(file=video)
     while uploaded.state.name == "PROCESSING":
         time.sleep(2)
         uploaded = client().files.get(name=uploaded.name)
+    _uploads[video] = uploaded
     return uploaded
 
 
 FPS = 5  # Gemini's default is 1 frame a second, too few to see sharp vs fluid movement, hits or arm detail
 
 
-def video_part(video: str, start: float | None = None, end: float | None = None):
+def video_part(video: str, start: float | None = None, end: float | None = None, fps: int | None = None):
     """A video Gemini can watch at FPS frames a second: a local file (uploaded) or a public YouTube link (read by
     Gemini directly, never downloaded), optionally clipped to start..end seconds."""
-    clip = types.VideoMetadata(fps=FPS, start_offset=f"{start or 0:.0f}s" if start is not None else None,
-                               end_offset=f"{end:.0f}s" if end else None)
+    clip = types.VideoMetadata(fps=fps or FPS, start_offset=f"{start or 0:.1f}s" if start is not None else None,
+                               end_offset=f"{end:.1f}s" if end else None)
     if video.startswith("http"):
         return types.Part(file_data=types.FileData(file_uri=video), video_metadata=clip)
     uploaded = upload(video)
@@ -141,7 +147,7 @@ def performance_map(video: str, style_hint: str | None = None, start: float | No
                     end: float | None = None) -> dict:
     """Argon's map of the whole performance. Cached per video file, since a map only changes with the video."""
     # Keyed on the instructions too, so a changed prompt gets a fresh map.
-    digest = hashlib.sha1(source_key(video) + PROMPT.encode() + json.dumps(SCHEMA).encode()
+    digest = hashlib.sha1(source_key(video) + PROMPT.encode() + ZOOM.encode() + json.dumps(SCHEMA).encode()
                           + (style_hint or "").encode() + clip_note(start, end).encode()).hexdigest()[:16]
     cached = CACHE / f"{digest}.json"
     if cached.exists():
@@ -159,10 +165,38 @@ def performance_map(video: str, style_hint: str | None = None, start: float | No
             response_schema=SCHEMA,
         ),
     ))
-    result = json.loads(response.text)
+    result = zoom(video, json.loads(response.text), start, end)
     CACHE.mkdir(parents=True, exist_ok=True)
     cached.write_text(json.dumps(result, indent=2))
     return result
+
+
+ZOOM = """Zoom in on this section of the dance (the rest of the piece is mapped already). Watch closely and describe,
+second by second, with times in the full video: what each dancer does; every technique and which style it comes from
+(name each influence in a fusion); what the arms, hands, wrists, head, hair and face do, including performance
+details such as hand performance, head and hair whips and the face; the texture and dynamics and exactly when they change (sharp to fluid, still to explosive); the shapes at
+holds and hits; formations, unison and canons; the big accents with the music. Only what you can see. Plain text."""
+
+
+def zoom(video: str, plan: dict, start: float | None, end: float | None) -> dict:
+    """A close look at each section at 8 frames a second: one pass over a long piece skims the detail."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    def look(section):
+        a, b = section["start"], section["end"]
+        if b - a < 3:
+            return ""
+        r = with_retry(lambda: client().models.generate_content(
+            model=MODEL, contents=[video_part(video, a, b, fps=8),
+                                   ZOOM + f"\nThis section runs from {a:.1f} s to {b:.1f} s ({section['label']})."],
+            config=types.GenerateContentConfig(thinking_config=types.ThinkingConfig(thinking_level="low"))))
+        return r.text.strip()
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        details = list(pool.map(look, plan["sections"]))
+    for section, detail in zip(plan["sections"], details):
+        section["detail"] = detail
+    return plan
 
 
 # What each claim needs to see in the measured features of the phrase it falls in.
