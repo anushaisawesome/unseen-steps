@@ -23,6 +23,7 @@ sys.path.insert(0, str(ROOT / "server"))
 from music import load_audio, map_song  # noqa: E402
 from narrate import describe  # noqa: E402
 from speech import speak  # noqa: E402
+from localise import localise  # noqa: E402
 import wave  # noqa: E402
 
 # COCO keypoints
@@ -416,6 +417,7 @@ def main():
     parser.add_argument("--beats-per-bar", type=int, default=4)
     parser.add_argument("--bars-per-phrase", type=int, default=4)
     parser.add_argument("--no-frames", action="store_true", help="features only, no close-up crops")
+    parser.add_argument("--lang", default="en", help="narration language: en, uk, de, hi")
     parser.add_argument("--seed", help="who to follow: time,x,y with x and y as fractions of the frame, e.g. 18,0.6,0.7")
     args = parser.parse_args()
 
@@ -449,13 +451,16 @@ def main():
     audio_dir.mkdir(exist_ok=True)
     for n, r in enumerate(results):
         if r["line"] and r["clean_space"]:
-            wav = speak(r["line"], audio_dir / f"{stem}-{n}.wav")
+            r["line_en"] = r["line"]
+            r["line"] = localise(r["line"], args.lang)  # checked in English, then translated
+            wav = speak(r["line"], audio_dir / f"{stem}-{args.lang}-{n}.wav")
             with wave.open(str(wav)) as f:
                 seconds = f.getnframes() / f.getframerate()
             r["speech"] = {"path": str(wav), "at": r["clean_space"][0], "seconds": round(seconds, 2)}
     (out_dir / f"{stem}.json").write_text(json.dumps(results, indent=2, default=float))
-    render(args.clip, frames, path, results, out_dir / f"{stem}-annotated.mp4")
-    print(f"\nannotated video: {out_dir / f'{stem}-annotated.mp4'}")
+    name = f"{stem}-annotated.mp4" if args.lang == "en" else f"{stem}-annotated-{args.lang}.mp4"
+    render(args.clip, frames, path, results, out_dir / name)
+    print(f"\nannotated video: {out_dir / name}")
 
 
 if __name__ == "__main__":
