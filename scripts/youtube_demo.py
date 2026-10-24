@@ -96,13 +96,14 @@ def build(video: tuple) -> dict:
     def share():
         return sum(l["seconds"] for l in lines if l.get("audio")) / (end - start)
 
-    # No collisions: a late line shifts after the one before (within 0.6 s for callouts, 2 s otherwise).
+    # No collisions, and no knock-on: a line that can't start within half a second of its moment is left out rather
+    # than pushed later (pushing made every following line drift late).
     finish = 0.0
     for l in lines:
         if not l.get("audio"):
             continue
         if l["at"] < finish + 0.15:
-            if finish + 0.15 - l["at"] > (0.6 if l["kind"] == "callout" else 2.0):
+            if finish + 0.15 - l["at"] > 0.5:
                 l["status"] = "no room"
                 l.pop("audio")
                 continue

@@ -31,39 +31,29 @@ except ImportError:
 # slow lines drag and pull attention off the music.
 RATE = {"steady": 2.8, "brisk": 3.2, "rapid": 3.8}
 
-BRIEF = """You are an expert audio describer for dance, writing the audio description for blind and partially
-sighted listeners from this recording (watch and listen closely). It is spoken over the music.
+BRIEF = """You are an expert audio describer for dance, and a former dancer in this style. Describe this performance
+for a blind listener who loves dance, the way a dancer would see it: as rich and precise as a dancer would be, in few
+words, spoken over the music.
 
-The goal: a listener who can't see should come away with what a sighted viewer gets from this choreography.
+A dancer's eye picks up:
+- what this piece is (the style and, if you recognise it, the work, the variation or the character) and what the
+  dancer is portraying;
+- the quality and intention behind each movement, not just the movement: attack, ease, playfulness, control, weight,
+  what a jump or an extension expresses;
+- the detail that makes it impressive or beautiful: the height and placement of an extension, the speed and finish of
+  turns, the shape of the body in a hold or a freeze, the arms and hands, the head, hair and face, the feet and
+  footwork, the use of a prop, where the gaze goes;
+- how the movement plays with the music: accents, suspensions, a step landing on a beat, a change of texture or
+  energy as it happens;
+- for groups: formations, unison, canon, who stands out.
+Use the style's own terms where they fit, only when every part of the term's definition is visible, and let a
+newcomer picture each term the first time. Directions as the audience sees them. Only describe what you can see, at
+the moment it happens.
 
-What to say:
-- The signature of this piece (named in your first viewing, below): what a sighted viewer notices and remembers,
-  carried in specific body language: where the movement lives in the body (head, hair, face, gaze, arms, hands,
-  wrists, torso, hips, legs, feet and footwork), its dynamics (sharp or sustained, light or strong, bound or free) and its texture.
-- Every change of texture or energy (the dynamics timeline below), said as it happens: what it changes from and to.
-- Shapes, not just steps: at holds, hits and arrivals, the shape the body makes (limbs, line, level, gaze).
-- How dancers relate: facing, travel, formations, unison, canon (the same move rippling through dancers one after
-  another, and which way it travels), a soloist breaking out, pairs. Directions as the audience sees them ("to the
-  left"), never "stage left" or "stage right".
-- The big accents, called as they land: a drop, a hit, a clap, a turn into a new phrase.
-- When the piece moves into a new section.
-- Precise vocabulary: the style's own terms where they apply, used only when every part of the term's definition is
-  visible (ballet terms such as plié and the positions need turnout; otherwise say "bent knees" or "a wide stance");
-  never one style's term for another style's movement; the technique, not a mime it resembles; in a fusion, each
-  influence in its own language. A newcomer should be able to picture each term the first time it appears.
-- Expression: the feeling the movement gives, grounded in what is visible.
-Only describe what you can see, at the moment it happens. No generic filler, no costume beyond the opening, and
-never repeat a description.
-
-How to say it: the music is the main thing, and the description is commentary inside it.
-- Short: most lines 3 to 8 words; callouts 2 to 5 words on the hits. A richer line is a better-chosen word, not a
-  longer line.
-- In the music: start lines on beats, in the gaps between phrases where you can; never continuous, never like a
-  speech. How much to say follows the choreography: dense, sharp passages carry more short lines and callouts; where
-  the movement repeats or rests, let the music play. Avoid long silences while new movement is happening.
-- time is when the line starts: just after the movement it describes, or on the hit for a callout. Lines never
-  overlap (words per second: steady 2.8, brisk 3.2, rapid 3.8).
-- delivery: a short tone note for the voice (under 10 words). Never slow or drawn out.
+How to say it: one idea per line, never a list of details; most lines 5 to 12 words. At most one line per musical
+phrase (phrase starts are listed below when there's a beat grid; otherwise listen for them), placed in the gap where
+the phrase starts, plus brief callouts on standout hits. Leave the music room. time is when the line starts, just
+after the movement it describes. delivery is a short tone note for the voice, never slow.
 
 For each line give: time, moment_start and moment_end (the movement it describes), who (solo, pair, group or
 subgroup), kind (description or callout), pace (steady, brisk or rapid), delivery, and text."""
@@ -83,26 +73,15 @@ SCHEMA = {
     "required": ["style", "lines"],
 }
 
-REVIEW = """You are a second expert dance describer reviewing a colleague's audio description script for blind and
-partially sighted listeners, against the video (watch and listen closely). Their map of the piece and the script are
-below.
+REVIEW = """You are a second expert dance describer, and a former dancer in this style, reviewing a colleague's audio
+description script against the video (watch and listen closely). Their map of the piece and the script are below.
 
-Ask: what would a blind listener miss that a sighted viewer gets? Check that the signature comes through; that every
-change of texture or energy is said as it happens; that key shapes, arm and body detail, group structure (unison,
-canon, formations) and the big accents are there; that every line is accurate and at the right time (the movement
-really happens then, and every technical term meets its definition); and that no words go on generic filler.
-
-Then the density. The music is the main thing: the description is commentary inside it, and a listener should hear
-the music on its own for most of the piece. If the script speaks for much more than about a third of the running time
-(its measured density is below), edit it down: drop what is repeated, generic or less important, merge neighbours,
-and keep the signature, the texture changes, the big accents, key shapes and group structure. Keep the lines that are
-the best-chosen, not the ones that happen to come first. The signature is usually continuous (it runs through the
-piece, so many lines mention it): that is not repetition. Never drop it to save words; when you shorten, merge lines
-so the signature detail rides along with the step ("Wide stance, chests lifted; curved arms frame heads, wrists
-ticking").
-
-Fix only what needs fixing: replace a weak or wrong line, add a missing moment, drop a wrong, empty or surplus one.
-Keep lines short (most 3 to 8 words; callouts 2 to 5), at the right moment, and never overlapping.
+Read it as a dancer would hear it. Does it say what a dancer sees: what the piece is and what the dancer portrays, the
+quality and intention behind the movement (what a jump or an extension expresses, not just that it happened), the
+detail that makes it impressive, how it plays with the music, the moments that matter most? Is every line accurate and
+at the right time (the right movement, prop, technique term and speed)? Is it one idea per line, with room for the
+music (at most one line per musical phrase plus brief callouts on standout hits)? Replace flat or wrong lines with
+what a dancer would say, add what a dancer would miss, drop what is surplus. Its measured density is below.
 
 Return JSON {"notes": "one or two sentences on what was missing or wrong", "edits": [...]}, each:
 {"action": "replace", "time": t, "text": "...", ...} (the line starting nearest t),
@@ -131,7 +110,8 @@ def music_notes(song: dict) -> str:
             f"Beat grid: the first beat is at {song['beats'][0]:.2f} s; bars start at the times listed under energy.\n"
             f"Energy per bar (bar start: 0 quietest to 1 loudest): {energy}\n"
             f"Quieter gaps good for fuller lines (seconds): {gaps}\n"
-            f"Strongest hits (seconds): {hits}")
+            f"Strongest hits (seconds): {hits}\n"
+            f"Musical phrases start at (seconds): " + " ".join(f"{p[0]:.1f}" for p in song["phrases"]))
 
 
 def structure_notes(plan: dict) -> str:
@@ -322,9 +302,9 @@ def keep_signature(before: list[dict], after: list[dict], plan: dict | None) -> 
     original = "\n".join(f"{n}. {l['time']:.1f} s: {l['text']}" for n, l in enumerate(before))
     edited = "\n".join(f"{l['time']:.1f} s: {l['text']}" for l in after)
     prompt = (f"The signature of this dance piece:\n{qualities}\n\nOriginal script (numbered):\n{original}\n\n"
-              f"Edited script:\n{edited}\n\nFor each signature quality: does the edited script carry it as fully as "
-              "the original (about as many lines, in the same parts of the piece)? Where the edit lost or thinned a "
-              "quality, list the numbers of the original lines that best restore it (at most 4 in total). "
+              f"Edited script:\n{edited}\n\nFor each signature quality: is it still in the edited script at all? Only "
+              "where a quality has disappeared completely, give the number of the one original line that best restores "
+              "it (at most 2 in total). "
               "Return JSON {\"restore\": [numbers]} (empty if nothing was lost).")
     response = with_retry(lambda: client().models.generate_content(
         model="gemini-3.8-flash", contents=prompt,

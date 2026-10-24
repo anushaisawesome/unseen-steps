@@ -843,3 +843,21 @@ functions; no build step. WCAG 2.2 AA aimed for (Lighthouse accessibility 100 on
 - **Deploy:** `cd web && npx vercel@63.1.2 deploy --prod`. `GEMINI_API_KEY` is a Vercel environment variable; there is no
   access code, so anyone with the link spends on that key: keep the AI Studio spending cap.
 - `web/youtube-demo/` is excluded from deploys (`web/.vercelignore`) until its generated `data.js` and audio are committed.
+
+### Richness: a dancer's eye, not more rules (24 Oct, ~23:30)
+
+Anusha (after hours of feedback): "is it gonna do anything richer than 'she spins and taps her hip'... this is not
+what I see"; "jumps and extensions mean something but apparently not in this AD"; Leiomy: hair and hands now caught,
+the freeze still missed; YouTube ballet: tambourine called a fan, lines feel late.
+**Strip-back experiment** (ballet 56–80 s, Argon at 8 fps): the pipeline said "Taps her hip" / "Double spin, fourth
+pause, quadruple spin!"; a bare "expert ballet describer" prompt was already richer; adding a short description of a
+dancer's eye gave "In the Esmeralda variation, she flicks her right foot up behind to tap her tambourine", "Dropping
+into a lunging fourth, she suspends the pause, tambourine held out like a dare", "Over the low drumroll, she spins
+four slow, centered turns on one point, opening wide on the crescendo". **Conclusion: the rule pile (word limits,
+density targets, body-part checklists) made Argon report *what happened*; richness comes from asking for what a dancer
+sees: the work and character, the quality and intention (what a jump or an extension expresses), the detail that
+makes it impressive, how it plays with the music.** The writer and reviewer briefs were rewritten around that, with only
+pacing (one line per musical phrase plus brief callouts; 5–12 words; one idea per line) and accuracy kept as rules.
+Also: one idea per line (lines strung with commas/semicolons were "word salad"); no knock-on shifting (lines that
+can't start within ~0.5 s are left out; pushing them made Leiomy drift late); the signature guard only restores a
+quality that vanished completely (max 2 lines).

@@ -1065,7 +1065,7 @@ def finish(args, results, frames, path, focus, group, song):
             continue
         if sp["at"] < end + 0.1:
             later = beats[beats >= end + 0.1]
-            limit = bar / song["beats_per_bar"] if r.get("kind") == "callout" else bar
+            limit = bar / song["beats_per_bar"]  # within a beat, or left out: pushing later made lines drift
             if not len(later) or later[0] - sp["at"] > limit:
                 print(f"   dropped (no room to speak): {r['line']}")
                 r.pop("speech")
