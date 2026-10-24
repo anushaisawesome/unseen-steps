@@ -671,3 +671,20 @@ changes to the describer. Steps in `feedback/README.md`.
 
 **Pipeline explainer for the team (24 Oct, 19:30):** https://claude.ai/artifact/1YMrgTFi7Dks4vueFZyiKP (diagram, each
 stage, how checking works, pacing rules, what's built vs not, commands). Submission text: https://claude.ai/artifact/9wqknz9gKac4m97zJkZNNj.
+
+### Ballet fixes (24 Oct, 19:45)
+
+Anusha: "tracking is worse for the ballet, and where are the names of the steps?"; "sometimes the voice doesn't say what
+the captions are saying".
+- **Names first:** the short-line rule had squeezed step names out ("Glides left, springs up" instead of glissade). The
+  brief now says lead with the step's name, every recognisable step gets its name, and the opening line (scene and
+  starting position) and every named step are priority 1, so the speech cap never cuts them. Ballet now: "Fifth
+  position, feet neatly crossed." / "Soubresaut, springing with legs tight." / "Glissade into a split sissonne." /
+  "Port de bras, arching back."
+- **Tracking:** it wasn't worse; the new render drew skeletons in backlit frames the old one left blank, with wrong legs.
+  Now `--model` works without `--seed` too (pose cache keyed per model), and only keypoints with confidence > 0.5 are
+  drawn (`DRAW_CONF`). For uploads use `--model yolo11x-pose.pt`: on the ballet it follows her cambré properly and draws
+  nothing mid-leap instead of wrong legs (3 min for 23 s on the Mac).
+- **Voice vs caption:** `speech._faithful` now asks Gemini Flash whether the clip says exactly the caption (nothing added,
+  dropped or swapped; dance-term pronunciation allowed) and re-records up to three takes (tone note twice, then plain),
+  printing what was heard on each mismatch and a WARNING if all three fail.

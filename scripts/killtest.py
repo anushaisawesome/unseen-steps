@@ -84,13 +84,13 @@ def seated(box, xy, conf):
     return thigh < 0.12 * h
 
 
-def detect(video: str):
+def detect(video: str, model_name: str = "yolo11n-pose.pt"):
     """Every sampled frame: (t, [(box, keypoints xy, keypoint conf, (colour hist, saturation), activity), ...]).
 
     Activity is how much a person moves relative to the crowd as a whole, so a panning camera
     doesn't make standing spectators look like they're dancing.
     """
-    model = load_pose("yolo11n-pose.pt")
+    model = load_pose(model_name)
     cap = cv2.VideoCapture(video)
     fps = cap.get(cv2.CAP_PROP_FPS)
     size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
@@ -125,18 +125,19 @@ def detect(video: str):
     return frames, size
 
 
-def detected(video):
+def detected(video, model_name="yolo11n-pose.pt"):
     """detect(), cached per video file: pose on a long group clip takes half an hour, and re-renders only
     change the script or the sound."""
     import hashlib
     import pickle
     data = Path(video).read_bytes()
-    cache = ROOT / "data/killtest/cache" / f"{Path(video).stem}-{hashlib.sha1(data[:20_000_000]).hexdigest()[:12]}-{len(data)}.pkl"
+    model_tag = "" if model_name == "yolo11n-pose.pt" else "-" + Path(model_name).stem
+    cache = ROOT / "data/killtest/cache" / f"{Path(video).stem}-{hashlib.sha1(data[:20_000_000]).hexdigest()[:12]}-{len(data)}{model_tag}.pkl"
     if cache.exists():
         frames, size, seated_people = pickle.loads(cache.read_bytes())
         SEATED.update(seated_people)
         return frames, size
-    frames, size = detect(video)
+    frames, size = detect(video, model_name)
     cache.parent.mkdir(parents=True, exist_ok=True)
     cache.write_bytes(pickle.dumps((frames, size, SEATED)))
     return frames, size
@@ -695,12 +696,15 @@ LEAD_COLOUR, PARTNER_COLOUR, OTHER_COLOUR = (230, 120, 255), (170, 235, 150), (1
 FONT = "/System/Library/Fonts/HelveticaNeue.ttc"
 
 
+DRAW_CONF = 0.5  # points the model is unsure of are hidden rather than drawn in the wrong place
+
+
 def draw_skeleton(frame, xy, conf, colour, thickness):
     for a, b in SKELETON:
-        if conf[a] > 0.3 and conf[b] > 0.3:
+        if conf[a] > DRAW_CONF and conf[b] > DRAW_CONF:
             cv2.line(frame, tuple(int(v) for v in xy[a]), tuple(int(v) for v in xy[b]), colour, thickness, cv2.LINE_AA)
     for k in range(5, 17):
-        if conf[k] > 0.3:
+        if conf[k] > DRAW_CONF:
             cv2.circle(frame, tuple(int(v) for v in xy[k]), thickness + 1, colour, -1, cv2.LINE_AA)
 
 
@@ -824,7 +828,7 @@ def main():
     if seed:  # marked couple: follow her dress, pose only inside a steady frame around them
         frames, path, solo, size, focus = track_focus(args.clip, seed, args.model)
     else:
-        frames, frame_size = detected(args.clip)
+        frames, frame_size = detected(args.clip, args.model)
         path, solo, size = follow(frames, frame_size, seed)
     print(f"following {'one dancer' if solo else 'a couple'} in {len(path)}/{len(frames)} sampled frames")
 

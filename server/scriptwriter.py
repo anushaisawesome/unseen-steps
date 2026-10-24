@@ -49,6 +49,9 @@ What to say, like the best dance describers:
   unsure of a term, describe the shape plainly.
 
 How and when to say it: the music is the star, the description is tasteful commentary inside it.
+- Lead with the step's name whenever the style has one: the name carries the most in the fewest words
+  ("Glissade, then a sissonne, legs split wide." not "Glides left, springs up"; "Cambré, arching back." not
+  "Arches back"). Every recognisable step gets its name. Add a few plain words only where they help picture it.
 - Be sparse and short. Most lines are 3 to 8 words and fit inside one bar; a few may take two bars. Speak for at
   most a third of the running time overall; in lyrical passages, at most one line every two bars. Leave the rest
   to the music. Never narrate continuously and never read like a speech.
@@ -64,7 +67,8 @@ How and when to say it: the music is the star, the description is tasteful comme
 
 For each line give: time, moment_start and moment_end (seconds: the movement it describes), who (solo, pair,
 group or subgroup), kind (description or callout), pace (steady, brisk or rapid), delivery, priority (1 = a listener
-would miss something important without it, 2 = helpful, 3 = optional colour), and text."""
+would miss something important without it, 2 = helpful, 3 = optional colour; the opening line that sets the scene
+and starting position, and every named step, are priority 1), and text."""
 
 SCHEMA = {
     "type": "object",

@@ -1,8 +1,9 @@
 """Turn a checked line into spoken audio with Gemini text-to-speech.
 
 Delivery: an optional director's note sets the tone ("hushed, tender" or "punchy, explosive"). The TTS model
-sometimes reads such notes aloud, so every clip is transcribed and compared with the line, and regenerated
-plainly if extra words crept in. Speed is set by time-stretching the audio (pitch kept) to fit the time the
+sometimes reads such notes aloud, and sometimes swaps or drops words ("fold" came out as "full"), so Gemini Flash
+listens to every clip and compares it with the caption; it's re-recorded (up to three takes, the last plain) until
+they match. Speed is set by time-stretching the audio (pitch kept) to fit the time the
 line has before the next one, rather than trusting the model's pace.
 
 Usage:
@@ -10,6 +11,7 @@ Usage:
 """
 
 import io
+import json
 import re
 import subprocess
 import sys
@@ -46,23 +48,39 @@ def _words(text: str) -> list[str]:
     return re.findall(r"[a-z']+", text.lower())
 
 
-def _faithful(audio: bytes, mime: str, line: str) -> bool:
-    """True if the clip says the line and nothing else (no director's note read aloud)."""
-    heard = with_retry(lambda: client().models.generate_content(
+MATCH = {"type": "object", "properties": {"match": {"type": "boolean"}, "heard": {"type": "string"}},
+         "required": ["match", "heard"]}
+
+
+def _faithful(audio: bytes, mime: str, line: str) -> tuple[bool, str]:
+    """Does the clip say exactly the line (caption), with nothing added, dropped or swapped? Dance terms in
+    French count as matching if they're recognisably said."""
+    response = with_retry(lambda: client().models.generate_content(
         model="gemini-3.8-flash",
-        contents=[types.Part.from_bytes(data=audio, mime_type=mime), "Transcribe exactly what is spoken. Nothing else."],
-    )).text
-    return len(_words(heard)) <= len(_words(line)) + 2
+        contents=[types.Part.from_bytes(data=audio, mime_type=mime),
+                  f"The caption for this clip is: {line!r}\nListen and write down what is actually said (heard). "
+                  "match is true only if the speech says the caption's words, in order, with nothing added, dropped "
+                  "or replaced (punctuation and pronunciation of dance terms don't matter)."],
+        config=types.GenerateContentConfig(response_mime_type="application/json", response_schema=MATCH,
+                                           thinking_config=types.ThinkingConfig(thinking_level="low")),
+    ))
+    result = json.loads(response.text)
+    return result["match"], result["heard"]
 
 
 def speak(line: str, path: Path, delivery: str | None = None, max_seconds: float | None = None) -> Path:
-    """Say the line (in the delivery's tone, if given), fit it into max_seconds, and save it as a WAV file."""
-    if delivery:
-        _synthesise(f"# DIRECTOR'S NOTES\n{delivery}\n\n# TRANSCRIPT\n{line}", path)
-        if not _faithful(path.read_bytes(), "audio/wav", line):
-            _synthesise(line, path)
+    """Say the line (in the delivery's tone, if given), check the voice said exactly the caption, fit it into
+    max_seconds, and save it as a WAV file. Up to three takes: with the tone note twice, then plain."""
+    takes = [f"# DIRECTOR'S NOTES\n{delivery}\n\n# TRANSCRIPT\n{line}"] * 2 if delivery else [line]
+    takes.append(line)
+    for n, contents in enumerate(takes):
+        _synthesise(contents, path)
+        ok, heard = _faithful(path.read_bytes(), "audio/wav", line)
+        if ok:
+            break
+        print(f"   voice take {n + 1} said {heard!r} instead of {line!r}")
     else:
-        _synthesise(line, path)
+        print(f"   WARNING: voice still doesn't match the caption after {len(takes)} takes: {line!r}")
     _tighten(path)
     if max_seconds:
         with wave.open(str(path)) as f:
