@@ -111,15 +111,18 @@ def upload(video: str):
     return uploaded
 
 
+FPS = 5  # Gemini's default is 1 frame a second, too few to see sharp vs fluid movement, hits or arm detail
+
+
 def video_part(video: str, start: float | None = None, end: float | None = None):
-    """A video Gemini can watch: a local file (uploaded) or a public YouTube link (read by Gemini directly,
-    never downloaded), optionally clipped to start..end seconds."""
+    """A video Gemini can watch at FPS frames a second: a local file (uploaded) or a public YouTube link (read by
+    Gemini directly, never downloaded), optionally clipped to start..end seconds."""
+    clip = types.VideoMetadata(fps=FPS, start_offset=f"{start or 0:.0f}s" if start is not None else None,
+                               end_offset=f"{end:.0f}s" if end else None)
     if video.startswith("http"):
-        clip = None
-        if start is not None or end is not None:
-            clip = types.VideoMetadata(start_offset=f"{start or 0:.0f}s", end_offset=f"{end:.0f}s" if end else None)
         return types.Part(file_data=types.FileData(file_uri=video), video_metadata=clip)
-    return upload(video)
+    uploaded = upload(video)
+    return types.Part(file_data=types.FileData(file_uri=uploaded.uri, mime_type=uploaded.mime_type), video_metadata=clip)
 
 
 def clip_note(start: float | None, end: float | None) -> str:
@@ -130,7 +133,8 @@ def clip_note(start: float | None, end: float | None) -> str:
 
 
 def source_key(video: str) -> bytes:
-    return video.encode() if video.startswith("http") else Path(video).read_bytes()
+    """Identifies what Argon watched (the video and the frame rate), for caching."""
+    return (video.encode() if video.startswith("http") else Path(video).read_bytes()) + f"@{FPS}fps".encode()
 
 
 def performance_map(video: str, style_hint: str | None = None, start: float | None = None,
@@ -143,12 +147,12 @@ def performance_map(video: str, style_hint: str | None = None, start: float | No
     if cached.exists():
         return json.loads(cached.read_text())
 
-    uploaded = video_part(video, start, end)
+    watched = video_part(video, start, end)
     prompt = PROMPT + (f"\nThe person who uploaded it says the style is: {style_hint}. Treat that as a hint, "
                        "not a fact; if the video clearly shows otherwise, say so in style." if style_hint else "") + clip_note(start, end)
     response = with_retry(lambda: client().models.generate_content(
         model=MODEL,
-        contents=[uploaded, prompt],
+        contents=[watched, prompt],
         config=types.GenerateContentConfig(
             thinking_config=types.ThinkingConfig(thinking_level="medium"),
             response_mime_type="application/json",

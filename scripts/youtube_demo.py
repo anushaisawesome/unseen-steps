@@ -22,13 +22,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
 from director import performance_map  # noqa: E402
-from scriptwriter import RATE, budget, review_script, revise, trim, write_script  # noqa: E402
+from scriptwriter import RATE, budget, review_script, revise, write_script  # noqa: E402
 from speech import speak  # noqa: E402
 
 OUT = ROOT / "web" / "youtube-demo"
-SPEECH_SHARE = 0.35
-# Essential lines are only cut past this share, most crowded first.
-SPEECH_CEILING = 0.40
 
 # key, YouTube id, label, style hint, clip start and end (seconds)
 VIDEOS = [
@@ -49,14 +46,6 @@ VIDEOS = [
     ("afrobeats", "uWqCqv6pmmU", "HomeBros: Afro dance choreography", "afrobeats", 0, 164),
     ("ballroom", "0GHkCRM8DBc", "WDSF World Open Prague: Standard final, waltz", "ballroom waltz", 0, 141),
 ]
-
-
-def opens_gap(lines, cut, spoken, at, seconds, limit=8.0):
-    """Would cutting this line leave more than `limit` seconds with nothing said?"""
-    rest = [l for l in lines if spoken(l) and l is not cut]
-    before = max((at(l) + seconds(l) for l in rest if at(l) < at(cut)), default=None)
-    after = min((at(l) for l in rest if at(l) > at(cut)), default=None)
-    return before is not None and after is not None and after - before > limit
 
 
 def seconds(path: Path) -> float:
@@ -103,42 +92,9 @@ def build(video: tuple) -> dict:
         line["audio"] = line["audio_kept"] = f"audio/{mp3.name}"
         line["at"] = line["time"]
 
-    # The music stays the star: past 35%, Argon chooses what to drop (with taste); the blunt cutter below is
-    # only a safety net if that still doesn't fit.
     def share():
         return sum(l["seconds"] for l in lines if l.get("audio")) / (end - start)
-    if share() > SPEECH_SHARE:
-        spoken_now = [l for l in lines if l.get("audio")]
-        drop = trim(spoken_now, SPEECH_SHARE * (end - start), plan)
-        for l in spoken_now[1:]:  # never the opening line
-            if round(l["at"], 1) in drop:
-                l["status"] = "dropped by Argon for space"
-                l.pop("audio")
-        # If that left a long silence, bring back the shortest dropped line inside it.
-        while True:
-            spoken = [l for l in lines if l.get("audio")]
-            holes = [(a, b) for a, b in zip(spoken, spoken[1:]) if b["at"] - (a["at"] + a["seconds"]) > 8]
-            back = [min((l for l in lines if l.get("status") == "dropped by Argon for space" and a["at"] < l["at"] < b["at"]),
-                        key=lambda l: l["seconds"], default=None) for a, b in holes]
-            back = [l for l in back if l]
-            if not back:
-                break
-            for l in back:
-                l["audio"], l["status"] = l["audio_kept"], "spoken"
-    while share() > SPEECH_SHARE:
-        # never the opening line, which sets the scene
-        optional = [l for l in lines[1:] if l.get("audio") and l["kind"] != "callout" and l.get("priority", 2) > 1]
-        if not optional and share() > SPEECH_CEILING:
-            optional = [l for l in lines[1:] if l.get("audio") and l["kind"] != "callout"]
-        optional = [l for l in optional if not opens_gap(lines, l, lambda x: x.get("audio"), lambda x: x["at"],
-                                                          lambda x: x["seconds"])]
-        if not optional:
-            break
-        def crowding(l):
-            return -min((abs(o["at"] - l["at"]) for o in lines if o.get("audio") and o is not l), default=99)
-        cut = max(optional, key=lambda l: (l.get("priority", 2), crowding(l)))
-        cut["status"] = "cut for space"
-        cut.pop("audio")
+
     # No collisions: a late line shifts after the one before (within 0.6 s for callouts, 2 s otherwise).
     finish = 0.0
     for l in lines:

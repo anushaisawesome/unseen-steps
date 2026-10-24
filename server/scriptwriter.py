@@ -31,60 +31,42 @@ except ImportError:
 # slow lines drag and pull attention off the music.
 RATE = {"steady": 2.8, "brisk": 3.2, "rapid": 3.8}
 
-BRIEF = """You are an expert audio describer for dance, preparing the audio description for blind and partially
-sighted audience members from this recording (watch and listen). It is spoken over the music. Write the script.
+BRIEF = """You are an expert audio describer for dance, writing the audio description for blind and partially
+sighted listeners from this recording (watch and listen closely). It is spoken over the music.
 
-What to say, like the best dance describers:
-- First, what makes this piece this piece. Your first viewing (below) names its signature: the qualities a sighted
-  viewer notices and remembers most. Every one of them must come through, at the moments it's strongest, in
-  specific body language: where the movement lives in the body (arms, hands, torso, hips, legs, feet, head, gaze),
-  its dynamics (sharp or sustained, light or strong, bound or free), its texture and its relationship to the music.
-  A listener who can't see should come away with the same impression of the choreography as someone who can.
-- Use the style's own vocabulary, accurately, for steps and techniques; the first time a term appears, add a few
-  plain words so a newcomer can picture it. A term carries its definition: use it only when every part of the
-  definition is visible, and never borrow one style's term for another style's movement. Ballet terms in particular
-  require turnout: a plié is bent knees with the legs rotated out from the hips, knees over turned-out feet, and the
-  positions (first, second, fifth...) are turned out too. Bent legs with knees forward or turned in are "bent knees",
-  "a deep squat" or "a wide stance", or that style's own word. Name the technique a dancer is doing even when its shape suggests an
-  image, and give the image only as a comparison. If the piece fuses styles, notice each influence as it appears,
-  use that style's language for it, and say when the piece shifts between influences.
-- Give the pose, not just the step: at holds, hits and arrival points, say the shape the body makes (where the
-  limbs are, the line of the body, the level, where the gaze goes), so a listener can picture the body, not only
-  follow the action.
-- Capture expression: the feeling the movement gives, grounded in what is visible. Vivid, plain words, not purple
-  prose.
-- Say where dancers are and how they relate: facing, travel, formations, unison or canon (the same move rippling
-  through dancers one after another, and which way it travels), a soloist breaking out, pairs forming. Directions
-  as the audience sees them ("to the left"), never "stage left" or "stage right".
-- Follow the structure of the piece given below. Every section gets at least one line: a listener must hear when
-  the piece changes.
-- Every change in the dynamics timeline is priority 1: say the shift as it happens, so the listener feels the
-  texture change (what it changes from and to), not just the new steps.
-- Spend words on what matters most, never on what is generic or incidental, and never repeat a description.
-  Present tense. Only describe what you can see; if unsure of a term, describe the shape plainly.
+The goal: a listener who can't see should come away with what a sighted viewer gets from this choreography.
 
-How and when to say it: the music is the star, the description is tasteful commentary inside it.
-- Where a step or technique has a name, lead with it: a name carries the most in the fewest words. Add a few
-  plain words only where they help picture it.
-- Be sparse and short. Most lines are 3 to 8 words and fit inside one bar; a few may take two bars. Speak for at
-  most a third of the running time overall; in lyrical passages, at most one line every two bars. Leave the rest
-  to the music. Never narrate continuously and never read like a speech.
-- Stay in meter: every line starts on a beat and lasts a whole number of beats (see the beat grid below), so it
-  sits inside the music's phrasing rather than across it. Prefer the quieter gaps.
-- Match the music's energy. Lyrical passages: occasional short, steady lines. Builds: brisk. When the music
-  explodes (a big chorus, a run of hard hits), call the movement on the hits in bursts of two to five words, e.g.
-  "Hit above the head! To the side! Fold to the right!" Each burst is its own line, on its hit.
-- time is the beat the line starts on: just after the movement it describes, or on the hit for callouts.
-- Lines never overlap. Rates in words per second: steady 2.8, brisk 3.2, rapid 3.8.
-- delivery: a short tone note for the voice (under 10 words), e.g. "light, warm" or "punchy, explosive". Never slow
-  or drawn out.
+What to say:
+- The signature of this piece (named in your first viewing, below): what a sighted viewer notices and remembers,
+  carried in specific body language: where the movement lives in the body (arms, hands, torso, hips, legs, feet,
+  head, gaze), its dynamics (sharp or sustained, light or strong, bound or free) and its texture.
+- Every change of texture or energy (the dynamics timeline below), said as it happens: what it changes from and to.
+- Shapes, not just steps: at holds, hits and arrivals, the shape the body makes (limbs, line, level, gaze).
+- How dancers relate: facing, travel, formations, unison, canon (the same move rippling through dancers one after
+  another, and which way it travels), a soloist breaking out, pairs. Directions as the audience sees them ("to the
+  left"), never "stage left" or "stage right".
+- The big accents, called as they land: a drop, a hit, a clap, a turn into a new phrase.
+- When the piece moves into a new section.
+- Precise vocabulary: the style's own terms where they apply, used only when every part of the term's definition is
+  visible (ballet terms such as plié and the positions need turnout; otherwise say "bent knees" or "a wide stance");
+  never one style's term for another style's movement; the technique, not a mime it resembles; in a fusion, each
+  influence in its own language. A newcomer should be able to picture each term the first time it appears.
+- Expression: the feeling the movement gives, grounded in what is visible.
+Only describe what you can see, at the moment it happens. No generic filler, no costume beyond the opening, and
+never repeat a description.
 
-For each line give: time, moment_start and moment_end (seconds: the movement it describes), who (solo, pair,
-group or subgroup), kind (description or callout), pace (steady, brisk or rapid), delivery, priority (1 = a listener
-would miss something important without it, 2 = helpful, 3 = optional colour). Priority 1 is only for the opening
-line (scene and starting position), the first line of each section, canons or formation changes, and lines that
-carry the piece's signature. Most other
-lines, including ones that name steps, are 2), and text."""
+How to say it: the music is the main thing, and the description is commentary inside it.
+- Short: most lines 3 to 8 words; callouts 2 to 5 words on the hits. A richer line is a better-chosen word, not a
+  longer line.
+- In the music: start lines on beats, in the gaps between phrases where you can; never continuous, never like a
+  speech. How much to say follows the choreography: dense, sharp passages carry more short lines and callouts; where
+  the movement repeats or rests, let the music play. Avoid long silences while new movement is happening.
+- time is when the line starts: just after the movement it describes, or on the hit for a callout. Lines never
+  overlap (words per second: steady 2.8, brisk 3.2, rapid 3.8).
+- delivery: a short tone note for the voice (under 10 words). Never slow or drawn out.
+
+For each line give: time, moment_start and moment_end (the movement it describes), who (solo, pair, group or
+subgroup), kind (description or callout), pace (steady, brisk or rapid), delivery, and text."""
 
 SCHEMA = {
     "type": "object",
@@ -95,30 +77,29 @@ SCHEMA = {
             "who": {"type": "string", "enum": ["solo", "pair", "group", "subgroup"]},
             "kind": {"type": "string", "enum": ["description", "callout"]},
             "pace": {"type": "string", "enum": list(RATE)},
-            "delivery": {"type": "string"}, "priority": {"type": "integer"}, "text": {"type": "string"}},
-            "required": ["time", "moment_start", "moment_end", "who", "kind", "pace", "delivery", "priority", "text"]}},
+            "delivery": {"type": "string"}, "text": {"type": "string"}},
+            "required": ["time", "moment_start", "moment_end", "who", "kind", "pace", "delivery", "text"]}},
     },
     "required": ["style", "lines"],
 }
 
 REVIEW = """You are a second expert dance describer reviewing a colleague's audio description script for blind and
-partially sighted listeners, against the video (watch and listen). The first viewing's map of the piece and the
-script are below.
+partially sighted listeners, against the video (watch and listen closely). Their map of the piece and the script are
+below.
 
-Ask: what would a blind listener miss that a sighted viewer gets from this choreography? Look for signature
-qualities that don't come through (where the movement lives in the body, its dynamics, texture, musicality),
-group structure or striking moments that are missing, lines that are generic, inaccurate or misname a technique
-(check every technical term against its definition: a term whose definition isn't fully visible, or a term borrowed
-from another style, must be replaced with plain words; for example a plié or a ballet position needs visible
-turnout), and words spent on what matters less. Keep the same rules as the script: lines stay short (most 3 to 8 words, inside one
-bar; callouts 2 to 5 words); a richer line is a better-chosen word, not a longer line. Callouts on the hits, the
-music stays the main thing, so prefer replacing a weaker line over adding one.
+Ask: what would a blind listener miss that a sighted viewer gets? Check that the signature comes through; that every
+change of texture or energy is said as it happens; that key shapes, arm and body detail, group structure (unison,
+canon, formations) and the big accents are there; that every line is accurate and at the right time (the movement
+really happens then, and every technical term meets its definition); and that no words go on generic filler.
 
-Return JSON {"notes": "one or two sentences on what was missing", "edits": [...]}, at most 10 edits, each one of:
+Fix only what needs fixing: replace a weak or wrong line, add a missing moment, drop a wrong or empty one. Keep lines
+short (most 3 to 8 words; callouts 2 to 5), at the right moment, and never overlapping.
+
+Return JSON {"notes": "one or two sentences on what was missing or wrong", "edits": [...]}, at most 12 edits, each:
 {"action": "replace", "time": t, "text": "...", ...} (the line starting nearest t),
 {"action": "add", "time": t, "moment_start": s, "moment_end": e, "text": "...", ...},
 {"action": "drop", "time": t}.
-replace and add also give kind, pace, delivery, priority and who, as in the script.
+replace and add also give kind, pace, delivery and who, as in the script.
 
 """
 
@@ -144,25 +125,9 @@ def music_notes(song: dict) -> str:
             f"Strongest hits (seconds): {hits}")
 
 
-def room(song: dict | None, start: float | None, end: float | None) -> str:
-    """How many lines the music has room for, so Argon chooses them (with taste) instead of a cutter later."""
-    if song:
-        length = song["beats"][-1] - song["beats"][0]
-    elif end:
-        length = end - (start or 0)
-    else:
-        return ""
-    seconds = 0.35 * length
-    return (f"\nRoom: this piece runs {length:.0f} s, so the speech should total about {seconds:.0f} s. A description "
-            "line takes about 3 s; a callout takes about 1 s, so a sharp, hit-driven passage can carry several callouts. "
-            "Spend the time on the signature and the key moments, call the big accents on the music (a hit, a clap, a "
-            "turn into a new phrase) as they land, and leave the rest to the music. Silence belongs where the movement "
-            "repeats or rests: never more than about 6 s of quiet while new movement is happening.")
-
-
 def structure_notes(plan: dict) -> str:
     """The director's performance map as text: sections with formation, group structure and techniques; motifs."""
-    out = [f"Signature of this piece (must come through):"]
+    out = ["Signature of this piece (must come through):"]
     for sig in plan.get("signature", []):
         out.append(f"- {sig['quality']}: {sig['body']}; {sig['dynamics']}; strongest at "
                    + ", ".join(f"{t:.0f} s" for t in sig["times"]))
@@ -188,7 +153,7 @@ def write_script(video: str, song: dict | None, glossary: list[str] = (), style_
     (a YouTube link we can't analyse), Argon keeps time by ear."""
     prompt = BRIEF + "\n\n" + (music_notes(song) if song else
                                 "No beat grid is available: listen to the music and start each line on a beat yourself.")
-    prompt += clip_note(start, end) + room(song, start, end)
+    prompt += clip_note(start, end)
     if plan:
         prompt += "\n\n" + structure_notes(plan)
     if glossary:
@@ -238,13 +203,8 @@ def in_meter(lines: list[dict], beats: list[float]) -> list[dict]:
 def review_script(video: str, script: dict, plan: dict | None, song: dict | None = None,
                   start: float | None = None, end: float | None = None) -> dict:
     """A second Argon pass watches the video with the script and fixes what a blind listener would miss. Cached."""
-    listing = "\n".join(f"{l['time']:.1f} s [{l['kind']}, {l['pace']}, priority {l.get('priority')}] {l['text']}"
-                         for l in script["lines"])
-    prompt = (REVIEW + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n" + listing + clip_note(start, end)
-              + room(song, start, end) + " Keep the total speaking time about the same: for every line you add, drop or "
-              "merge a weaker one. Check especially that the signature comes through, that every change of texture or energy in the "
-              "dynamics timeline is felt at the moment it happens, that the big accents are called, and that key "
-              "shapes (holds, hits, arrivals) are given as poses a listener can picture.")
+    listing = "\n".join(f"{l['time']:.1f} s [{l['kind']}, {l['pace']}] {l['text']}" for l in script["lines"])
+    prompt = REVIEW + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n" + listing + clip_note(start, end)
     key = hashlib.sha1(source_key(video)[:50_000_000] + prompt.encode()).hexdigest()[:16]
     cached = CACHE / f"review-{key}.json"
     if cached.exists():
@@ -263,48 +223,24 @@ def review_script(video: str, script: dict, plan: dict | None, song: dict | None
         cached.write_text(json.dumps(review, indent=2, ensure_ascii=False))
 
     lines = [dict(l) for l in script["lines"]]
-    for edit in review.get("edits", [])[:10]:
+    for edit in review.get("edits", [])[:12]:
         near = min(lines, key=lambda l: abs(l["time"] - edit.get("time", 0)), default=None)
         if edit.get("action") in ("replace", "drop") and (near is None or abs(near["time"] - edit["time"]) > 1.5):
             continue
         if edit["action"] == "drop":
             lines.remove(near)
         elif edit["action"] == "replace" and edit.get("text"):
-            near.update({k: v for k, v in edit.items() if k in ("text", "kind", "pace", "delivery", "priority", "who")},
+            near.update({k: v for k, v in edit.items() if k in ("text", "kind", "pace", "delivery", "who")},
                         reviewed=True)
         elif edit["action"] == "add" and edit.get("text"):
             t = edit["time"]
             lines.append({"time": t, "moment_start": edit.get("moment_start", t - 2), "moment_end": edit.get("moment_end", t),
                           "who": edit.get("who", "solo"), "kind": edit.get("kind", "description"),
                           "pace": edit.get("pace", "steady"), "delivery": edit.get("delivery", ""),
-                          "priority": edit.get("priority", 1), "text": edit["text"], "reviewed": True})
+                          "text": edit["text"], "reviewed": True})
     lines = [l for l in lines if l.get("pace") in RATE] + [dict(l, pace="steady") for l in lines if l.get("pace") not in RATE]
     lines = in_meter(lines, song["beats"]) if song else sorted(lines, key=lambda l: l["time"])
     return {**script, "lines": lines, "review": review.get("notes", "")}
-
-
-TRIM = """This audio description script runs over its speaking time: the music must stay the main thing. Choose
-which lines to drop so the total fits, the way an expert describer would: keep what a blind listener most needs (the
-opening context, the piece's signature, every change of texture or energy, the big accents, key shapes) and drop what
-is repeated, generic or less important, whether description or callout. Prefer dropping lines that sit close to
-others. Never leave more than about 6 s of silence while new movement is happening, and keep the calls on the
-big accents (a drop, a hit, a turn into a new phrase). Return JSON {"drop": [times of the lines to drop]}.
-
-"""
-
-
-def trim(lines: list[dict], seconds_allowed: float, plan: dict | None = None) -> set[float]:
-    """Argon picks which lines to drop when speech runs over, instead of a blunt cutter. Returns their times."""
-    total = sum(l["seconds"] for l in lines)
-    listing = "\n".join(f"{l['at']:.1f} s ({l['seconds']:.1f} s spoken) [{l['kind']}] {l['text']}" for l in lines)
-    prompt = (TRIM + (structure_notes(plan) + "\n\n" if plan else "")
-              + f"Speaking time allowed: {seconds_allowed:.0f} s. Current total: {total:.0f} s.\n\nScript:\n" + listing)
-    response = with_retry(lambda: client().models.generate_content(
-        model=MODEL, contents=prompt,
-        config=types.GenerateContentConfig(thinking_config=types.ThinkingConfig(thinking_level="low"),
-                                           response_mime_type="application/json"),
-    ))
-    return {round(float(t), 1) for t in json.loads(response.text).get("drop", [])}
 
 
 def budget(lines: list[dict], end: float) -> list[int]:

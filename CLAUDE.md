@@ -756,3 +756,29 @@ turn before the vocals), first line cut, nothing on the arm work, 10 s silent wh
   comes back. The blunt cutter is only a final safety net. Aquamarine (Anusha's reference, "70% there"): 10 of 17 lines
   kept at 38%, signature line kept, gaps ~6–7 s.
 - **Pose rule:** at holds, hits and arrivals, give the shape (limbs, line of the body, level, gaze); the reviewer checks it.
+
+## Reset: principles, 5 fps, no speech cap (24 Oct, ~22:45)
+
+Anusha: "take my feedback generally... always find the root complaint"; "why is there so much silence and so many lines
+cut they may as well not be there"; "it missed the canon on ponyboy, why is this degrading in quality".
+**Root causes found:**
+1. The ballet note ("drags, talks over the music") was a delivery problem (slow voice, long lines, placement), but it
+   became a hard 35% speech cap plus cutting machinery (line budgets, priorities, cutter, trim, gap restoring). Every
+   piece of it deleted lines Argon wrote while watching: long silences, good lines cut, Ponyboy's canon lost.
+2. **Gemini watches video at 1 frame per second by default.** At that rate it can't see sharp vs fluid, hits or arm
+   detail, and it guesses timings. Checked on Aquamarine 15–26 s at 5 fps: far richer, second-by-second detail.
+3. The brief had grown a rule per note, and each change was only checked on one video.
+**Changes:**
+- `director.FPS = 5` for every Gemini video read (`video_part`), YouTube and uploaded files; caches keyed on it.
+- The cap, budgets, priority cutting and trim are gone. Only collision handling remains (a line can't talk over the
+  previous one). How much to say is Argon's call: dense passages carry more short lines and callouts, repeated or
+  resting movement gets the music alone.
+- The brief is rewritten as principles from all her feedback: the goal (a blind listener gets what a sighted viewer
+  gets), signature, every texture/energy change as it happens, shapes at holds/hits/arrivals, group structure, big
+  accents, sections, precise vocabulary (definitions, turnout, technique over mime, fusion), expression; short lines in
+  the music, never continuous. The second describer only fixes and fills (up to 12 edits), no budget.
+- **`scripts/regress.py`:** must-haves per video from `feedback/*.md` (Ponyboy canon; Track 10 arm work, sharpness,
+  sharp-to-fluid at ~12 s, clap and turn before the vocals, rich end groove, opening context; Aquamarine texture and
+  poses; Judas canon, tutting, floorwork; ballet fifth position and step names), judged by Gemini Flash from the
+  timed lines, plus longest silence (> 8 s flagged) and longest line (> 10 words). Run after every change.
+  Baseline before the reset: 9/14. The judge is lenient on "arm work" (passed Track 10 when Anusha said it was missing).
