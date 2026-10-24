@@ -861,3 +861,20 @@ pacing (one line per musical phrase plus brief callouts; 5–12 words; one idea 
 Also: one idea per line (lines strung with commas/semicolons were "word salad"); no knock-on shifting (lines that
 can't start within ~0.5 s are left out; pushing them made Leiomy drift late); the signature guard only restores a
 quality that vanished completely (max 2 lines).
+
+### Final shape of the describer (25 Oct, ~00:20)
+
+- **Window-by-window writing is the default** (`scriptwriter.write_script_windowed`): Argon writes each stretch of up to
+  20 s (the map's sections, split) at 8 fps with the whole piece's map for context, about one line every 5–8 s plus
+  callouts on standout hits. Writing a 3-minute piece in one pass drifted in timing (the line check corrected 15 of the
+  ballet's lines, mostly right movement at the wrong moment) and went generic; short windows gave "Waiting in the wings
+  for La Esmeralda", "each elastic kick suspends on the beat". `--whole` keeps the one-pass writer.
+- **Final cut with the video** (`scriptwriter.select_lines`): after voicing, Argon watches the video with the voiced
+  lines and their real lengths and chooses which to keep for about a third of the piece (signature spread across it,
+  texture changes, accents, how dancers relate; no rewriting; no silence over ~8 s during new movement). A gap over 10 s
+  gets one line back as a safety net. Earlier cuts failed because they were blind (a fixed percentage, or text only).
+- Style naming: an influence is named only when several distinct cues support it (the "weigh traditions worldwide" rule
+  had tipped Track 10 into "Chinese classical / Dai dance"); styles with their own framework of elements (vogue femme,
+  a ballet variation's sections, a flamenco palo) are described in those terms.
+- Order: map + section zoom-ins -> windowed script -> second describer -> signature guard -> per-line visual check ->
+  voice (line only, checked against the caption) -> final cut -> no-collision placement.

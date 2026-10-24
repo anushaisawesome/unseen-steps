@@ -46,7 +46,8 @@ Watch the whole performance and return JSON with:
   fuses styles, name the style each technique comes from, the way an expert dancer would: consider the traditions it
   could come from worldwide (classical and folk as well as street and studio), weigh the visible evidence (hands,
   stance, footwork, head and eyes, torso) and the context in the video (on-screen names, flags, music, costume), and
-  name the one the evidence supports best rather than the first label that roughly fits.
+  name the one the evidence supports best rather than the first label that roughly fits, but only when several
+  distinct cues clearly support it; when the evidence is thin, describe the movement plainly instead of guessing.
 - signature: [{quality, body, dynamics, times: [seconds]}] the two to four things a sighted viewer notices and
   remembers most about this particular choreography (not the style in general): what it is, where it lives in the
   body (head, hair, face, arms, hands, torso, hips, legs, feet and footwork), its dynamics and texture, and the times
@@ -186,7 +187,9 @@ Name influences the way an expert dancer would: before settling on a style for a
 traditions it could come from worldwide (classical and folk forms as well as street and studio styles), weigh the
 visible evidence for each (the hand shapes, the stance and its turnout, the footwork, the head, neck and eyes, the
 torso), and the context in the video itself (on-screen names, flags, the music, the costume). Name the influence the
-evidence supports best, in that tradition's own terms, rather than the first label that roughly fits."""
+evidence supports best, in that tradition's own terms, rather than the first label that roughly fits; but only when
+several distinct cues clearly support it. When the evidence is thin, describe the movement plainly instead of guessing
+a tradition. Where the style has its own framework of named elements or parts, use it."""
 
 
 def zoom(video: str, plan: dict, start: float | None, end: float | None) -> dict:

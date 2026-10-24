@@ -47,7 +47,9 @@ A dancer's eye picks up:
   energy as it happens;
 - for groups: formations, unison, canon, who stands out.
 Use the style's own terms where they fit, only when every part of the term's definition is visible, and let a
-newcomer picture each term the first time. Directions as the audience sees them. Only describe what you can see, at
+newcomer picture each term the first time. Where the style has its own framework of named elements or parts (the
+elements of a vogue performance, the sections of a ballet variation, the parts of a flamenco palo), describe the piece
+in those terms. Directions as the audience sees them. Only describe what you can see, at
 the moment it happens.
 
 How to say it: one idea per line, never a list of details; most lines 5 to 12 words. At most one line per musical
@@ -173,6 +175,65 @@ def write_script(video: str, song: dict | None, glossary: list[str] = (), style_
     return script
 
 
+def windows(plan: dict, start: float | None, end: float | None, longest: float = 20.0) -> list[tuple[float, float]]:
+    """Short stretches to write one at a time: the map's sections, split so none is longer than `longest` seconds."""
+    out = []
+    for sec in plan["sections"]:
+        a, b = sec["start"], sec["end"]
+        if start is not None:
+            a = max(a, start)
+        if end is not None:
+            b = min(b, end)
+        if b - a < 1:
+            continue
+        n = max(1, int(-(-(b - a) // longest)))
+        step = (b - a) / n
+        out += [(round(a + k * step, 2), round(a + (k + 1) * step, 2)) for k in range(n)]
+    return out
+
+
+def write_script_windowed(video: str, song: dict | None, glossary: list[str] = (), style_hint: str | None = None,
+                          plan: dict | None = None, start: float | None = None, end: float | None = None) -> dict:
+    """Argon writes the script one short stretch at a time (at 8 frames a second, with the whole piece's map for
+    context). Writing a 3-minute piece in one go drifted in timing and went generic; the richest, most accurate lines
+    came from short windows."""
+    from concurrent.futures import ThreadPoolExecutor
+    base = BRIEF + "\n\n" + (music_notes(song) if song else
+                              "No beat grid is available: listen to the music and start each line on a beat yourself.")
+    if plan:
+        base += "\n\n" + structure_notes(plan)
+    if glossary:
+        base += ("\n\nGlossary vetted by dancers for this style (use these names where they fit):\n"
+                 + "\n".join(f"- {g}" for g in glossary))
+    if style_hint:
+        base += f"\n\nThe person who uploaded it says the style is {style_hint}; treat that as a hint, not a fact."
+
+    def write(window):
+        a, b = window
+        prompt = (base + f"\n\nWrite the lines for this stretch only, from {a:.1f} s to {b:.1f} s (the clip shown); "
+                  "give every time in the full video. The rest of the piece is written separately. Pacing for this "
+                  f"{b - a:.0f} s stretch: about one line every 5 to 8 seconds, plus brief callouts on standout hits.")
+        key = hashlib.sha1(source_key(video)[:50_000_000] + prompt.encode()).hexdigest()[:16]
+        cached = CACHE / f"window-{key}.json"
+        if cached.exists():
+            return json.loads(cached.read_text())["lines"]
+        response = with_retry(lambda: client().models.generate_content(
+            model=MODEL, contents=[video_part(video, a, b, fps=8), prompt],
+            config=types.GenerateContentConfig(thinking_config=types.ThinkingConfig(thinking_level="high"),
+                                               response_mime_type="application/json", response_schema=SCHEMA)))
+        result = json.loads(response.text)
+        result["lines"] = [l for l in result["lines"] if a - 0.5 <= l["time"] <= b + 0.5]
+        CACHE.mkdir(parents=True, exist_ok=True)
+        cached.write_text(json.dumps(result, indent=2, ensure_ascii=False))
+        return result["lines"]
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        parts = list(pool.map(write, windows(plan, start, end)))
+    lines = [l for part in parts for l in part]
+    lines = in_meter(lines, song["beats"]) if song else sorted(lines, key=lambda l: l["time"])
+    return {"style": plan["style"]["name"] if plan else "", "lines": lines}
+
+
 def in_meter(lines: list[dict], beats: list[float]) -> list[dict]:
     """Start every line on a beat (the nearest one, never more than half a beat early), in order, and drop a line
     whose beat is already taken by the line before it."""
@@ -286,6 +347,45 @@ def verify_lines(video: str, lines: list[dict], start: float | None = None, end:
         else:
             print(f"   seen wrong at {line['time']:.1f}s, dropped: \"{line['text']}\" ({v['issue'][:80]})")
     return out
+
+
+SELECT = """You are an expert dance describer, and a former dancer in this style, making the final cut of an audio
+description script against the video (watch and listen closely). The music is the main thing: the speech should total
+about {target:.0f} s of this {length:.0f} s piece; it is {total:.0f} s now. Choose which lines to KEEP so a blind listener
+gets what a dancer sees: what the piece is, its signature spread across the piece, every change of texture or energy,
+the big accents and standout moments, how the dancers relate. Drop lines that repeat, state the obvious or crowd the
+music. Never leave more than about 8 s of silence while new movement is happening. Don't rewrite anything: only choose.
+Return JSON {{"keep": [the numbers of the lines to keep]}}.
+
+"""
+
+KEPT = {"type": "object", "properties": {"keep": {"type": "array", "items": {"type": "integer"}}}, "required": ["keep"]}
+
+
+def select_lines(video: str, lines: list[dict], plan: dict | None, length: float, share: float = 0.35,
+                 start: float | None = None, end: float | None = None) -> set[int]:
+    """The final cut, made by Argon watching the video with the finished, voiced lines and their real lengths: which
+    lines to keep so the music stays the main thing. Earlier cuts went wrong by cutting blind (a fixed percentage, or
+    from the text alone). Returns the indexes of the lines to keep; the opening line is always kept."""
+    total = sum(l["seconds"] for l in lines)
+    if total <= share * length * 1.1:
+        return set(range(len(lines)))
+    listing = "\n".join(f"{n}. {l['at']:.1f} s ({l['seconds']:.1f} s spoken) {l['text']}" for n, l in enumerate(lines))
+    prompt = (SELECT.format(target=share * length, length=length, total=total)
+              + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n" + listing + clip_note(start, end))
+    response = with_retry(lambda: client().models.generate_content(
+        model=MODEL, contents=[video_part(video, start, end), prompt],
+        config=types.GenerateContentConfig(response_mime_type="application/json", response_schema=KEPT,
+                                           thinking_config=types.ThinkingConfig(thinking_level="high"))))
+    keep = {n for n in json.loads(response.text)["keep"] if 0 <= n < len(lines)} | {0}
+    # Safety net only: a stretch of more than 10 s with nothing said gets its best-placed line back.
+    spoken = sorted(keep)
+    for a, b in zip(spoken, spoken[1:]):
+        if lines[b]["at"] - (lines[a]["at"] + lines[a]["seconds"]) > 10:
+            inside = [n for n in range(a + 1, b)]
+            if inside:
+                keep.add(min(inside, key=lambda n: abs(lines[n]["at"] - (lines[a]["at"] + lines[b]["at"]) / 2)))
+    return keep
 
 
 KEEP = {"type": "object", "properties": {"restore": {"type": "array", "items": {"type": "integer"}}},

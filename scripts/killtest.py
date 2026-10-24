@@ -930,7 +930,7 @@ def scripted(args, song, frames, path, solo, size, group):
     """Argon writes the whole timed description (pace and delivery included); each line is checked against the
     pose measurements for the moment it describes; rejected lines go back to Argon once, then stay silent."""
     from checker import check
-    from scriptwriter import budget, review_script, revise, verify_lines, write_script
+    from scriptwriter import budget, review_script, revise, verify_lines, write_script_windowed
     glossary = []
     if args.style:
         from db import db, spoken_name
@@ -946,7 +946,7 @@ def scripted(args, song, frames, path, solo, size, group):
         print(f"measured texture changes: {plan['measured_texture']}")
     print(f"Argon map: {plan['style']['name']}, " + "; ".join(
         f"{s['start']:.0f}-{s['end']:.0f}s {s['label']}" for s in plan["sections"]))
-    script = write_script(args.clip, song, glossary, args.style, plan)
+    script = write_script_windowed(args.clip, song, glossary, args.style, plan)
     script = review_script(args.clip, script, plan, song)  # a second describer: what would a listener miss?
     script["lines"] = verify_lines(args.clip, script["lines"])  # every line checked against its moment
     print(f"Second describer: {script.get('review', '')}")
@@ -1058,7 +1058,18 @@ def finish(args, results, frames, path, focus, group, song):
             with wave.open(str(wav)) as f:
                 seconds = f.getnframes() / f.getframerate()
             r["speech"] = {"path": str(wav), "at": r["clean_space"][0], "seconds": round(seconds, 2)}
-    # How much is said is Argon's call (it watched the piece); here we only keep lines from talking over each other.
+    # The final cut: Argon, watching the video with the voiced lines, keeps what a dancer would (the music stays the
+    # main thing). Then lines are only kept from talking over each other.
+    if args.script:
+        from scriptwriter import select_lines
+        voiced = [r for r in results if r.get("speech")]
+        lines = [{"at": r["speech"]["at"], "seconds": r["speech"]["seconds"], "text": r["line"]} for r in voiced]
+        keep = select_lines(args.clip, lines, None, song["beats"][-1] - song["beats"][0])
+        for n, r in enumerate(voiced):
+            if n not in keep:
+                print(f"   left for the music: {r['line']}")
+                r.pop("speech")
+                r["status"] = "left for the music"
     # Never talk over the previous line: move to the next free beat (within a beat for a callout, a bar
     # otherwise, so it stays in meter and near its moment), or drop it.
     beats = np.array(song["beats"])

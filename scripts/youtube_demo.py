@@ -22,10 +22,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
 from director import performance_map  # noqa: E402
-from scriptwriter import RATE, budget, review_script, revise, verify_lines, write_script  # noqa: E402
+from scriptwriter import (RATE, budget, review_script, revise, select_lines, verify_lines,  # noqa: E402
+                          write_script, write_script_windowed)
 from speech import speak  # noqa: E402
 
 OUT = ROOT / "web" / "youtube-demo"
+WINDOWED = "--whole" not in sys.argv  # write one short stretch at a time (--whole: the old one-pass writer)
 
 # key, YouTube id, label, style hint, clip start and end (seconds)
 VIDEOS = [
@@ -57,7 +59,8 @@ def build(video: tuple) -> dict:
     key, vid, label, style, start, end = video
     url = f"https://www.youtube.com/watch?v={vid}"
     plan = performance_map(url, style_hint=style, start=start, end=end)
-    script = write_script(url, None, style_hint=style, plan=plan, start=start, end=end)
+    writer = write_script_windowed if WINDOWED else write_script
+    script = writer(url, None, style_hint=style, plan=plan, start=start, end=end)
     script = review_script(url, script, plan, None, start, end)  # a second describer: what would a listener miss?
     script["lines"] = verify_lines(url, script["lines"], start, end)  # every line checked against its moment
     lines = [l for l in script["lines"] if start - 1 <= l["time"] <= end]
@@ -101,6 +104,14 @@ def build(video: tuple) -> dict:
     def share():
         return sum(l["seconds"] for l in lines if l.get("audio")) / (end - start)
 
+    # The final cut: Argon, watching the video, keeps the lines a dancer would (the music stays the main thing).
+    voiced = [l for l in lines if l.get("audio")]
+    keep = select_lines(url, voiced, plan, end - start, start=start, end=end)
+    for n, l in enumerate(voiced):
+        if n not in keep:
+            l["status"] = "left for the music"
+            l.pop("audio")
+
     # No collisions, and no knock-on: a line that can't start within half a second of its moment is left out rather
     # than pushed later (pushing made every following line drift late).
     finish = 0.0
@@ -128,7 +139,7 @@ def build(video: tuple) -> dict:
 
 
 def main():
-    wanted = set(sys.argv[1:])
+    wanted = {a for a in sys.argv[1:] if not a.startswith("--")}
     videos = [v for v in VIDEOS if not wanted or v[0] in wanted]
     OUT.mkdir(parents=True, exist_ok=True)
     data_file = OUT / "data.json"
@@ -142,7 +153,8 @@ def main():
     def save():  # after every video, so the page fills in as the batch runs (refresh to see more)
         data = sorted(existing.values(), key=lambda d: order.index(d["key"]) if d["key"] in order else 99)
         data_file.write_text(json.dumps(data, indent=1, ensure_ascii=False))
-        (OUT / "data.js").write_text("window.DEMOS = " + json.dumps(data, ensure_ascii=False) + ";\n")
+        (OUT / "data.js").write_text(
+            "window.DEMOS = " + json.dumps(data, ensure_ascii=False) + ";\n")
         return data
 
     with ThreadPoolExecutor(max_workers=3) as pool:
