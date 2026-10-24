@@ -290,5 +290,17 @@ left: girl in a red dress, boy in black. Is that right?" Yes / no / describe aga
   narration works in any player and with any screen reader, not just our page.
 - Test with VoiceOver (Mac) before the demo.
 
+**How blind and partially sighted people will upload** (screen readers: VoiceOver, TalkBack, JAWS, NVDA):
+- One big, clearly labelled **native** button, "Choose or record a dance video": `<input type="file"
+  accept="video/*">`. It opens the phone's own picker (Photo Library / Take Video / Choose File), which
+  screen readers handle well. **Never a drag-and-drop-only area** (unusable without sight or a mouse).
+- Read back what was chosen: file name and length ("Waltz final, 1 minute 32"), then spoken progress.
+- **Share sheet route:** make the page an installable web app with a share target, so a video from WhatsApp
+  or Photos can go Share → Unseen Steps. Works on Android; iPhone likely doesn't support web share targets
+  (from memory, unverified), so the native picker is the iPhone route.
+- "Paste a link" for direct video file links only (not YouTube/Instagram, whose terms forbid downloading).
+- Key user: blind dancers reviewing recordings of their own performances (filmed by a coach or parent),
+  which ties to the training-tool next step.
+
 This also deepens the Gemini use: transcription for dictation, Robotics-ER for choosing and confirming the
 target, TTS for spoken confirmations, Argon for the performance map, Flash for lines.
