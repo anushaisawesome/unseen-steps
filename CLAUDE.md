@@ -100,7 +100,7 @@ its translation in one call (the English is still what gets checked).
   program playback, pitch.
 - **Andrii:** pose model on his laptop, dance glossary (Deep Research + vetting), MongoDB, filming the demo
   footage, audio routing.
-- **Nastia (joined Sat 24 Oct, morning):** Imperial, bioscience, computer vision in medicine. Works with
+- **Nastia (joined Sat 24 Oct, morning; GitHub `nxstiaa`):** Imperial, bioscience, computer vision in medicine. Works with
   Anusha on **computer vision quality**: an evaluation set, keypoint filtering, joint-angle features, pose
   signatures for glossary terms, model benchmark for live. **Also has design experience: leads the design of the live venue page and the
   upload page** (accessibility requirements below). Onboarding: `docs/ONBOARDING.md` and the shareable doc
