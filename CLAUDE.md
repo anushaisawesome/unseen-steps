@@ -647,3 +647,24 @@ star of the show."
 - **Annotated demos (script mode):** `docs/media/ballet-script-demo.mp4` and `docs/media/andrii-script-demo.mp4` in this
   repo; the Judas group render is a release asset in the private clips repo (release `annotated-1`), because it's
   another crew's choreography and this repo is public.
+
+## Tuning workflow (Anusha + Nastia, from Sat 19:00)
+
+Anusha and Nastia each find clips, render them in script mode, watch, and write feedback; the feedback drives
+changes to the describer. Steps in `feedback/README.md`.
+- Every `--script` render writes `data/killtest/<clip>-script-review.md`: each line with its time, status (spoken, cut for
+  space, no room, rejected by the checker), kind, pace, priority and the moment it describes, plus blank feedback
+  fields and the brief version. Filled-in reviews go to `feedback/<clip>-<name>.md`.
+- **For Claude reading feedback:** look for patterns across reviews before changing anything; most fixes belong in
+  the BRIEF in `server/scriptwriter.py` (what to say, how long, how often), the checker (false rejections), or the
+  pacing constants (`SPEECH_SHARE`, `RATE`, `in_beats`). Quote the feedback that motivated a change in the commit.
+- **One person edits `server/scriptwriter.py` at a time** (pull first, say so in the team chat), so the two of you
+  don't conflict. Changing the BRIEF changes its hash, so Argon writes a fresh script (the cache is keyed on it);
+  pose is cached per clip, so a re-render takes minutes.
+- Cost: each new script is one Argon call on the whole video with high thinking. Keep clips under ~3 minutes, and
+  keep an eye on the key's spending.
+- **Finding clips:** your own or teammates' footage, or free stock (Mixkit, Pexels). Never download from YouTube or
+  Instagram (their terms forbid it); Gemini can read a public YouTube link directly (`scripts/argon_script.py`) for
+  script-only tests. Raw clips stay out of this public repo.
+- Aim for a spread: solo, couple and group; lyrical and explosive music; ballet, ballroom, contemporary, hip hop,
+  commercial; fixed and handheld camera.

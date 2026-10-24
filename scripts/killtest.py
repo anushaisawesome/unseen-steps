@@ -978,6 +978,7 @@ def finish(args, results, frames, path, focus, group, song):
             r = max(optional, key=lambda r: (r.get("priority", 2), crowding(r)))
             print(f"   cut for space (priority {r.get('priority')}): {r['line']}")
             r.pop("speech")
+            r["status"] = "cut for space"
         print(f"   speech covers {share():.0%} of the piece")
     # Never talk over the previous line: move to the next free beat (within a beat for a callout, a bar
     # otherwise, so it stays in meter and near its moment), or drop it.
@@ -994,6 +995,7 @@ def finish(args, results, frames, path, focus, group, song):
             if not len(later) or later[0] - sp["at"] > limit:
                 print(f"   dropped (no room to speak): {r['line']}")
                 r.pop("speech")
+                r["status"] = "no room to speak"
                 continue
             sp["at"] = round(float(later[0]), 2)
         end = sp["at"] + sp["seconds"]
@@ -1001,6 +1003,37 @@ def finish(args, results, frames, path, focus, group, song):
     name = f"{stem}-annotated.mp4" if args.lang == "en" else f"{stem}-annotated-{args.lang}.mp4"
     render(args.clip, frames, path, results, out_dir / name, focus, everyone=group)
     print(f"\nannotated video: {out_dir / name}")
+    if args.script:
+        review = out_dir / f"{stem}-review.md"
+        review.write_text(review_sheet(args, results, name))
+        print(f"review sheet: {review}  (fill it in while watching, then save it to feedback/)")
+
+
+def review_sheet(args, results, video_name):
+    """A sheet to watch the render with: every line, when it's spoken and what happened to it, with a blank
+    feedback field each. Filled-in sheets go in feedback/ so everyone's Claude can learn from them."""
+    import hashlib
+    from datetime import date
+    from scriptwriter import BRIEF
+    version = hashlib.sha1(BRIEF.encode()).hexdigest()[:8]
+    def mmss(t):
+        return f"{int(t // 60)}:{t % 60:04.1f}"
+    out = [f"# Review: {Path(args.clip).name}", "",
+           f"Video: `data/killtest/{video_name}` · brief `{version}` · rendered {date.today()} · reviewer: ",
+           f"Command: `python scripts/killtest.py {' '.join(sys.argv[1:])}`", "",
+           "Overall (timing, amount of speech, voice, vocabulary, what a dancer would have said instead):", "", "",
+           "## Lines", ""]
+    for r in results:
+        at = r["speech"]["at"] if r.get("speech") else r["time"]
+        status = ("spoken" if r.get("speech") else r.get("status")
+                  or ("rejected by the checker" if r["attempts"] and not r["attempts"][-1]["passed"] else "silent"))
+        out.append(f"**{mmss(at)}** · {status} · {r.get('kind')}, {r.get('pace')}, priority {r.get('priority')} "
+                   f"· describes {mmss(r['moment'][0])}-{mmss(r['moment'][1])}")
+        for a in r["attempts"]:
+            if not a["passed"]:
+                out.append(f"> rejected: \"{a['draft']}\" ({a['reason']})")
+        out += [f"> {r['line'] or '(no line)'}", "", "Feedback: ", ""]
+    return "\n".join(out) + "\n"
 
 
 if __name__ == "__main__":
