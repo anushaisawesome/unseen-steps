@@ -51,6 +51,14 @@ VIDEOS = [
 ]
 
 
+def opens_gap(lines, cut, spoken, at, seconds, limit=8.0):
+    """Would cutting this line leave more than `limit` seconds with nothing said?"""
+    rest = [l for l in lines if spoken(l) and l is not cut]
+    before = max((at(l) + seconds(l) for l in rest if at(l) < at(cut)), default=None)
+    after = min((at(l) for l in rest if at(l) > at(cut)), default=None)
+    return before is not None and after is not None and after - before > limit
+
+
 def seconds(path: Path) -> float:
     with wave.open(str(path)) as f:
         return f.getnframes() / f.getframerate()
@@ -99,9 +107,12 @@ def build(video: tuple) -> dict:
     def share():
         return sum(l["seconds"] for l in lines if l.get("audio")) / (end - start)
     while share() > SPEECH_SHARE:
-        optional = [l for l in lines if l.get("audio") and l["kind"] != "callout" and l.get("priority", 2) > 1]
-        if not optional and share() > SPEECH_CEILING:  # never the opening line, which sets the scene
+        # never the opening line, which sets the scene
+        optional = [l for l in lines[1:] if l.get("audio") and l["kind"] != "callout" and l.get("priority", 2) > 1]
+        if not optional and share() > SPEECH_CEILING:
             optional = [l for l in lines[1:] if l.get("audio") and l["kind"] != "callout"]
+        optional = [l for l in optional if not opens_gap(lines, l, lambda x: x.get("audio"), lambda x: x["at"],
+                                                          lambda x: x["seconds"])]
         if not optional:
             break
         def crowding(l):

@@ -47,6 +47,10 @@ Watch the whole performance and return JSON with:
 - signature: [{quality, body, dynamics, times: [seconds]}] the two to four things a sighted viewer notices and
   remembers most about this particular choreography (not the style in general): what it is, where it lives in the
   body, its dynamics and texture, and the times it is strongest.
+- dynamics: [{start, end, texture, energy, music}] a timeline of the quality of movement covering the whole piece,
+  with a new entry whenever it changes, even inside a section: texture (e.g. sharp staccato hits, fluid sustained
+  waves, heavy grounded drops, light suspended), energy (low, building, high, release) and what the music is doing
+  then. A sighted viewer feels these shifts even without words for them; mark each one at the moment it happens.
 - motifs: [{name, description, times: [seconds]}] movements that recur; give every time each one appears
 - moments: [{time, what, claim}] the most striking moments, described in body terms with direction as
   the audience sees it ("to the left"). claim is one of: jump, turn, floor, still, travel_left,
@@ -68,6 +72,10 @@ SCHEMA = {
             "techniques": {"type": "array", "items": {"type": "object", "properties": {
                 "name": {"type": "string"}, "evidence": {"type": "string"}}, "required": ["name", "evidence"]}}},
             "required": ["start", "end", "label", "description", "formation", "group", "techniques"]}},
+        "dynamics": {"type": "array", "items": {"type": "object", "properties": {
+            "start": {"type": "number"}, "end": {"type": "number"}, "texture": {"type": "string"},
+            "energy": {"type": "string"}, "music": {"type": "string"}},
+            "required": ["start", "end", "texture", "energy", "music"]}},
         "signature": {"type": "array", "items": {"type": "object", "properties": {
             "quality": {"type": "string"}, "body": {"type": "string"}, "dynamics": {"type": "string"},
             "times": {"type": "array", "items": {"type": "number"}}},
@@ -81,7 +89,7 @@ SCHEMA = {
             "claim": {"type": "string", "enum": ["jump", "turn", "floor", "still", "travel_left", "travel_right", "other"]}},
             "required": ["time", "what", "claim"]}},
     },
-    "required": ["style", "sections", "signature", "motifs", "moments"],
+    "required": ["style", "sections", "signature", "dynamics", "motifs", "moments"],
 }
 
 _client = None

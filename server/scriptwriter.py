@@ -41,7 +41,11 @@ What to say, like the best dance describers:
   its dynamics (sharp or sustained, light or strong, bound or free), its texture and its relationship to the music.
   A listener who can't see should come away with the same impression of the choreography as someone who can.
 - Use the style's own vocabulary, accurately, for steps and techniques; the first time a term appears, add a few
-  plain words so a newcomer can picture it. Name the technique a dancer is doing even when its shape suggests an
+  plain words so a newcomer can picture it. A term carries its definition: use it only when every part of the
+  definition is visible, and never borrow one style's term for another style's movement. Ballet terms in particular
+  require turnout: a plié is bent knees with the legs rotated out from the hips, knees over turned-out feet, and the
+  positions (first, second, fifth...) are turned out too. Bent legs with knees forward or turned in are "bent knees",
+  "a deep squat" or "a wide stance", or that style's own word. Name the technique a dancer is doing even when its shape suggests an
   image, and give the image only as a comparison. If the piece fuses styles, notice each influence as it appears,
   use that style's language for it, and say when the piece shifts between influences.
 - Capture expression: the feeling the movement gives, grounded in what is visible. Vivid, plain words, not purple
@@ -51,6 +55,8 @@ What to say, like the best dance describers:
   as the audience sees them ("to the left"), never "stage left" or "stage right".
 - Follow the structure of the piece given below. Every section gets at least one line: a listener must hear when
   the piece changes.
+- Every change in the dynamics timeline is priority 1: say the shift as it happens, so the listener feels the
+  texture change (what it changes from and to), not just the new steps.
 - Spend words on what matters most, never on what is generic or incidental, and never repeat a description.
   Present tense. Only describe what you can see; if unsure of a term, describe the shape plainly.
 
@@ -98,8 +104,10 @@ script are below.
 
 Ask: what would a blind listener miss that a sighted viewer gets from this choreography? Look for signature
 qualities that don't come through (where the movement lives in the body, its dynamics, texture, musicality),
-group structure or striking moments that are missing, lines that are generic, inaccurate or misname a technique, and
-words spent on what matters less. Keep the same rules as the script: lines stay short (most 3 to 8 words, inside one
+group structure or striking moments that are missing, lines that are generic, inaccurate or misname a technique
+(check every technical term against its definition: a term whose definition isn't fully visible, or a term borrowed
+from another style, must be replaced with plain words; for example a plié or a ballet position needs visible
+turnout), and words spent on what matters less. Keep the same rules as the script: lines stay short (most 3 to 8 words, inside one
 bar; callouts 2 to 5 words); a richer line is a better-chosen word, not a longer line. Callouts on the hits, the
 music stays the main thing, so prefer replacing a weaker line over adding one.
 
@@ -141,9 +149,12 @@ def room(song: dict | None, start: float | None, end: float | None) -> str:
         length = end - (start or 0)
     else:
         return ""
-    lines = max(2, round(0.35 * length / 3.0))  # a spoken line takes about 3 s
-    return (f"\nRoom: this piece runs {length:.0f} s, so the music has room for about {lines} lines in total (callouts "
-            "count). Choose them so the signature and the key moments come through; leave the rest to the music.")
+    seconds = 0.35 * length
+    return (f"\nRoom: this piece runs {length:.0f} s, so the speech should total about {seconds:.0f} s. A description "
+            "line takes about 3 s; a callout takes about 1 s, so a sharp, hit-driven passage can carry several callouts. "
+            "Spend the time on the signature and the key moments, call the big accents on the music (a hit, a clap, a "
+            "turn into a new phrase) as they land, and leave the rest to the music. Silence belongs where the movement "
+            "repeats or rests: never more than about 6 s of quiet while new movement is happening.")
 
 
 def structure_notes(plan: dict) -> str:
@@ -152,6 +163,12 @@ def structure_notes(plan: dict) -> str:
     for sig in plan.get("signature", []):
         out.append(f"- {sig['quality']}: {sig['body']}; {sig['dynamics']}; strongest at "
                    + ", ".join(f"{t:.0f} s" for t in sig["times"]))
+    out.append("Dynamics timeline (every change of texture or energy is a key moment):")
+    for d in plan.get("dynamics", []):
+        out.append(f"- {d['start']:.0f}-{d['end']:.0f} s: {d['texture']}; energy {d['energy']}; music: {d['music']}")
+    if plan.get("measured_texture"):
+        out.append("Texture changes measured from the pose tracking (sudden stops and starts in the joints vs smooth, "
+                   "continuous motion): " + "; ".join(plan["measured_texture"]))
     out.append(f"Structure of the piece (style: {plan['style']['name']}):")
     for sec in plan["sections"]:
         techniques = "; ".join(f"{t['name']} ({t['evidence']})" for t in sec.get("techniques", []))
@@ -221,7 +238,9 @@ def review_script(video: str, script: dict, plan: dict | None, song: dict | None
     listing = "\n".join(f"{l['time']:.1f} s [{l['kind']}, {l['pace']}, priority {l.get('priority')}] {l['text']}"
                          for l in script["lines"])
     prompt = (REVIEW + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n" + listing + clip_note(start, end)
-              + room(song, start, end) + " Keep the total about the same: for every line you add, drop or merge a weaker one.")
+              + room(song, start, end) + " Keep the total speaking time about the same: for every line you add, drop or "
+              "merge a weaker one. Check especially that the signature comes through, that every change of texture or energy in the "
+              "dynamics timeline is felt at the moment it happens, and that the big accents are called.")
     key = hashlib.sha1(source_key(video)[:50_000_000] + prompt.encode()).hexdigest()[:16]
     cached = CACHE / f"review-{key}.json"
     if cached.exists():

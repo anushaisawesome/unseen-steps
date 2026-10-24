@@ -483,6 +483,7 @@ def phrase_features(path, size, solo, start, end, phrase, beats=None):
             current, pending = f, None
             events.append((tt, f"now {FACING_WORDS[f]}"))
 
+    turnout = turnout_of(lead, faces)
     steps, pattern = footwork(t, lead, beats, start, end, size) if beats is not None else ([], None)
     if pattern:
         label = pattern if not turns or not rotation or rotation == "mixed" else f"{pattern} turning to his/her {rotation}"
@@ -550,7 +551,83 @@ def phrase_features(path, size, solo, start, end, phrase, beats=None):
         "steps": " ".join(steps) if steps else None,  # per beat: fb (forward/back), side, close, hold
         "footwork": pattern,
         "facing": FACING_WORDS.get(facing, "unclear"),  # where the dancer faces most of the phrase
+        "turnout": turnout,  # "out", "parallel" or "in" when the knees bend facing the camera, else None
     }
+
+
+def measured_texture(path, size, window=1.0, min_run=3.0):
+    """Where the movement's texture changes, from the followed dancer's wrists and ankles: sharp movement has sudden
+    stops and starts (high jerk for its speed), fluid movement is smooth and continuous. Returns lines like
+    "12.4 s: sharp to fluid". Works for any style; it measures how the body moves, not what the step is."""
+    times = sorted(path)
+    if len(times) < SAMPLE_FPS * 6 or not size:
+        return []
+    joints = [L_WRI, R_WRI, L_ANK, R_ANK]
+    xy = np.array([[path[t][0][1][j] for j in joints] for t in times]) / size  # frames x joints x 2, body heights
+    conf = np.array([[path[t][0][2][j] for j in joints] for t in times])
+    xy = np.where(conf[..., None] > 0.3, xy, np.nan)
+    k = np.ones(3) / 3  # light smoothing, so tracking jitter doesn't read as sharpness
+    for j in range(len(joints)):
+        for d in range(2):
+            col = xy[:, j, d]
+            ok = ~np.isnan(col)
+            if ok.sum() > 3:
+                col[~ok] = np.interp(np.flatnonzero(~ok), np.flatnonzero(ok), col[ok])
+                xy[:, j, d] = np.convolve(col, k, mode="same")
+    dt = 1 / SAMPLE_FPS
+    vel = np.linalg.norm(np.diff(xy, axis=0), axis=2) / dt           # frames x joints
+    jerk = np.abs(np.diff(vel, n=2, axis=0)) / dt ** 2
+    t = np.array(times[2:-1])
+    sharp = np.nanmean(jerk, axis=1) / (np.nanmean(vel[1:-1], axis=1) + 0.3)  # jerk for its speed
+    per_window = []
+    for start in np.arange(t[0], t[-1] - window, window / 2):
+        m = (t >= start) & (t < start + window)
+        if m.sum() >= 5:
+            per_window.append((start + window / 2, float(np.nanmedian(sharp[m]))))
+    if len(per_window) < 8:
+        return []
+    centres, values = np.array([w[0] for w in per_window]), np.array([w[1] for w in per_window])
+    # A texture is a sustained state: label each half-second clearly sharp, clearly fluid or neither, smooth the
+    # labels, and keep only runs lasting at least min_run seconds. Report where a sharp run gives way to a fluid
+    # one (or the reverse), so the rhythm of a step or tracking jitter doesn't count as a change.
+    level = np.median(values)
+    labels = np.where(values > 1.5 * level, 1, np.where(values < 0.67 * level, -1, 0))
+    labels = np.array([int(np.sign(np.sum(labels[max(0, i - 1):i + 2]))) for i in range(len(labels))])
+    runs, i = [], 0
+    while i < len(labels):
+        j = i
+        while j + 1 < len(labels) and labels[j + 1] == labels[i]:
+            j += 1
+        if labels[i] != 0 and centres[j] - centres[i] >= min_run:
+            runs.append((labels[i], centres[i], centres[j]))
+        i = j + 1
+    changes = []
+    for (state_a, _, end_a), (state_b, start_b, _) in zip(runs, runs[1:]):
+        if state_a != state_b and start_b - end_a <= 2.5:
+            changes.append(f"{(end_a + start_b) / 2:.1f} s: " + ("sharp to fluid" if state_a == 1 else "fluid to sharp"))
+    return changes
+
+
+def turnout_of(lead, faces):
+    """Do bent knees open out over the feet (turnout) or fall in? Only measurable facing the camera with the legs
+    clearly bent: knees wider apart than the ankles means turned out, narrower means turned in. The feet themselves
+    aren't tracked, so this catches knees turning in, not perfect turnout."""
+    ratios = []
+    for p, face in zip(lead, faces):
+        xy, conf = p[1], p[2]
+        if face != "front" or min(conf[L_HIP], conf[R_HIP], conf[L_KNE], conf[R_KNE], conf[L_ANK], conf[R_ANK]) < 0.5:
+            continue
+        thigh = np.linalg.norm(xy[L_KNE] - xy[L_HIP]) + np.linalg.norm(xy[R_KNE] - xy[R_HIP])
+        leg = np.linalg.norm(xy[L_ANK] - xy[L_HIP]) + np.linalg.norm(xy[R_ANK] - xy[R_HIP])
+        if leg > 0.85 * (thigh + np.linalg.norm(xy[L_ANK] - xy[L_KNE]) + np.linalg.norm(xy[R_ANK] - xy[R_KNE])):
+            continue  # legs nearly straight: nothing to judge
+        ankles = abs(xy[L_ANK][0] - xy[R_ANK][0])
+        if ankles > 1:
+            ratios.append(abs(xy[L_KNE][0] - xy[R_KNE][0]) / ankles)
+    if len(ratios) < 5:
+        return None
+    r = float(np.median(ratios))
+    return "out" if r > 1.05 else "in" if r < 0.9 else "parallel"
 
 
 def group_features(frames, start, end):
@@ -842,6 +919,14 @@ def main():
     finish(args, results, frames, path, focus, group, song)
 
 
+def opens_gap(lines, cut, spoken, at, seconds, limit=8.0):
+    """Would cutting this line leave more than `limit` seconds with nothing said?"""
+    rest = [l for l in lines if spoken(l) and l is not cut]
+    before = max((at(l) + seconds(l) for l in rest if at(l) < at(cut)), default=None)
+    after = min((at(l) for l in rest if at(l) > at(cut)), default=None)
+    return before is not None and after is not None and after - before > limit
+
+
 def in_beats(start, until, song, text, pace, max_bars=2):
     """Time a line should take: the whole beats its words need at its pace, never past the next line or
     max_bars bars. The voice is tightened and sped up to fit."""
@@ -867,6 +952,9 @@ def scripted(args, song, frames, path, solo, size, group):
     # second pass: it writes the script from that map, so no section or canon is lost.
     from director import performance_map
     plan = performance_map(args.clip, style_hint=args.style)
+    if not group:  # texture changes measured from pose, as evidence for Argon
+        plan["measured_texture"] = measured_texture(path, size)
+        print(f"measured texture changes: {plan['measured_texture']}")
     print(f"Argon map: {plan['style']['name']}, " + "; ".join(
         f"{s['start']:.0f}-{s['end']:.0f}s {s['label']}" for s in plan["sections"]))
     script = write_script(args.clip, song, glossary, args.style, plan)
@@ -986,9 +1074,11 @@ def finish(args, results, frames, path, focus, group, song):
             others = [x["speech"]["at"] for x in results if x.get("speech") and x is not r]
             return -min((abs(t - r["speech"]["at"]) for t in others), default=99)
         while share() > SPEECH_SHARE:
-            optional = [r for r in results if r.get("speech") and r.get("kind") != "callout" and r.get("priority", 2) > 1]
+            optional = [r for r in results[1:] if r.get("speech") and r.get("kind") != "callout" and r.get("priority", 2) > 1]
             if not optional and share() > SPEECH_CEILING:
                 optional = [r for r in results[1:] if r.get("speech") and r.get("kind") != "callout"]
+            optional = [r for r in optional if not opens_gap(results, r, lambda x: x.get("speech"),
+                                                             lambda x: x["speech"]["at"], lambda x: x["speech"]["seconds"])]
             if not optional:
                 break
             r = max(optional, key=lambda r: (r.get("priority", 2), crowding(r)))

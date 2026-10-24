@@ -734,3 +734,19 @@ the brief were removed and replaced with three general mechanisms:
 - **A line budget up front** (`scriptwriter.room`): "this piece runs N s, room for about M lines" (35% of the length at
   ~3 s a line), for both the writer and the reviewer, so Argon chooses what to keep instead of the blunt cutter. The
   cutter stays as a safety net and never cuts the opening line. Over-long lines go back to Argon once (`revise`).
+
+### Texture changes (24 Oct, ~22:00)
+
+Anusha: Track 10 "loses the bit where the texture changes from sharp to fluid for the buildup at about 12 s... this kind of
+thing needs to be picked up on for styles I can't comment on as well. It's important." Also: hits missed (the clap and
+turn before the vocals), first line cut, nothing on the arm work, 10 s silent while a lot happens.
+- Map: `dynamics` timeline [{start, end, texture, energy, music}], a new entry whenever the quality of movement changes,
+  even mid-section. Every change is priority 1 in the script and checked by the reviewer.
+- Pose (local renders, solo/couple): `killtest.measured_texture` measures jerk-for-speed at wrists and ankles, labels
+  half-seconds clearly sharp / clearly fluid, and reports switches between runs of 3 s or more; passed to Argon as
+  evidence. Quiet on Andrii's waltz and the ballet (correct for steady pieces); not yet tested on a clip with a real change.
+- Budget in seconds, not lines (callouts ~1 s, descriptions ~3 s), so sharp passages can carry callouts; big accents
+  (a hit, a clap, a turn into a new phrase) are called; no more than ~6 s of quiet while new movement happens; the cap
+  never opens a gap over 8 s and never cuts the opening line.
+- Terms must meet their definitions (plié and ballet positions need turnout); `turnout` measured from knees vs ankles when
+  facing the camera; the checker rejects plié/positions when knees measure turned in.

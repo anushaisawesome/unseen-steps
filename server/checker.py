@@ -27,6 +27,10 @@ CLAIMS = [
      r"(?<!body roll)(?<!body rolls)",
      "lowest_level", lambda f: f.get("lowest_level") in ("floor", "low"),
      "it mentions going low or to the floor, but the dancer stayed standing"),
+    # ballet's bent-knee terms and positions need turnout; knees measured falling inward contradict them
+    (r"\b(demi-|grand )?pli[eé]s?\b|\b(first|second|fourth|fifth) position\b|\bin (first|second|fourth|fifth)\b",
+     "turnout", lambda f: f.get("turnout") != "in",
+     "it uses a ballet term that needs turnout, but the knees were measured turning in"),
     # "still" only as stopping ("stands still"), not as "continuing" ("still facing us")
     (r"\b(stands?|holds?|stays?|remains?|keeps?)\s+still\b|\b(stillness|paus\w*|freez\w*|frozen|motionless|rests?|resting)\b",
      "stillness", lambda f: (f.get("stillness") or 0) >= 0.3,
