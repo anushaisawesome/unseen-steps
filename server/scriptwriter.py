@@ -69,7 +69,7 @@ SCHEMA = {
             "who": {"type": "string", "enum": ["solo", "pair", "group", "subgroup"]},
             "kind": {"type": "string", "enum": ["description", "callout"]},
             "pace": {"type": "string", "enum": list(RATE)},
-            "delivery": {"type": "string"}, "text": {"type": "string"}},
+            "delivery": {"type": "string"}, "text": {"type": "string"}, "key_moment": {"type": "boolean"}},
             "required": ["time", "moment_start", "moment_end", "who", "kind", "pace", "delivery", "text"]}},
     },
     "required": ["style", "lines"],
@@ -175,6 +175,26 @@ def write_script(video: str, song: dict | None, glossary: list[str] = (), style_
     return script
 
 
+def key_moments(plan: dict) -> list[tuple[float, str]]:
+    """The timed moments a blind listener must hear, from the map: changes in group structure (canons, breakouts,
+    pairs, a soloist), every change of texture or energy, the signature at its strongest, and the striking moments."""
+    out = []
+    for sec in plan.get("sections", []):
+        group = sec.get("group", "")
+        if any(w in group.lower() for w in ("canon", "ripple", "break", "split", "solo", "pair", "trade")):
+            out.append((sec["start"], f"group structure: {group}"))
+    dyn = plan.get("dynamics", [])
+    for a, b in zip(dyn, dyn[1:]):
+        out.append((b["start"], f"texture or energy changes from {a['texture']} ({a['energy']}) to {b['texture']} ({b['energy']})"))
+    for q in plan.get("signature", []):
+        if q.get("times"):
+            out.append((q["times"][0], f"signature: {q['quality']} ({q['body']}; {q['dynamics']})"))
+    for m in plan.get("moments", []):
+        if m.get("check") != "dropped":
+            out.append((m["time"], f"striking moment: {m['what']}"))
+    return sorted(out)
+
+
 def windows(plan: dict, start: float | None, end: float | None, longest: float = 20.0) -> list[tuple[float, float]]:
     """Short stretches to write one at a time: the map's sections, split so none is longer than `longest` seconds."""
     out = []
@@ -210,7 +230,12 @@ def write_script_windowed(video: str, song: dict | None, glossary: list[str] = (
 
     def write(window):
         a, b = window
-        prompt = (base + f"\n\nWrite the lines for this stretch only, from {a:.1f} s to {b:.1f} s (the clip shown); "
+        here = [f"{t:.1f} s: {what}" for t, what in key_moments(plan) if a - 0.5 <= t < b] if plan else []
+        must = ("\n\nKey moments in this stretch. These are the backbone of the description: each one gets its own line, "
+                "at its time, marked key_moment true, said the way a dancer would put it (what it is and what it "
+                "expresses, not just that it happened). Only add other lines where the music has room between them:\n"
+                + "\n".join(here)) if here else ""
+        prompt = (base + must + f"\n\nWrite the lines for this stretch only, from {a:.1f} s to {b:.1f} s (the clip shown); "
                   "give every time in the full video. The rest of the piece is written separately. Pacing for this "
                   f"{b - a:.0f} s stretch: about one line every 5 to 8 seconds, plus brief callouts on standout hits.")
         key = hashlib.sha1(source_key(video)[:50_000_000] + prompt.encode()).hexdigest()[:16]
@@ -350,8 +375,10 @@ def verify_lines(video: str, lines: list[dict], start: float | None = None, end:
 
 
 SELECT = """You are an expert dance describer, and a former dancer in this style, making the final cut of an audio
-description script against the video (watch and listen closely). The music is the main thing: the speech should total
-about {target:.0f} s of this {length:.0f} s piece; it is {total:.0f} s now. Choose which lines to KEEP so a blind listener
+description script against the video (watch and listen closely). The music is the main thing, but how much to say
+follows the choreography: busy, sharp passages can carry short lines and callouts for up to about half their time;
+calm, lyrical or repeating passages need much less. Never continuous: leave at least a beat or so of music between
+lines. This piece runs {length:.0f} s and the script speaks for {total:.0f} s now. Choose which lines to KEEP so a blind listener
 gets what a dancer sees: what the piece is, its signature spread across the piece, every change of texture or energy,
 the big accents and standout moments, how the dancers relate. Drop lines that repeat, state the obvious or crowd the
 music. Never leave more than about 8 s of silence while new movement is happening. Don't rewrite anything: only choose.
@@ -362,15 +389,16 @@ Return JSON {{"keep": [the numbers of the lines to keep]}}.
 KEPT = {"type": "object", "properties": {"keep": {"type": "array", "items": {"type": "integer"}}}, "required": ["keep"]}
 
 
-def select_lines(video: str, lines: list[dict], plan: dict | None, length: float, share: float = 0.35,
+def select_lines(video: str, lines: list[dict], plan: dict | None, length: float, share: float = 0.3,
                  start: float | None = None, end: float | None = None) -> set[int]:
     """The final cut, made by Argon watching the video with the finished, voiced lines and their real lengths: which
-    lines to keep so the music stays the main thing. Earlier cuts went wrong by cutting blind (a fixed percentage, or
-    from the text alone). Returns the indexes of the lines to keep; the opening line is always kept."""
+    lines to keep so the music stays the main thing, with density following the choreography. Earlier cuts went wrong
+    by cutting blind (a fixed percentage, or from the text alone); a fixed target left dense pieces with 3 lines. Returns the indexes of the lines to keep; the opening line is always kept."""
     total = sum(l["seconds"] for l in lines)
-    if total <= share * length * 1.1:
+    if total <= share * length:  # comfortably sparse already: nothing to choose
         return set(range(len(lines)))
-    listing = "\n".join(f"{n}. {l['at']:.1f} s ({l['seconds']:.1f} s spoken) {l['text']}" for n, l in enumerate(lines))
+    listing = "\n".join(f"{n}. {l['at']:.1f} s ({l['seconds']:.1f} s spoken){' [key moment: kept]' if l.get('key_moment') else ''} "
+                         f"{l['text']}" for n, l in enumerate(lines))
     prompt = (SELECT.format(target=share * length, length=length, total=total)
               + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n" + listing + clip_note(start, end))
     response = with_retry(lambda: client().models.generate_content(
@@ -378,6 +406,7 @@ def select_lines(video: str, lines: list[dict], plan: dict | None, length: float
         config=types.GenerateContentConfig(response_mime_type="application/json", response_schema=KEPT,
                                            thinking_config=types.ThinkingConfig(thinking_level="high"))))
     keep = {n for n in json.loads(response.text)["keep"] if 0 <= n < len(lines)} | {0}
+    keep |= {n for n, l in enumerate(lines) if l.get("key_moment")}  # the key moments are never cut
     # Safety net only: a stretch of more than 10 s with nothing said gets its best-placed line back.
     spoken = sorted(keep)
     for a, b in zip(spoken, spoken[1:]):

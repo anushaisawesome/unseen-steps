@@ -878,3 +878,18 @@ quality that vanished completely (max 2 lines).
   a ballet variation's sections, a flamenco palo) are described in those terms.
 - Order: map + section zoom-ins -> windowed script -> second describer -> signature guard -> per-line visual check ->
   voice (line only, checked against the caption) -> final cut -> no-collision placement.
+
+### Moments first, and the pitch plan (25 Oct, ~00:45)
+
+Anusha's gripes, grouped (from the whole night): doesn't see like a dancer; misses what matters (arm work, sharpness,
+texture changes, canons, accents such as Track 10's clap and turn before the vocals, grooves, Leiomy's hands/freeze/hair,
+legs and feet, poses); wrong or late lines; delivery swings between wall-to-wall and 3 lines; my process (patching per
+video, restarting, no finished videos). Root causes: Argon barely watched (1 fps, one pass); write-then-rescue with six
+reshuffling passes; "don't drag" turned into fixed percentages; no stable check.
+**Fix being tested (`youtube_demo.py --keymoments`, page `?key`):** the map's key moments (group-structure changes,
+texture/energy changes, signature, striking moments incl. musical accents) are the backbone: each gets its own line,
+written with the dancer's eye; other lines only where the music has room; no rewrite review and no final cut; the
+per-line visual check and caption check stay. Reference videos: Track 10, Aquamarine, Esmeralda ballet. Freeze at 04:00.
+Pitch and submission plan for the team: https://claude.ai/artifact/WUVqqiV2qvKaZtZgQwgEep (timeline, judging criteria
+mapped to evidence, 3-minute video shot list, stage pitch with the eyes-closed hook, submission field updates, owners,
+backups). Judging: innovation, technical execution, impact, usability; top 10 pitch at 15:00 and the audience votes.

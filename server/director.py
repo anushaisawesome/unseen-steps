@@ -57,8 +57,9 @@ Watch the whole performance and return JSON with:
   waves, heavy grounded drops, light suspended), energy (low, building, high, release) and what the music is doing
   then. A sighted viewer feels these shifts even without words for them; mark each one at the moment it happens.
 - motifs: [{name, description, times: [seconds]}] movements that recur; give every time each one appears
-- moments: [{time, what, claim}] the most striking moments, described in body terms with direction as
-  the audience sees it ("to the left"). claim is one of: jump, turn, floor, still, travel_left,
+- moments: [{time, what, claim}] the most striking moments, including the big accents with the music (a hit, a
+  clap, a turn into a new phrase, a freeze, the moment the vocals or the beat come in), described in body terms with
+  direction as the audience sees it ("to the left"). claim is one of: jump, turn, floor, still, travel_left,
   travel_right, other.
 Only state what you can see. Use a dance term only if you are confident it is correct for this style;
 otherwise describe the shape plainly."""

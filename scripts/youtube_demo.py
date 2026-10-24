@@ -27,6 +27,9 @@ from scriptwriter import (RATE, budget, review_script, revise, select_lines, ver
 from speech import speak  # noqa: E402
 
 OUT = ROOT / "web" / "youtube-demo"
+# Moments first (--keymoments): the script is built on the map's key moments, with no rewrite review and no final cut,
+# so nothing a describer would keep gets reshuffled away. Output in data-keymoments.json (page: ?key).
+MOMENTS_FIRST = "--keymoments" in sys.argv
 WINDOWED = "--whole" not in sys.argv  # write one short stretch at a time (--whole: the old one-pass writer)
 
 # key, YouTube id, label, style hint, clip start and end (seconds)
@@ -61,7 +64,8 @@ def build(video: tuple) -> dict:
     plan = performance_map(url, style_hint=style, start=start, end=end)
     writer = write_script_windowed if WINDOWED else write_script
     script = writer(url, None, style_hint=style, plan=plan, start=start, end=end)
-    script = review_script(url, script, plan, None, start, end)  # a second describer: what would a listener miss?
+    if not MOMENTS_FIRST:
+        script = review_script(url, script, plan, None, start, end)  # a second describer: what would a listener miss?
     script["lines"] = verify_lines(url, script["lines"], start, end)  # every line checked against its moment
     lines = [l for l in script["lines"] if start - 1 <= l["time"] <= end]
     if lines and max(l["time"] for l in lines) < start:  # times came back relative to the clip
@@ -106,7 +110,7 @@ def build(video: tuple) -> dict:
 
     # The final cut: Argon, watching the video, keeps the lines a dancer would (the music stays the main thing).
     voiced = [l for l in lines if l.get("audio")]
-    keep = select_lines(url, voiced, plan, end - start, start=start, end=end)
+    keep = set(range(len(voiced))) if MOMENTS_FIRST else select_lines(url, voiced, plan, end - start, start=start, end=end)
     for n, l in enumerate(voiced):
         if n not in keep:
             l["status"] = "left for the music"
@@ -134,6 +138,7 @@ def build(video: tuple) -> dict:
             "sections": [{"start": s["start"], "end": s["end"], "label": s["label"], "group": s.get("group", "")}
                          for s in plan["sections"]],
             "lines": [{"at": l["at"], "text": l["text"], "kind": l["kind"], "pace": l["pace"],
+                       "key_moment": bool(l.get("key_moment")),
                        "priority": l.get("priority"), "audio": l.get("audio"), "status": l.get("status", "spoken"),
                        "seconds": l["seconds"]} for l in lines]}  # audio_kept stays internal
 
@@ -142,7 +147,7 @@ def main():
     wanted = {a for a in sys.argv[1:] if not a.startswith("--")}
     videos = [v for v in VIDEOS if not wanted or v[0] in wanted]
     OUT.mkdir(parents=True, exist_ok=True)
-    data_file = OUT / "data.json"
+    data_file = OUT / ("data-keymoments.json" if "--keymoments" in sys.argv else "data.json")
     existing = {d["key"]: d for d in json.loads(data_file.read_text())} if data_file.exists() else {}
     # Create each Gemini client once, before the threads: lazily created clients race, and the loser gets closed.
     import director
@@ -153,7 +158,7 @@ def main():
     def save():  # after every video, so the page fills in as the batch runs (refresh to see more)
         data = sorted(existing.values(), key=lambda d: order.index(d["key"]) if d["key"] in order else 99)
         data_file.write_text(json.dumps(data, indent=1, ensure_ascii=False))
-        (OUT / "data.js").write_text(
+        (OUT / ("data-keymoments.js" if "--keymoments" in sys.argv else "data.js")).write_text(
             "window.DEMOS = " + json.dumps(data, ensure_ascii=False) + ";\n")
         return data
 
