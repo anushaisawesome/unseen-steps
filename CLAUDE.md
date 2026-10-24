@@ -194,3 +194,37 @@ a motif ("the glissade from the opening returns"), the checker badge, and the ER
 
 **Next code (Anusha):** lookup functions in `server/db.py` (`match_terms(summary, style)`,
 `find_song(name)`, `save_memory(...)`), then the writer reads real vocabulary from `terms`.
+
+## Demo priorities (decided 24 Oct, 02:50)
+
+1. **Headline: live real-time narration of Andrii dancing** (`scripts/live.py`). This is the "blow their
+   socks off" moment and gets built first on Saturday. The style is known in advance (his dance), so no
+   style guessing is needed live.
+2. **Second act: the upload page.** A judge films Andrii (or anything) on their own phone, uploads it, and
+   gets a narrated video back in about a minute. Reuses the `scripts/killtest.py` pipeline wrapped in a
+   function, behind a small FastAPI server and page, run locally on the laptop.
+
+### Upload page flow
+1. **Upload checks first** (Gemini on a few frames): is there dancing; how many dancers (1–2 fine; a crowd
+   means Robotics-ER asks "who should I follow?"); length cap 3 min; is there music (if not, fixed 6 s
+   phrases instead of the music map).
+2. **Argon proposes the style per section**, with the evidence spoken and shown ("pointe shoes, tutu,
+   turnout"). Choices are a **fixed list of buttons plus "Not sure / mixed"**: never free text, which would
+   let someone inject instructions. Confirming is optional (the uploader may be blind and can't check by
+   sight); the default is safe mode below.
+3. **Argon builds this video's performance glossary** (moves, times, body-terms descriptions), reusing
+   MongoDB `terms` and saving new ones. Deep Research tops terms up with sources in the background (too slow
+   per upload).
+4. Pipeline: music map → pose → features → writer → checker → voice → video with skeleton and captions.
+5. Uploads are deleted after processing; faces of everyone except the followed dancers are blurred.
+
+### Input sanitising: verify each term, not the style
+"Gemini guesses, user picks" is weak on its own: users rubber-stamp the top option, blind users can't check,
+pieces mix styles, and model confidence numbers aren't calibrated. So the style is a **hint, not a gate**:
+- Terms from the likely styles (top few, or the confirmed one) are allowed into the candidate list.
+- **Every dance term must pass two checks before it's spoken:** (1) a body-shape check against the pose data
+  (e.g. arabesque: one leg extended behind, standing leg straight; store a `signature` per term), and (2) a
+  visual check, a second Gemini call on the frame at that moment: "Is she doing an arabesque? yes/no".
+- If either fails, drop the term and describe the shape plainly ("balances on one leg, the other stretched
+  behind"). A wrong style label then can't put a wrong term in anyone's ear.
+- "Not sure / mixed" means plain descriptions plus only terms that pass both checks.
