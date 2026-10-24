@@ -782,3 +782,21 @@ cut they may as well not be there"; "it missed the canon on ponyboy, why is this
   poses; Judas canon, tutting, floorwork; ballet fifth position and step names), judged by Gemini Flash from the
   timed lines, plus longest silence (> 8 s flagged) and longest line (> 10 words). Run after every change.
   Baseline before the reset: 9/14. The judge is lenient on "arm work" (passed Track 10 when Anusha said it was missing).
+
+## Live narration: `scripts/live.py` (24 Oct, ~23:30) — improvised, nothing rehearsed
+
+Anusha: "don't rehearse it, that's the same as hardcoding. We want to show how Gemini can think on its feet."
+- The program plays the song itself (`sounddevice`, so it knows exactly where it is in the music; works on Windows) and
+  watches the camera. YOLO-pose follows the biggest, clearest person every frame; skeleton and captions on screen.
+- Half a second before each 2-bar phrase ends, Gemini 3.8 Flash gets the last 4 s as frames (2 a second, with song
+  times), the pose features for the phrase, what's been said, Argon's running notes and the style's vetted glossary, and
+  writes one line or chooses silence. The checker vets it against the live pose; Gemini TTS voices it; the music dips
+  while it plays. Lines more than 8 s stale are dropped.
+- Gemini 4 Argon watches in the background: every 20 s it updates notes (style, the dancer's signature, motifs, what just
+  changed) from the last 20 s of frames; the live writer uses them.
+- Test on Andrii's clip (70 s): 12 lines, waltz terms used ("closed change", "reverse turn", "box step"), the checker
+  caught a wrong direction, ~5 s from phrase end to a spoken line (~2.5 s writing, ~2.5 s voice).
+- Run: `python scripts/live.py --song <music file> --camera 0 --beats-per-bar 3 --style waltz --model yolo11m-pose.pt`
+  (`--record out.mp4` saves the session with music and narration; `--camera <video file>` stands in for a camera;
+  `--mute` keeps time silently for tests). Needs `pip install sounddevice` and ffmpeg on PATH. Press q to stop.
+- Known: Argon without the style hint read Andrii's waltz frame as "mime-like, marionette arms"; pass `--style`.
