@@ -457,6 +457,11 @@ problem and who it's for, live demo). Rehearsal in the demo spot **Sat 20:00**. 
   2. Optional, **timeboxed to 30 min:** SAM 3 alone (text-prompted tracking) on a 10 s clip for the crowded
      upload path. Drop it if it doesn't install cleanly or runs out of memory.
   3. Full SAM-Body4D (with the diffusion model) probably won't fit in 8 GB; leave it for a cloud GPU later.
+- **SAM-Body4D tried and dropped for the weekend (Sat 16:00):** it failed on Nastia's setup, and won't run on
+  Anusha's Mac either. Their own profile (H800 80 GB): single target, 100 frames = **14.5 GB peak GPU memory**,
+  0.7 s/frame; 5 targets = 41–53 GB. CUDA-only (cu118 PyTorch + detectron2), no CPU/Mac mode. So it doesn't fit a
+  laptop 4070 (8 GB) or a 16 GB Mac. Possible later on a 24 GB+ cloud GPU (A100/L4) with
+  `completion.enable = false`. Don't spend more time on it this weekend.
 
 ## Status 24 Oct 15:45
 
