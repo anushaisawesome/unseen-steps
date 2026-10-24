@@ -250,3 +250,21 @@ How the `terms` collection gets filled, with Andrii vetting before anything is t
 
 Suggested document fields: `term, style, description, signature, names {en, uk, de, ...}, sources {en: [...],
 uk: [...], de: [...]}, status (draft | vetted | translated), vetted_by, embedding`.
+
+## Other dance styles: trust levels (decided 24 Oct, 03:05)
+
+Gemini runs every style end to end; a human expert only raises the ceiling.
+
+| Level | Styles | How terms get in | When a term is spoken |
+| --- | --- | --- | --- |
+| `vetted` | Ballroom (Andrii vets) | Deep Research, then an expert checks | When the pose and visual checks pass |
+| `auto` | Everything else (ballet, hip hop, contemporary...) | Deep Research, kept only if 2+ independent sources agree on the term and its description, and Argon's own understanding matches | Only when both checks pass with high confidence; otherwise plain description |
+| none | Unknown style or "Not sure / mixed" | No terms | Plain body-language description only |
+
+- Plain descriptions work for any dance with no glossary at all; terms are a bonus layer, so unvetted
+  styles get fewer technical names, never worse narration.
+- Later: an expert review page (any teacher or describer approves/fixes terms for their style, recorded in
+  `vetted_by`), and listener flags ("that term was wrong") that demote a term to `auto` for review.
+- Pitch line: "Gemini does the whole job for any style; where a human expert has checked the glossary, you
+  get richer, more precise language."
+- Store the level on each term as `trust: "vetted" | "auto"`.
