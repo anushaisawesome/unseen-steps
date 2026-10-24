@@ -476,3 +476,17 @@ problem and who it's for, live demo). Rehearsal in the demo spot **Sat 20:00**. 
   Amit (DeepMind) ~15:50. Meanwhile use a key from a teammate's **own** temporary account, and **pause Deep
   Research** until there's fresh budget.
 - Tip for filming: his feet leave the bottom of the frame when he comes close; start further back.
+
+## Glossary in the narration (24 Oct, 16:15)
+
+- All 18 waltz terms are now `vetted` (Andrii checked them; marked by Anusha at 16:10). **No beginner names yet**
+  (`display_names.beginner`): per SPEC.md 5b, Anusha and Nastia confirm those (one enters, the other checks).
+- Each phrase's movement is described in plain words and matched to the glossary with Atlas vector search
+  (`db.match_terms(movement, style)`, same `gemini-embedding-2` / 3072 setup as the import). Only vetted terms are
+  returned. `db.spoken_name(term, level)` picks the name: `professional` = canonical term, `beginner` = confirmed
+  beginner name or nothing (plain description).
+- Kill test / demo render: `--style waltz --terms professional` (or `beginner`, the SPEC default, which speaks no
+  names until beginner names exist).
+- Timing fix: 2-bar phrases (`--bars-per-phrase 2`, a line every ~4 s), the writer favours the last few seconds,
+  and lines go in the earliest acceptable gap (`map_song(..., earliest=True)`). The checker's "floor" rule now only
+  fires on going down ("to/on the floor", floor work, kneel...), not "across the floor".

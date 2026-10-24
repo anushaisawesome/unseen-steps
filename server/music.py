@@ -34,7 +34,7 @@ def load_audio(path: str) -> np.ndarray:
 
 
 def map_song(y: np.ndarray, beats_per_bar: int = 4, bars_per_phrase: int = 8,
-             speech_seconds: float = 3.0, search_bars: int = 2) -> dict:
+             speech_seconds: float = 3.0, search_bars: int = 2, earliest: bool = False) -> dict:
     tempo, beat_frames = librosa.beat.beat_track(y=y, sr=SR)
     beats = librosa.frames_to_time(beat_frames, sr=SR)
     if len(beats) < 2:
@@ -70,7 +70,12 @@ def map_song(y: np.ndarray, beats_per_bar: int = 4, bars_per_phrase: int = 8,
         if not candidates:
             clean_spaces.append(None)
             continue
-        best = min(candidates, key=lambda c: loudness[c:c + window].mean())
+        quiet = {c: loudness[c:c + window].mean() for c in candidates}
+        if earliest:  # the first gap that's no louder than average, so lines stay close to the movement
+            typical = float(np.median(list(quiet.values())))
+            best = next(c for c in candidates if quiet[c] <= typical)
+        else:
+            best = min(candidates, key=quiet.get)
         clean_spaces.append([float(beats[best]), float(beats[best + window])])
     clean_spaces.append(None)  # nothing to speak into after the last phrase
 

@@ -631,12 +631,16 @@ def main():
     parser.add_argument("--bars-per-phrase", type=int, default=4)
     parser.add_argument("--no-frames", action="store_true", help="features only, no close-up crops")
     parser.add_argument("--model", default="yolo11n-pose.pt", help="pose model file in models/")
+    parser.add_argument("--style", help="dance style for glossary terms, e.g. waltz")
+    parser.add_argument("--terms", choices=["beginner", "professional"], default="beginner",
+                        help="which names to speak (SPEC.md 5b); beginner falls back to plain description")
+    parser.add_argument("--include-drafts", action="store_true", help="preview with unvetted glossary terms (never for the demo)")
     parser.add_argument("--lang", default="en", help="narration language: en, uk, de, hi")
     parser.add_argument("--seed", help="who to follow: time,x,y with x and y as fractions of the frame, e.g. 18,0.6,0.7")
     args = parser.parse_args()
 
     song = map_song(load_audio(args.clip), beats_per_bar=args.beats_per_bar,
-                    bars_per_phrase=args.bars_per_phrase, speech_seconds=2.5)
+                    bars_per_phrase=args.bars_per_phrase, speech_seconds=2.5, earliest=True)
     print(f"music: {song['bpm']} bpm, {len(song['phrases'])} phrases")
 
     seed = tuple(float(x) for x in args.seed.split(",")) if args.seed else None
@@ -652,7 +656,18 @@ def main():
     for n, ((start, end), space) in enumerate(zip(song["phrases"], song["clean_spaces"])):
         features = phrase_features(path, size, solo, start, end, n)
         shots = [] if args.no_frames or features["tracking"] == "poor" else crops(args.clip, path, start, end)
-        result = describe(features, previous, frames=shots)
+        vocab = []
+        if args.style and features["tracking"] != "poor":
+            from db import match_terms, spoken_name
+            parts = [f"travels {features['travel']}" if features.get("travel") not in (None, "none") else "stays in place",
+                     f"{features['turns']} turn(s)" if features.get("turns") else "no turns",
+                     "pauses" if (features.get("stillness") or 0) > 0.3 else "keeps moving",
+                     "rises" if (features.get("max_rise") or 0) > 0.05 else ""]
+            movement = "; ".join([p for p in parts if p] + (features.get("events") or []))
+            vocab = [f"{name} ({t['description']})" for t in
+                     match_terms(movement, args.style, include_drafts=args.include_drafts)
+                     if (name := spoken_name(t, args.terms))]
+        result = describe(features, previous, vocab=vocab, frames=shots)
         if result.line:
             previous.append(result.line)
         results.append({"features": features, "line": result.line, "attempts": result.attempts, "clean_space": space})

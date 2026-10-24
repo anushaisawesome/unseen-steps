@@ -17,7 +17,7 @@ CLAIMS = [
     (r"\b(spin|turn|pirouette|rotat|twirl|whirl)\w*",
      lambda f: (f.get("turns") or 0) >= 1,
      "it mentions turning, but no turn was measured"),
-    (r"\b(floor|kneel|crouch|roll|sink|low)\w*",
+    (r"\b((to|on|onto) the floor|floor ?work|kneel|crouch|roll|sink|low)\w*",
      lambda f: f.get("lowest_level") in ("floor", "low"),
      "it mentions going low or to the floor, but the dancer stayed standing"),
     (r"\b(still|stillness|pause|freez|frozen|motionless|rest)\w*",
