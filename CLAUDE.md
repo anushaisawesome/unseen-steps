@@ -24,7 +24,7 @@ commit.
 | Who-is-followed contact sheet | `scripts/track_debug.py` | Works |
 | Live demo program | `scripts/live.py` | **Not built yet** (see below) |
 | MongoDB (vocab, songs, show memory) | `server/db.py`, `server/setup_db.py` | Connected; collections and search indexes ready |
-| Dance vocabulary + Deep Research translations | `server/glossary_research.py` | 17 sourced drafts plus expert-vetted reverse turn; Andrii must vet the remaining drafts |
+| Dance vocabulary + Deep Research translations | `server/glossary_research.py` | Latest run produced 20 validated Waltz drafts; terminology confirmation belongs to Anusha + Nastia |
 
 Run the kill test / demo render:
 ```
@@ -75,6 +75,10 @@ python scripts/killtest.py clips/waltz.mp4 --beats-per-bar 3 --seed 17,0.42,0.7 
   pause on a representative frame with numbered clickable boxes; expose the same choices as descriptive
   keyboard/screen-reader buttons. The selected box seeds the tracker; if identity is lost, go silent and
   ask for reselection rather than switching people.
+- **Terminology level and aliases:** each move has one canonical professional name plus vetted common or
+  beginner aliases. The listener chooses `beginner` or `professional` terminology; never infer expertise
+  from the video. Recognition searches every alias, while narration uses the chosen display name. Anusha
+  and Nastia jointly confirm Waltz names and their syllabus/region context before a term becomes `vetted`.
 
 ## Live demo plan (`scripts/live.py`, to build Saturday)
 
@@ -105,13 +109,13 @@ its translation in one call (the English is still what gets checked).
 ## Who owns what
 
 - **Anusha:** music map, writer, checker, voice, translation, Argon director, Robotics-ER targeting, live
-  program playback, pitch.
-- **Andrii:** pose model on his laptop, dance glossary (Deep Research + vetting), MongoDB, filming the demo
-  footage, audio routing.
+  program playback, pitch; jointly confirms glossary terminology with Nastia.
+- **Andrii:** pose model on his laptop, Deep Research/MongoDB glossary pipeline, filming the demo footage,
+  audio routing.
 - **Nastia (joined Sat 24 Oct, morning; GitHub `nxstiaa`):** Imperial, bioscience, computer vision in medicine. Works with
   Anusha on **computer vision quality**: an evaluation set, keypoint filtering, joint-angle features, pose
   signatures for glossary terms, model benchmark for live. **Also has design experience: leads the design of the live venue page and the
-  upload page** (accessibility requirements below). Onboarding: `docs/ONBOARDING.md` and the shareable doc
+  upload page** and jointly confirms glossary terminology with Anusha (accessibility requirements below). Onboarding: `docs/ONBOARDING.md` and the shareable doc
   https://claude.ai/artifact/EPUve2GLzGbzjPyf8zVGmm.
 - Agree who edits which file before splitting up, to avoid merge conflicts. Computer vision code currently
   lives in `scripts/killtest.py`; if Nastia and Anusha both work on it, split it into `server/pose.py`
@@ -170,7 +174,7 @@ a motif ("the glissade from the opening returns"), the checker badge, and the ER
 2. Robotics-ER target selection: `--target "the girl in the red dress"` replaces `--seed` (Anusha)
 3. Writer uses Argon's notes and motif callbacks (Anusha)
 4. `scripts/live.py` (both)
-5. Glossary via Deep Research into MongoDB (Andrii)
+5. Glossary via Deep Research into MongoDB (Andrii); terminology confirmation (Anusha + Nastia)
 6. If time: announcer transcription, Live ask mode, Lyria music
 
 ## Database (MongoDB Atlas)
@@ -203,8 +207,10 @@ a motif ("the glissade from the opening returns"), the checker badge, and the ER
 
 **Collections to create (shapes match `SPEC.md` section 4):**
 - `terms`: the glossary, one document per move:
-  `{"term": "arabesque", "style": "ballet", "description": "standing on one leg, the other extended straight behind",`
-  `"names": {"en": "arabesque", "uk": "...", "de": "..."}, "sources": ["url"], "embedding": [...]}`.
+  `{"term": "natural turn", "style": "waltz", "aliases": ["right box turn", "right turn box"],`
+  `"display_names": {"professional": "natural turn", "beginner": "right box turn"},`
+  `"description": "couple rotates right while travelling", "names": {"en": "natural turn", "uk": "...",`
+  `"de": "..."}, "sources": ["url"], "embedding": [...]}`.
   The `description` (what the move looks like in body terms) is what vector search matches against each
   phrase's features summary, so write it in plain body language. Vector index on `embedding`
   (`gemini-embedding-2`, or Atlas Automated Embedding on `description` for extra MongoDB points).
@@ -252,23 +258,30 @@ enough to speak a technical term because confidence numbers are not perfectly ca
 
 ## Glossary pipeline (decided 24 Oct, 03:00)
 
-How the `terms` collection gets filled, with Andrii vetting before anything is translated:
+How the `terms` collection gets filled, with Anusha and Nastia confirming terminology before anything is
+translated:
 
-1. **Deep Research builds a skeleton glossary of ballroom terms in English** (start with waltz, since that's
-   the live demo). For each term: name, style, a plain body-language `description` of what it looks like
+1. **Deep Research builds a skeleton glossary of ballroom terms in English** (start with Waltz, since that's
+   the live demo). For each term: canonical professional name, common/beginner aliases, style, a plain
+   body-language `description` of what it looks like
    (written for Gemini and the pose data, e.g. "couple in closed hold rotates clockwise while travelling
    along the line of dance"), a `signature` (the body-shape rule the pose check tests), and `sources`.
    Status `draft`.
-2. **Andrii vets every term for accuracy** as a dancer: fix or delete anything wrong. Mark `status: "vetted"`
-   and `vetted_by: "Andrii"`. Nothing unvetted is used in narration.
+2. **Anusha and Nastia jointly confirm every Waltz term and alias:** one reviews the professional and
+   common/beginner names; the other double-checks them, including International/American/social syllabus
+   context where relevant. Fix, qualify or delete anything wrong. Mark `status: "vetted"` and record both
+   names in `vetted_by`. Nothing unvetted is used in narration.
 3. **Only after vetting: Deep Research again, once per language** (Ukrainian, German; Hindi later), pulling
    the names dancers actually use from dance blogs, federation syllabi and teaching material in that
    language, for nuance. Never machine translation. Store `names.<lang>` and per-language `sources`;
    status `translated`.
-4. The writer only gets vetted terms; `localise.py` gets the vetted names per language as its glossary.
+4. The writer only gets vetted terms. It receives the listener's explicit `terminology_level` and speaks
+   `display_names.professional` or `display_names.beginner` accordingly; the setting never changes the
+   recognized move. `localise.py` gets the vetted names per language as its glossary.
 
-Suggested document fields: `term, style, description, signature, names {en, uk, de, ...}, sources {en: [...],
-uk: [...], de: [...]}, status (draft | vetted | translated), vetted_by, embedding`.
+Suggested document fields: `term, style, aliases, display_names {professional, beginner}, naming_context,
+description, signature, names {en, uk, de, ...}, sources {en: [...], uk: [...], de: [...]}, status
+(draft | vetted | translated), vetted_by, embedding`.
 
 ### Deep Research implementation status (24 Oct)
 
@@ -280,9 +293,10 @@ uk: [...], de: [...]}, status (draft | vetted | translated), vetted_by, embeddin
 - English Mongo imports require `gemini-embedding-2` vectors (3072 dimensions). All 17 waltz drafts are now
   in Atlas with embeddings; the vector and song-name search indexes report `READY`. Imports atomically protect
   `vetted`/`translated` terms and translations marked vetted per language.
-- Andrii expert-vetted `reverse turn` from five years of ballroom experience. It is stored with aliases
+- Andrii initially expert-vetted `reverse turn` from five years of ballroom experience. It is stored with aliases
   `left box turn` / `left turn box`; `natural turn` has `right box turn` / `right turn box`. The Gemini
   spending cap blocked the new reverse-turn embedding, so that one record is marked `pending_billing_cap`.
+  Ongoing terminology confirmation has now moved to Anusha and Nastia.
 - Ukrainian/German jobs refuse to start until English terms exist in MongoDB with status `vetted` or
   `translated`. A localized name can be protected from later reruns by setting
   `translations.<lang>.status` to `vetted`.
@@ -293,7 +307,7 @@ Gemini runs every style end to end; a human expert only raises the ceiling.
 
 | Level | Styles | How terms get in | When a term is spoken |
 | --- | --- | --- | --- |
-| `vetted` | Ballroom (Andrii vets) | Deep Research, then an expert checks | When the pose and visual checks pass |
+| `vetted` | Ballroom (Anusha + Nastia review) | Deep Research, then both reviewers confirm canonical and common names | When the pose and visual checks pass |
 | `auto` | Everything else (ballet, hip hop, contemporary...) | Deep Research, kept only if 2+ independent sources agree on the term and its description, and Argon's own understanding matches | Only when style confidence is >= 0.90 and both term checks pass; otherwise plain description |
 | none | Unknown style or "Not sure / mixed" | No terms | Plain body-language description only |
 

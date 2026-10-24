@@ -91,8 +91,11 @@ examples of the Features shape.)
 
 **Vocabulary term**
 ```json
-{"term": "natural turn", "style": "ballroom", "description": "...",
- "names": {"en": "...", "hi": "..."}, "sources": ["url"], "embedding": [0.0]}
+{"term": "natural turn", "style": "waltz",
+ "aliases": ["right box turn", "right turn box"],
+ "display_names": {"professional": "natural turn", "beginner": "right box turn"},
+ "description": "...", "names": {"en": "...", "hi": "..."},
+ "sources": ["url"], "embedding": [0.0]}
 ```
 
 **Line**
@@ -114,7 +117,7 @@ examples of the Features shape.)
 | Web playback page | `web/` | Both | To build (MVP) | Plays song + narration, runs pose, renders the reveal |
 | Audio routing & sync | VoiceMeeter Banana | Both | **Done** | Music → speakers + dancer's headphones; narration → speakers only; speaker bus delayed to match headphone latency |
 | Database | `server/db.py` (MongoDB Atlas) | Andrii | Stretch (Sat) | Vocab vector search, songs, show memory |
-| Multilingual | Deep Research + render | — | Stretch (Sat) | Term names in Hindi + one more language, cited |
+| Glossary research + terminology review | `server/glossary_research.py` + MongoDB `terms` | Anusha + Nastia review | Stretch (Sat) | Confirm professional Waltz names, common/beginner aliases and localized names; keep sources |
 | Dance summarisation | — | — | Stretch | What went wrong across the whole dance |
 
 > Agree who edits which file before splitting up, to avoid merge conflicts.
@@ -143,6 +146,30 @@ Target selection happens before tracking:
   (for example, "Couple 2: red dress and black suit, centre"), with spoken confirmation.
 - The selected box seeds the focus tracker. If identity confidence is lost, go silent and request
   reselection rather than silently switching to another dancer.
+
+### 5b. Professional and beginner terminology
+
+Deep Research produces candidate names, but **Anusha and Nastia jointly own terminology
+confirmation**. For every Waltz move they must double-check the professional/competition name,
+the common name used in beginner teaching, and any style, syllabus or regional limitation. One
+reviewer enters or corrects the names and the other checks them before the record becomes `vetted`.
+
+- Store one move as one canonical record. `term` is the professional name; `aliases` contains all
+  confirmed alternative spellings and common teaching names. Do not create duplicate move records
+  merely because different communities use different names.
+- Store the preferred spoken forms explicitly in `display_names.professional` and
+  `display_names.beginner`. For example, `reverse turn` may use `left box turn` for beginners, while
+  `natural turn` may use `right box turn` for beginners. Keep `left turn box` and `right turn box`
+  as searchable aliases when confirmed.
+- Alias matching is not blanket equivalence: record whether a name belongs to International,
+  American, social or another syllabus when that distinction affects the actual figure.
+- Let the listener choose `terminology_level: beginner | professional`; never infer expertise from
+  the person's appearance or the video. Default to `beginner`. The professional setting speaks the
+  canonical term; the beginner setting speaks the confirmed common name, falling back to a plain
+  body description when no beginner name is vetted.
+- Search and recognition match the canonical term and every alias, but the writer speaks only the
+  display name selected for that listener. Changing the display level must not change the underlying
+  movement match or bypass the pose and visual verification gates.
 
 ## 6. Checker rules (the verification loop)
 
