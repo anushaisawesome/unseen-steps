@@ -379,8 +379,12 @@ def render(video, frames, path, results, out_path):
                 followed = path[nearest]
         k = int(np.abs(sample_times - t).argmin())
         if abs(sample_times[k] - t) < 0.1:
+            ref_h = height(followed[0][0]) if followed else 0.25 * h
             for p in frames[k][1]:
-                if p[4] >= MOVING and not any(p is q for q in followed):
+                # Other dancers only: moving, standing on the floor (feet in the lower part of the
+                # picture) and about the size of the followed dancer. Spectators at the edges get none.
+                on_floor = p[0][3] > 0.55 * h and 0.6 * ref_h < height(p[0]) < 1.6 * ref_h
+                if p[4] >= 2 * MOVING and on_floor and not any(p is q for q in followed):
                     draw_skeleton(frame, p[1], p[2], OTHER_COLOUR, 1)
         for n, p in enumerate(followed):
             draw_skeleton(frame, p[1], p[2], LEAD_COLOUR if n == 0 else PARTNER_COLOUR, thick)
