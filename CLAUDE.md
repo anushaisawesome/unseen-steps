@@ -821,3 +821,25 @@ Anusha: "don't rehearse it, that's the same as hardcoding. We want to show how G
   exact texture changes, shapes, canons, accents) feeds the script; `scriptwriter.verify_lines` checks every line against
   its moment at 10 fps (right movement, time, technique, speed) and corrects or drops it. Head, hair and face added to
   the body parts Argon attends to.
+
+## Website: `web/` on Vercel (24 Oct, late; Nastia)
+
+Live at https://unseen-steps.vercel.app (Vercel project `unseen-steps`, account `nxstiaa`). Static pages plus two Python
+functions; no build step. WCAG 2.2 AA aimed for (Lighthouse accessibility 100 on both pages); Atkinson Hyperlegible type.
+- **Home (`index.html`, `app.js`):** the ballet solo with Unseen Steps' narration from a recorded `killtest.py --script`
+  run (2D); music and narration as separate tracks with their own volumes, resizable captions, transcript, WebVTT
+  download, and the reveal (skeleton video, bar/beat/phrase counter, spoken and rejected lines). Rebuild it from a new
+  run with `python scripts/web_demo_media.py clips/ballet.mp4 data/killtest/ballet-script.json`.
+- **Live venue (`listen.html`, `live.js`, `pose.js`, `features.js`):** the website version of `scripts/live.py`. YOLO11n-pose
+  runs in the browser (`web/models/yolo11n-pose.onnx`, ONNX Runtime Web, WebGPU else WASM); `features.js` ports
+  `phrase_features` (thresholds in seconds; leg and arm events only from joints YOLO can see). Every ~1.5 s, one request
+  at a time, the last 4 s go to `api/describe.py` as 2 frames a second plus measurements, what's been said and Argon's
+  notes; it writes with `live.py`'s LIVE_BRIEF on `gemini-3.5-flash-lite` (~1.5 s with frames; 3.8 Flash took ~5.4 s),
+  one `checker.py` pass. Lines about movement more than 3 s old are skipped, never spoken late; only the newest waits
+  while a line is spoken. `api/notes.py` runs Argon's NOTES_BRIEF on the last 20 s in the background. Device voice by
+  default; the Gemini voice uses `speech._synthesise` only (`speak()` needs ffmpeg, which Vercel doesn't have).
+- **The functions can't import `server/` or `scripts/`:** `python scripts/web_sync_server.py` copies the server modules and
+  `live.py`'s briefs into `web/api/_unseen/`. Run it before every deploy; never edit the copies.
+- **Deploy:** `cd web && npx vercel@63.1.2 deploy --prod`. `GEMINI_API_KEY` is a Vercel environment variable; there is no
+  access code, so anyone with the link spends on that key: keep the AI Studio spending cap.
+- `web/youtube-demo/` is excluded from deploys (`web/.vercelignore`) until its generated `data.js` and audio are committed.

@@ -35,6 +35,9 @@ CLAIMS = [
     (r"\b(stands?|holds?|stays?|remains?|keeps?)\s+still\b|\b(stillness|paus\w*|freez\w*|frozen|motionless|rests?|resting)\b",
      "stillness", lambda f: (f.get("stillness") or 0) >= 0.3,
      "it mentions stillness, but the dancer kept moving"),
+    (r"\b(kick(s|ed|ing)?|battements?|high leg|leg (swings?|flicks?) (up|high))\b",
+     "events", lambda f: any("kick" in e or "high leg" in e for e in (f.get("events") or [])),
+     "it mentions a kick or high leg, but none was measured"),
 ]
 
 INDIVIDUAL = r"\b(she|he|her|his|him|the leader|the follower|one dancer|the other)\b"
