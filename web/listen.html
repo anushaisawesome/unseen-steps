@@ -34,9 +34,15 @@
   <section class="listen" aria-labelledby="title">
     <p class="eyebrow">Live venue</p>
     <h1 id="title">Describe a dancer, live</h1>
-    <p class="lede measure">Point this device's camera at one dancer, whole body in view, like an audience member's view of the stage. Unseen Steps tracks the movement on this device and speaks a short description every few seconds. The video never leaves this device: only body measurements are sent to write each line.</p>
+    <p class="lede measure">Point this device's camera at one dancer, whole body in view, like an audience member's view of the stage. Unseen Steps tracks the body on this device and, every second or two, Gemini looks at the last few seconds and describes it out loud, live, while a director model keeps notes on the style and the dancer's signature. To write each line, small still frames from the camera (two a second) and the body measurements are sent to Gemini; nothing is recorded or stored.</p>
 
     <form id="setup" class="settings" style="border-top:0;padding-top:0;width:100%">
+      <div>
+        <label for="style">Dance style <span class="hint">(optional)</span></label>
+        <input type="text" id="style" placeholder="e.g. ballet, waltz, hip hop" autocomplete="off" aria-describedby="style-hint"
+               style="font:inherit;padding:0.5rem 0.7rem;border:2px solid var(--ink);border-radius:8px;min-height:44px;background:var(--surface);color:var(--ink);width:100%">
+        <p class="hint" id="style-hint">Helps Gemini use the right vocabulary. Leave empty and it judges from what it sees.</p>
+      </div>
       <div>
         <label for="voice">Voice</label>
         <select id="voice">
@@ -68,9 +74,15 @@
     <div class="sr-only" aria-live="polite" id="live"></div>
   </section>
 
+  <section aria-labelledby="notes-title">
+    <h2 id="notes-title">Director's notes</h2>
+    <p class="measure hint">Every 20 seconds, Gemini Argon watches the last stretch and updates these notes on the style, the dancer's signature, recurring motifs and what just changed. The live describer uses them, so lines get more specific as the piece goes on.</p>
+    <p class="measure" id="notes" style="white-space:pre-line"></p>
+  </section>
+
   <section aria-labelledby="log-title">
     <h2 id="log-title">What it said</h2>
-    <p class="measure hint">About every second and a half: what was measured, the line, whether it was spoken, and any draft the checker rejected. To stay live, a line that's ready too late for the movement it describes is skipped, not spoken late.</p>
+    <p class="measure hint">About every second and a half: what was measured, the line, whether it was spoken, and any line the checker rejected. To stay live, a line that's ready too late for the movement it describes is skipped, not spoken late.</p>
     <ol class="lines" id="log" reversed></ol>
   </section>
 

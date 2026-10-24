@@ -1,30 +1,33 @@
-// Live venue loop: camera -> YOLO pose on this device -> every WINDOW seconds (one request at a time), the latest
-// movement's measurements go to /api/describe (Gemini writes, checker.py checks) -> the line is spoken if it's
-// still current, else skipped. Only measurements leave the device.
+// Live venue loop, the website version of scripts/live.py: camera -> YOLO pose on this device -> every WINDOW
+// seconds (one request at a time), the last CONTEXT seconds go to /api/describe as frames (FRAME_RATE a second)
+// plus pose measurements, what's been said and the director's notes -> Gemini writes a line, checker.py vets it
+// -> it's spoken if still current, else skipped. In the background, /api/notes has Argon update its running notes
+// from the last NOTES_EVERY seconds. Camera frames are sent to Gemini; nothing is stored.
 
 import { loadPose, detect } from "./pose.js";
 import { phraseFeatures } from "./features.js";
 
 // No music map live: every WINDOW seconds (as soon as the previous request is back, without waiting for speech),
-// describe the last CONTEXT seconds of movement: overlapping, so each line has enough pose readings to measure
-// travel, turns and jumps (1.5 s alone looks "still"). STALE: a line about movement that ended longer ago than
-// this is skipped, never spoken late.
-const WINDOW = 1.5, CONTEXT = 3, STALE = 2.5;
+// describe the last CONTEXT seconds (overlapping). STALE: a line about movement that ended longer ago than this is
+// skipped, never spoken late. CONTEXT, FRAME_RATE and NOTES_EVERY match scripts/live.py.
+const WINDOW = 1.5, CONTEXT = 4, STALE = 3, FRAME_RATE = 2, NOTES_EVERY = 20, FRAME_WIDTH = 512;
 const BONES = [[5, 7], [7, 9], [6, 8], [8, 10], [5, 6], [5, 11], [6, 12], [11, 12], [11, 13], [13, 15], [12, 14], [14, 16], [0, 5], [0, 6]];
 const $ = (id) => document.getElementById(id);
 const video = $("camera"), overlay = $("overlay"), draw = overlay.getContext("2d");
 
 let running = false, stream = null, t0 = 0, samples = [], phraseStart = 0, phraseN = 0;
+let frames = [], notes = "", notesBusy = false, lastNotes = 0;  // {t, jpeg base64} at FRAME_RATE; Argon's notes
+const snap = document.createElement("canvas"), snapCtx = snap.getContext("2d");
 let previous = [], playing = null, pending = null, speechToken = 0, waiting = false, speaking = false, smoothed = null, lastT = 0, lastError = "", lastLineAt = null;
 const SMOOTH = 0.1;  // seconds: keypoint smoothing time constant (steadier turns and travel, still follows jumps)
 
 const saved = (() => { try { return JSON.parse(localStorage.getItem("unseen-steps-live") || "{}"); } catch { return {}; } })();
-for (const k of ["voice", "vol"]) if (saved[k] !== undefined) $(k).value = saved[k];
+for (const k of ["voice", "vol", "style"]) if (saved[k] !== undefined) $(k).value = saved[k];
 $("announce").checked = !!saved.announce;
 function remember() {
-  try { localStorage.setItem("unseen-steps-live", JSON.stringify({ voice: $("voice").value, vol: $("vol").value, announce: $("announce").checked })); } catch {}
+  try { localStorage.setItem("unseen-steps-live", JSON.stringify({ voice: $("voice").value, vol: $("vol").value, style: $("style").value, announce: $("announce").checked })); } catch {}
 }
-for (const id of ["voice", "vol", "announce"]) $(id).addEventListener("change", remember);
+for (const id of ["voice", "vol", "style", "announce"]) $(id).addEventListener("change", remember);
 
 const status = (text) => { $("status").textContent = text; };
 
@@ -42,6 +45,7 @@ $("setup").addEventListener("submit", async (e) => {
     running = true;
     t0 = performance.now() / 1000;
     samples = []; phraseStart = 0; phraseN = 0; previous = []; waiting = false; speaking = false; pending = null;
+    frames = []; notes = ""; notesBusy = false; lastNotes = 0; $("notes").textContent = "";
     $("start").textContent = "Stop";
     status(`Watching (pose on ${backend === "webgpu" ? "the graphics chip" : "the processor"}). The first description comes in a few seconds.`);
     loop();
@@ -71,12 +75,38 @@ async function loop() {
       let pose = null;
       try { pose = smooth(await detect(video), t); } catch (err) { lastError = err.message; console.error(err); }
       samples.push({ t, pose });
+      keepFrame(t);
       drawPose(pose);
       readout(t);
       if (!waiting && t - phraseStart >= WINDOW) endPhrase(t);
+      if (!notesBusy && t - lastNotes >= NOTES_EVERY && t > NOTES_EVERY / 2) direct(t);
     }
     await new Promise((r) => requestAnimationFrame(r));
   }
+}
+
+// FRAME_RATE small JPEGs a second, kept for the last NOTES_EVERY seconds (what the writer and director see).
+function keepFrame(t) {
+  if (frames.length && t - frames.at(-1).t < 1 / FRAME_RATE) return;
+  snap.width = FRAME_WIDTH;
+  snap.height = Math.round(video.videoHeight * FRAME_WIDTH / video.videoWidth);
+  snapCtx.drawImage(video, 0, 0, snap.width, snap.height);
+  frames.push({ t: +t.toFixed(2), jpeg: snap.toDataURL("image/jpeg", 0.8).split(",")[1] });
+  frames = frames.filter((f) => f.t > t - NOTES_EVERY - 2);
+}
+
+// Argon's running notes (style, signature, motifs, what just changed), in the background as in live.py.
+async function direct(t) {
+  notesBusy = true; lastNotes = t;
+  try {
+    const res = await fetch("/api/notes", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ frames: frames.filter((f) => f.t > t - NOTES_EVERY), notes, style: $("style").value.trim() }),
+    });
+    const out = await res.json();
+    if (res.ok) { notes = out.notes || notes; $("notes").textContent = notes; } else lastError = out.error;
+  } catch (err) { lastError = err.message; }
+  notesBusy = false;
 }
 
 // Exponential smoothing in seconds (frame-rate independent), per keypoint, only between confident readings.
@@ -138,7 +168,8 @@ async function endPhrase(t) {
   try {
     const res = await fetch("/api/describe", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ voice: $("voice").value, features, previous }),
+      body: JSON.stringify({ voice: $("voice").value, features, said: previous, notes, style: $("style").value.trim(),
+                             frames: frames.filter((f) => f.t >= start && f.t <= t) }),
     });
     const out = await res.json();
     if (!res.ok) { lastError = out.error; entry.say(`(silent: ${out.error})`); return; }
