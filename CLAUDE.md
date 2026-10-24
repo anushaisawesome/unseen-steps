@@ -268,3 +268,27 @@ Gemini runs every style end to end; a human expert only raises the ceiling.
 - Pitch line: "Gemini does the whole job for any style; where a human expert has checked the glossary, you
   get richer, more precise language."
 - Store the level on each term as `trust: "vetted" | "auto"`.
+
+## Choosing who to follow, and accessibility (decided 24 Oct, 03:10)
+
+**Pick the dancers in words (Andrii's request).** For videos with several dancers, the user says or types
+who to follow ("follow the girl in the red dress", "couple number 8", "the soloist nearest the camera").
+`gemini-robotics-er-2-preview` finds them; narration is **only about that pair** (other dancers are ignored
+unless they directly affect the pair, e.g. "another couple passes in front"). Because a blind user can't see
+the box, Robotics-ER also **says who it picked** in words, read back by TTS: "I'll follow the couple on the
+left: girl in a red dress, boy in black. Is that right?" Yes / no / describe again.
+
+**The web app must be properly accessible (it's an accessibility tool):**
+- WCAG 2.2 AA as the bar. Semantic HTML, full keyboard use with visible focus, no information by colour
+  alone, good contrast, respects reduced motion.
+- Screen readers: real `<label>`s on every field; an ARIA live region (`aria-live="polite"`) for progress
+  ("Watching the dance... 40%") and for each narration line as it's spoken; focus moves to the result when
+  it's ready.
+- **Dictation for every field** with `gemini-3.5-transcribe` (press and speak), with the same text box as a
+  fallback. Spoken confirmations with Flash TTS.
+- Output a **WebVTT descriptions track** (`<track kind="descriptions">`) and a plain-text transcript, so the
+  narration works in any player and with any screen reader, not just our page.
+- Test with VoiceOver (Mac) before the demo.
+
+This also deepens the Gemini use: transcription for dictation, Robotics-ER for choosing and confirming the
+target, TTS for spoken confirmations, Argon for the performance map, Flash for lines.
