@@ -1049,7 +1049,12 @@ def finish(args, results, frames, path, focus, group, song):
         if r["line"] and r["clean_space"]:
             r["line_en"] = r["line"]
             r["line"] = localise(r["line"], args.lang)  # checked in English, then translated
-            wav = speak(r["line"], audio_dir / f"{stem}-{args.lang}-{n}.wav", r.get("delivery"), r.get("fit"))
+            try:
+                wav = speak(r["line"], audio_dir / f"{stem}-{args.lang}-{n}.wav", None, r.get("fit"))
+            except ValueError as e:
+                print(f"   {e}; left out")
+                r["status"] = "voice failed"
+                continue
             with wave.open(str(wav)) as f:
                 seconds = f.getnframes() / f.getframerate()
             r["speech"] = {"path": str(wav), "at": r["clean_space"][0], "seconds": round(seconds, 2)}

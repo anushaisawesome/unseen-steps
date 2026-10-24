@@ -80,10 +80,15 @@ def build(video: tuple) -> dict:
         target = len(line["text"].split()) / RATE.get(line["pace"], 2.8)
         fit = max(0.8, min(until - line["time"] - 0.2, target * 1.15))
         # Named by what it says, so a caption can never be paired with another script's audio.
-        wav = audio / f"{key}-{hashlib.sha1((line['text'] + line.get('delivery', '')).encode()).hexdigest()[:10]}.wav"
+        wav = audio / f"{key}-{hashlib.sha1(('v2' + line['text']).encode()).hexdigest()[:10]}.wav"
         mp3 = wav.with_suffix(".mp3")
-        if not mp3.exists():  # a checked clip of exactly this line and tone is reused
-            speak(line["text"], wav, line.get("delivery"), fit)
+        if not mp3.exists():  # a checked clip of exactly this line is reused
+            try:
+                speak(line["text"], wav, None, fit)
+            except ValueError as e:
+                print(f"   {e}; left out")
+                line["status"], line["seconds"] = "voice failed", 0.0
+                continue
             subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(wav), "-c:a", "libmp3lame", "-b:a", "64k",
                             str(mp3)], check=True)
             wav.unlink()

@@ -72,8 +72,8 @@ def _faithful(audio: bytes, mime: str, line: str) -> tuple[bool, str]:
 def speak(line: str, path: Path, delivery: str | None = None, max_seconds: float | None = None) -> Path:
     """Say the line (in the delivery's tone, if given), check the voice said exactly the caption, fit it into
     max_seconds, and save it as a WAV file. Up to three takes: with the tone note twice, then plain."""
-    takes = [f"# DIRECTOR'S NOTES\n{delivery}\n\n# TRANSCRIPT\n{line}"] * 2 if delivery else [line]
-    takes.append(line)
+    # The voice gets the line only: tone instructions in any form were sometimes read aloud ("Director's notes: ...").
+    takes = [line] * 3
     for n, contents in enumerate(takes):
         _synthesise(contents, path)
         ok, heard = _faithful(path.read_bytes(), "audio/wav", line)
@@ -81,7 +81,8 @@ def speak(line: str, path: Path, delivery: str | None = None, max_seconds: float
             break
         print(f"   voice take {n + 1} said {heard!r} instead of {line!r}")
     else:
-        print(f"   WARNING: voice still doesn't match the caption after {len(takes)} takes: {line!r}")
+        path.unlink(missing_ok=True)  # never play a clip that doesn't say the caption
+        raise ValueError(f"voice didn't say the caption in {len(takes)} takes: {line!r}")
     _tighten(path)
     if max_seconds:
         with wave.open(str(path)) as f:
