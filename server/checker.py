@@ -11,7 +11,7 @@ MAX_WORDS = 10
 
 # word stems -> (what must be true of the features, reason if it isn't)
 CLAIMS = [
-    (r"\b(jump|leap|hop|spring|lift|bound)\w*",
+    (r"\b(jump|leap|hop|spring|bound)\w*|\blift\w*\b(?!\s+(his|her|their|one|an|the|both)\s+(arm|hand|leg|head|chin))",
      lambda f: (f.get("max_rise") or 0) >= 0.05,
      "it mentions a jump or lift, but no rise was measured"),
     (r"\b(spin|turn|pirouette|rotat|twirl|whirl)\w*",
@@ -47,7 +47,10 @@ def check(line: str, features: dict) -> Verdict:
 
     travel = features.get("travel")
     for side in ("left", "right"):
-        if re.search(rf"\b{side}\b", text) and travel != side:
+        # "left"/"right" as a direction of travel, not a body part ("his right arm").
+        moving = rf"\b{side}(ward)?\b(?!\s+(arm|hand|leg|foot|shoulder|hip|knee|elbow|side))"
+        facing = rf"\b(fac\w*|point\w*|look\w*)\s+(to\s+(the\s+)?)?{side}\b"  # facing/pointing isn't travel
+        if re.search(moving, text) and not re.search(facing, text) and travel != side:
             measured = travel if travel in ("left", "right") else "no clear direction"
             return Verdict(False, f"it says {side}, but the measured travel was {measured}")
 

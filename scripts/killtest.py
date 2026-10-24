@@ -667,6 +667,8 @@ def main():
             vocab = [f"{name} ({t['description']})" for t in
                      match_terms(movement, args.style, include_drafts=args.include_drafts)
                      if (name := spoken_name(t, args.terms))]
+        if vocab:
+            print(f"   terms offered: {[v.split(' (')[0] for v in vocab]}")
         result = describe(features, previous, vocab=vocab, frames=shots)
         if result.line:
             previous.append(result.line)
