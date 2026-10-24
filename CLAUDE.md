@@ -23,8 +23,8 @@ commit.
 | Kill test + demo video render on a clip | `scripts/killtest.py` | Works: pose, following, features, lines, voice, skeleton/caption video |
 | Who-is-followed contact sheet | `scripts/track_debug.py` | Works |
 | Live demo program | `scripts/live.py` | **Not built yet** (see below) |
-| MongoDB (vocab, songs, show memory) | — | Andrii, in progress |
-| Dance vocabulary + Deep Research translations | — | Andrii, in progress |
+| MongoDB (vocab, songs, show memory) | `server/db.py`, `server/setup_db.py` | Atlas is reachable; current local credentials are rejected |
+| Dance vocabulary + Deep Research translations | `server/glossary_research.py` | English workflow works; 17-term sourced waltz draft generated, not vetted/imported yet |
 
 Run the kill test / demo render:
 ```
@@ -250,6 +250,21 @@ How the `terms` collection gets filled, with Andrii vetting before anything is t
 
 Suggested document fields: `term, style, description, signature, names {en, uk, de, ...}, sources {en: [...],
 uk: [...], de: [...]}, status (draft | vetted | translated), vetted_by, embedding`.
+
+### Deep Research implementation status (24 Oct)
+
+- `server/glossary_research.py` starts and resumes `deep-research-preview-04-2026` jobs through the
+  Interactions API, validates one final JSON block, rejects placeholders/search pages/forums/document
+  mirrors, and stores generated files under gitignored `data/glossary-research/`.
+- A real English waltz run completed: 17 sourced draft terms survived validation. Three terms were rejected
+  because their only sources were Scribd/forums; one-source terms are flagged for extra review.
+- English Mongo imports require `gemini-embedding-2` vectors (3072 dimensions). The embedding call was tested.
+  Imports atomically protect `vetted`/`translated` terms and translations marked vetted per language.
+- Atlas is now network-reachable from this machine, but authentication fails with `bad auth`. Fix the database
+  user/password in `.env`, run `python server/setup_db.py`, then collect with `--import-mongo --embed`.
+- Ukrainian/German jobs refuse to start until English terms exist in MongoDB with status `vetted` or
+  `translated`. A localized name can be protected from later reruns by setting
+  `translations.<lang>.status` to `vetted`.
 
 ## Other dance styles: trust levels (decided 24 Oct, 03:05)
 
