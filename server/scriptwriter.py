@@ -48,6 +48,9 @@ What to say, like the best dance describers:
   "a deep squat" or "a wide stance", or that style's own word. Name the technique a dancer is doing even when its shape suggests an
   image, and give the image only as a comparison. If the piece fuses styles, notice each influence as it appears,
   use that style's language for it, and say when the piece shifts between influences.
+- Give the pose, not just the step: at holds, hits and arrival points, say the shape the body makes (where the
+  limbs are, the line of the body, the level, where the gaze goes), so a listener can picture the body, not only
+  follow the action.
 - Capture expression: the feeling the movement gives, grounded in what is visible. Vivid, plain words, not purple
   prose.
 - Say where dancers are and how they relate: facing, travel, formations, unison or canon (the same move rippling
@@ -240,7 +243,8 @@ def review_script(video: str, script: dict, plan: dict | None, song: dict | None
     prompt = (REVIEW + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n" + listing + clip_note(start, end)
               + room(song, start, end) + " Keep the total speaking time about the same: for every line you add, drop or "
               "merge a weaker one. Check especially that the signature comes through, that every change of texture or energy in the "
-              "dynamics timeline is felt at the moment it happens, and that the big accents are called.")
+              "dynamics timeline is felt at the moment it happens, that the big accents are called, and that key "
+              "shapes (holds, hits, arrivals) are given as poses a listener can picture.")
     key = hashlib.sha1(source_key(video)[:50_000_000] + prompt.encode()).hexdigest()[:16]
     cached = CACHE / f"review-{key}.json"
     if cached.exists():
