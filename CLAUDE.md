@@ -377,7 +377,12 @@ was undesigned and **"scan the QR code" is a visual task**; no control over amou
 **Testing:** VoiceOver (iPhone) and TalkBack (Android) before the demo; ideally 10 minutes with one blind
 user (one of Gerard's dancers). **Pitch:** 10 seconds of the page driven by VoiceOver.
 
-## Saturday task lists (written 24 Oct, 03:35)
+## Saturday task lists (written 24 Oct, 03:35; superseded 14:55)
+
+**The live team to-do list (Anusha, Andrii, Nastia, with checkboxes) is now the shared doc
+https://claude.ai/artifact/RvPoVfKk2fmu9pDPwcUSR4.** Schedule: parallel work until 16:30, sync at 16:30,
+render the demo clip, submit checkpoint 2 at 17:45, live program 18:00–20:00, rehearsal 20:00. The lists below
+are the original overnight version, kept for context.
 
 **Deadlines:** checkpoint 2 on the Encode platform by **Sat 18:00** (code link, description, bounties,
 problem and who it's for, live demo). Rehearsal in the demo spot **Sat 20:00**. Final submission **Sun 12:00**.
