@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unseen Steps demos</title>
+<style>
+  :root {
+    --bg: #faf8f6; --panel: #ffffff; --ink: #1d1b22; --muted: #5d5866; --line: #e3dfe6;
+    --accent: #7a3fd1; --accent-soft: #efe7fb; --caption-bg: #1d1b22; --caption-ink: #ffffff; --cut: #8a8494;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141318; --panel: #1d1b23; --ink: #eeeaf2; --muted: #a8a2b2; --line: #2e2b36;
+            --accent: #b58cff; --accent-soft: #2a2238; --caption-bg: #000000; --caption-ink: #ffffff; --cut: #79738a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding: 20px 16px 8px; max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  main { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; padding: 12px 16px 40px; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  nav h2, section h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
+  nav ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  nav button { width: 100%; text-align: left; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+               border-radius: 8px; padding: 8px 10px; font: inherit; cursor: pointer; }
+  nav button small { display: block; color: var(--muted); font-size: 12.5px; }
+  nav button[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .stage { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+  .section-now { font-size: 14px; color: var(--muted); min-height: 21px; margin: 0 0 8px; }
+  .section-now strong { color: var(--ink); }
+  .video { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; overflow: hidden; }
+  .video > div, .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .caption { min-height: 64px; margin-top: 10px; padding: 12px 16px; border-radius: 8px; background: var(--caption-bg);
+             color: var(--caption-ink); font-size: clamp(18px, 2.4vw, 24px); font-weight: 600; display: flex; align-items: center; }
+  .caption:empty::before { content: "\00a0"; }
+  .controls { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; font-size: 14px; color: var(--muted); }
+  .controls label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+  .note { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+  .transcript { margin-top: 16px; }
+  .transcript ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .transcript button { width: 100%; text-align: left; display: grid; grid-template-columns: 56px 1fr auto; gap: 10px;
+                       border: 0; background: transparent; color: var(--ink); font: inherit; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+  .transcript button:hover { background: var(--accent-soft); }
+  .transcript .t { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .transcript .tag { color: var(--muted); font-size: 12.5px; }
+  .transcript li.cut button { color: var(--cut); text-decoration: line-through; }
+  .transcript li.now button { background: var(--accent-soft); }
+  .about { margin-top: 14px; font-size: 14px; color: var(--muted); }
+  .about summary { cursor: pointer; color: var(--ink); font-weight: 600; }
+  .about ul { margin: 6px 0; padding-left: 20px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Unseen Steps: audio description demos</h1>
+  <p>Each video plays in YouTube's own player; the narration is written by Gemini 4 Argon from the video and spoken over it in time with the music.</p>
+</header>
+<main>
+  <nav aria-labelledby="pick">
+    <h2 id="pick">Choose a performance</h2>
+    <ul id="list"></ul>
+  </nav>
+  <section aria-labelledby="now">
+    <h2 id="now" class="sr-only">Now playing</h2>
+    <div class="stage">
+      <p class="section-now" id="section"></p>
+      <div class="video"><div id="player"></div></div>
+      <div class="caption" id="caption" aria-live="polite" aria-atomic="true"></div>
+      <div class="controls">
+        <label><input type="checkbox" id="narrate" checked> Narration</label>
+        <label><input type="checkbox" id="duck" checked> Lower the music while a line is spoken</label>
+      </div>
+      <p class="note">These lines are written from the YouTube video and haven't been checked against pose tracking (that needs the video file). Struck-through lines were cut so the music stays the main thing.</p>
+    </div>
+    <details class="about" id="about"><summary>What Argon noticed</summary><div id="about-body"></div></details>
+    <div class="transcript">
+      <h2 id="lines-h">Script</h2>
+      <ol id="lines" aria-labelledby="lines-h"></ol>
+    </div>
+  </section>
+</main>
+<script>document.write(`<script src="data.js?v=${Date.now()}"><\/script>`);</script>
+<script>
+const demos = window.DEMOS || [];
+const list = document.getElementById("list"), linesEl = document.getElementById("lines");
+const caption = document.getElementById("caption"), sectionEl = document.getElementById("section");
+const narrate = document.getElementById("narrate"), duck = document.getElementById("duck");
+const voice = new Audio();
+let player, demo, played = new Set(), lastT = 0, captionTimer;
+
+const mmss = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+
+demos.forEach((d, i) => {
+  const li = document.createElement("li"), b = document.createElement("button");
+  const small = document.createElement("small");
+  small.textContent = `${d.style} · ${d.lines.filter(l => l.audio).length} lines`;
+  b.append(d.label, small);
+  b.addEventListener("click", () => choose(i));
+  li.appendChild(b); list.appendChild(li);
+});
+
+function choose(i) {
+  demo = demos[i];
+  [...list.querySelectorAll("button")].forEach((b, k) => b.setAttribute("aria-current", k === i ? "true" : "false"));
+  linesEl.innerHTML = "";
+  demo.lines.forEach((l, k) => {
+    const li = document.createElement("li"), b = document.createElement("button");
+    if (!l.audio) li.className = "cut";
+    li.dataset.k = k;
+    for (const [cls, text] of [["t", mmss(l.at)], ["", l.text], ["tag", l.audio ? l.kind : l.status]]) {
+      const span = document.createElement("span");
+      if (cls) span.className = cls;
+      span.textContent = text;
+      b.appendChild(span);
+    }
+    b.addEventListener("click", () => { player.seekTo(Math.max(demo.start, l.at - 1.5), true); player.playVideo(); });
+    li.appendChild(b); linesEl.appendChild(li);
+  });
+  const about = document.getElementById("about-body");
+  about.replaceChildren();
+  const h = document.createElement("p"); h.textContent = "Signature of this piece:"; about.appendChild(h);
+  const ul = document.createElement("ul");
+  (demo.signature || []).forEach(x => { const li = document.createElement("li"); li.textContent = x; ul.appendChild(li); });
+  about.appendChild(ul);
+  if (demo.review) { const r = document.createElement("p"); r.textContent = "Second describer: " + demo.review; about.appendChild(r); }
+  played = new Set(); stopVoice();
+  if (player) player.loadVideoById({ videoId: demo.id, startSeconds: demo.start, endSeconds: demo.end });
+}
+
+function stopVoice() { voice.pause(); caption.textContent = ""; if (player && player.setVolume) player.setVolume(100); }
+
+function say(l) {
+  played.add(l);
+  if (!narrate.checked) return;
+  clearTimeout(captionTimer);
+  caption.textContent = l.text;
+  if (duck.checked) player.setVolume(70);  // a dip, not a takeover: the music stays the main thing
+  voice.src = l.audio; voice.play();
+}
+voice.addEventListener("ended", () => {
+  player.setVolume(100);
+  captionTimer = setTimeout(() => { caption.textContent = ""; }, 600);
+});
+
+function tick() {
+  if (!player || !demo || !player.getCurrentTime) return;
+  const t = player.getCurrentTime(), playing = player.getPlayerState() === YT.PlayerState.PLAYING;
+  if (Math.abs(t - lastT) > 1.5) {  // a seek: lines before here count as said, none after
+    stopVoice();
+    played = new Set(demo.lines.filter(l => l.at < t));
+  }
+  lastT = t;
+  if (!playing && !voice.paused) voice.pause();
+  if (playing) for (const l of demo.lines) {
+    if (l.audio && !played.has(l) && t >= l.at && t < l.at + 0.8) { say(l); break; }
+  }
+  const s = demo.sections.find(s => t >= s.start && t < s.end);
+  if (s && sectionEl.dataset.label !== s.label) {
+    const strong = document.createElement("strong");
+    strong.textContent = s.label;
+    sectionEl.replaceChildren(strong, ` · ${s.group}`);
+    sectionEl.dataset.label = s.label;
+  } else if (!s) { sectionEl.replaceChildren(); sectionEl.dataset.label = ""; }
+  let now = -1;
+  demo.lines.forEach((l, k) => { if (l.audio && l.at <= t) now = k; });
+  linesEl.querySelectorAll("li").forEach(li => li.classList.toggle("now", Number(li.dataset.k) === now));
+}
+
+window.onYouTubeIframeAPIReady = () => {
+  player = new YT.Player("player", {
+    videoId: demos[0]?.id, playerVars: { start: demos[0]?.start || 0, rel: 0, modestbranding: 1 },
+    events: { onReady: () => { choose(0); setInterval(tick, 100); } },
+  });
+};
+</script>
+<script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>

@@ -21,9 +21,16 @@ CLAIMS = [
      # a change of facing ("turns to face the front") is a turn too
      "turns", lambda f: (f.get("turns") or 0) >= 1 or any("now " in e for e in (f.get("events") or [])),
      "it mentions turning, but no turn was measured"),
-    (r"\b((to|on|onto) the floor|floor ?work|kneel\w*|crouch\w*|roll\w*|sink\w*|low)\b",
+    (r"\b((to|on|onto) the floor|floor ?work|kneel\w*|crouch\w*|sink\w*|low)\b"
+     # rolling on the floor, not rolling a head, the shoulders or a body roll
+     r"|\broll\w*\b(?!\s+(their|his|her|the)?\s*(heads?|necks?|shoulders?|hips?|chests?|ribs?|ribcages?|torsos?|bod(y|ies)|wrists?|arms?))"
+     r"(?<!body roll)(?<!body rolls)",
      "lowest_level", lambda f: f.get("lowest_level") in ("floor", "low"),
      "it mentions going low or to the floor, but the dancer stayed standing"),
+    # ballet's bent-knee terms and positions need turnout; knees measured falling inward contradict them
+    (r"\b(demi-|grand )?pli[eé]s?\b|\b(first|second|fourth|fifth) position\b|\bin (first|second|fourth|fifth)\b",
+     "turnout", lambda f: f.get("turnout") != "in",
+     "it uses a ballet term that needs turnout, but the knees were measured turning in"),
     # "still" only as stopping ("stands still"), not as "continuing" ("still facing us")
     (r"\b(stands?|holds?|stays?|remains?|keeps?)\s+still\b|\b(stillness|paus\w*|freez\w*|frozen|motionless|rests?|resting)\b",
      "stillness", lambda f: (f.get("stillness") or 0) >= 0.3,
@@ -65,7 +72,7 @@ def check(line: str, features: dict, max_words: int = MAX_WORDS) -> Verdict:
             return Verdict(False, f"it says the turn goes to the {side}, but the measured rotation was {measured}")
         # Facing, pointing or profile isn't travel either.
         facing = (rf"\b(fac\w*|point\w*|look\w*)\s+(to\s+(the\s+)?)?{side}\b|\bprofile\s+(to\s+the\s+)?{side}\b"
-                  rf"|\bside-on[^.,;]*\b{side}\b")
+                  rf"|\b{side}\s+profile\b|\bside-on[^.,;]*\b{side}\b")
         rest = re.sub(facing, " ", re.sub(rotating, " ", text))
         moving = rf"\b{side}(ward)?s?\b(?!\s+(arm|hand|leg|foot|shoulder|hip|knee|elbow|side))"
         if re.search(moving, rest) and travel != side:

@@ -37,7 +37,20 @@ CACHE = Path(__file__).resolve().parents[1] / "data" / "director"
 PROMPT = """You are directing live audio description of this dance for blind audience members.
 Watch the whole performance and return JSON with:
 - style: {name, confidence 0 to 1, evidence: short visible cues, e.g. "pointe shoes", "closed hold"}
-- sections: [{start, end, label, description}] the structure of the piece, in seconds
+- sections: [{start, end, label, description, formation, group, techniques}] the structure of the piece, in seconds.
+  formation: where dancers are (lines, wedge, V, circle, clusters, scattered; which side). group: how they move
+  together (unison, canon and the direction it ripples, a soloist against the group, pairs, subgroups trading).
+  techniques: [{name, evidence}] the dance techniques used, each with what the body visibly does (e.g. tutting:
+  forearms and hands make sharp right angles and boxes; floorwork: rolls, slides, spins on the floor). Be precise
+  about technique versus mime: a geometric hand shape that suggests an image is still the technique. If the piece
+  fuses styles, name the style each technique comes from.
+- signature: [{quality, body, dynamics, times: [seconds]}] the two to four things a sighted viewer notices and
+  remembers most about this particular choreography (not the style in general): what it is, where it lives in the
+  body, its dynamics and texture, and the times it is strongest.
+- dynamics: [{start, end, texture, energy, music}] a timeline of the quality of movement covering the whole piece,
+  with a new entry whenever it changes, even inside a section: texture (e.g. sharp staccato hits, fluid sustained
+  waves, heavy grounded drops, light suspended), energy (low, building, high, release) and what the music is doing
+  then. A sighted viewer feels these shifts even without words for them; mark each one at the moment it happens.
 - motifs: [{name, description, times: [seconds]}] movements that recur; give every time each one appears
 - moments: [{time, what, claim}] the most striking moments, described in body terms with direction as
   the audience sees it ("to the left"). claim is one of: jump, turn, floor, still, travel_left,
@@ -54,8 +67,19 @@ SCHEMA = {
             "required": ["name", "confidence", "evidence"]},
         "sections": {"type": "array", "items": {"type": "object", "properties": {
             "start": {"type": "number"}, "end": {"type": "number"},
-            "label": {"type": "string"}, "description": {"type": "string"}},
-            "required": ["start", "end", "label"]}},
+            "label": {"type": "string"}, "description": {"type": "string"},
+            "formation": {"type": "string"}, "group": {"type": "string"},
+            "techniques": {"type": "array", "items": {"type": "object", "properties": {
+                "name": {"type": "string"}, "evidence": {"type": "string"}}, "required": ["name", "evidence"]}}},
+            "required": ["start", "end", "label", "description", "formation", "group", "techniques"]}},
+        "dynamics": {"type": "array", "items": {"type": "object", "properties": {
+            "start": {"type": "number"}, "end": {"type": "number"}, "texture": {"type": "string"},
+            "energy": {"type": "string"}, "music": {"type": "string"}},
+            "required": ["start", "end", "texture", "energy", "music"]}},
+        "signature": {"type": "array", "items": {"type": "object", "properties": {
+            "quality": {"type": "string"}, "body": {"type": "string"}, "dynamics": {"type": "string"},
+            "times": {"type": "array", "items": {"type": "number"}}},
+            "required": ["quality", "body", "dynamics", "times"]}},
         "motifs": {"type": "array", "items": {"type": "object", "properties": {
             "name": {"type": "string"}, "description": {"type": "string"},
             "times": {"type": "array", "items": {"type": "number"}}},
@@ -65,7 +89,7 @@ SCHEMA = {
             "claim": {"type": "string", "enum": ["jump", "turn", "floor", "still", "travel_left", "travel_right", "other"]}},
             "required": ["time", "what", "claim"]}},
     },
-    "required": ["style", "sections", "motifs", "moments"],
+    "required": ["style", "sections", "signature", "dynamics", "motifs", "moments"],
 }
 
 _client = None
@@ -87,19 +111,48 @@ def upload(video: str):
     return uploaded
 
 
-def performance_map(video: str, style_hint: str | None = None) -> dict:
+FPS = 5  # Gemini's default is 1 frame a second, too few to see sharp vs fluid movement, hits or arm detail
+
+
+def video_part(video: str, start: float | None = None, end: float | None = None):
+    """A video Gemini can watch at FPS frames a second: a local file (uploaded) or a public YouTube link (read by
+    Gemini directly, never downloaded), optionally clipped to start..end seconds."""
+    clip = types.VideoMetadata(fps=FPS, start_offset=f"{start or 0:.0f}s" if start is not None else None,
+                               end_offset=f"{end:.0f}s" if end else None)
+    if video.startswith("http"):
+        return types.Part(file_data=types.FileData(file_uri=video), video_metadata=clip)
+    uploaded = upload(video)
+    return types.Part(file_data=types.FileData(file_uri=uploaded.uri, mime_type=uploaded.mime_type), video_metadata=clip)
+
+
+def clip_note(start: float | None, end: float | None) -> str:
+    if start is None and end is None:
+        return ""
+    return (f"\nOnly the part of the video from {start or 0:.0f} s to {end:.0f} s is shown. Give every time as the "
+            "time in the full video (seconds from its very beginning), not from the start of the part.")
+
+
+def source_key(video: str) -> bytes:
+    """Identifies what Argon watched (the video and the frame rate), for caching."""
+    return (video.encode() if video.startswith("http") else Path(video).read_bytes()) + f"@{FPS}fps".encode()
+
+
+def performance_map(video: str, style_hint: str | None = None, start: float | None = None,
+                    end: float | None = None) -> dict:
     """Argon's map of the whole performance. Cached per video file, since a map only changes with the video."""
-    digest = hashlib.sha1(Path(video).read_bytes()).hexdigest()[:16]
+    # Keyed on the instructions too, so a changed prompt gets a fresh map.
+    digest = hashlib.sha1(source_key(video) + PROMPT.encode() + json.dumps(SCHEMA).encode()
+                          + (style_hint or "").encode() + clip_note(start, end).encode()).hexdigest()[:16]
     cached = CACHE / f"{digest}.json"
     if cached.exists():
         return json.loads(cached.read_text())
 
-    uploaded = upload(video)
+    watched = video_part(video, start, end)
     prompt = PROMPT + (f"\nThe person who uploaded it says the style is: {style_hint}. Treat that as a hint, "
-                       "not a fact; if the video clearly shows otherwise, say so in style." if style_hint else "")
+                       "not a fact; if the video clearly shows otherwise, say so in style." if style_hint else "") + clip_note(start, end)
     response = with_retry(lambda: client().models.generate_content(
         model=MODEL,
-        contents=[uploaded, prompt],
+        contents=[watched, prompt],
         config=types.GenerateContentConfig(
             thinking_config=types.ThinkingConfig(thinking_level="medium"),
             response_mime_type="application/json",

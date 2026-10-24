@@ -620,3 +620,165 @@ writing as the main pipeline** (`--script` in `scripts/killtest.py`; the old pat
   leaps again" / "a soaring sissonne, legs split wide in the air"; the checker caught "gliding left" (no travel
   measured) and Argon's revision dropped the direction.
 - Competition test clip `clips/judas.mp4` (Anusha's own download, not in any repo): 20-dancer commercial piece.
+
+### Pacing rules (Anusha, 24 Oct evening): the music is the star
+
+Feedback on the first script render: "far too slow, dragging, over the music too much. It's not reading a speech, it's
+tastefully providing commentary while the music remains the main reference. Lines stay in meter and don't become the
+star of the show."
+- Brief: most lines 3 to 8 words, inside one bar (a few take two); speech at most a third of the running time; in
+  lyrical passages at most one line every two bars; no slow pace (paces: steady 2.8, brisk 3.2, rapid 3.8 words/s).
+- **In meter:** `scriptwriter.in_meter` snaps every line start to a beat; `killtest.in_beats` gives each line the whole
+  beats its words need at its pace (never past the next line, max 2 bars); a collision moves to the next free beat
+  (within a beat for callouts, a bar otherwise) or is dropped.
+- **Voice was the drag:** every Gemini voice measured ~1.7 words/s because each clip has ~0.25 s of silence at both ends
+  and 0.25–0.4 s pauses at every comma. `speech._tighten` trims ends and shortens pauses (ffmpeg silenceremove, -35 dB
+  rms); a 4.2 s clip became 2.9 s. Then `atempo` up to 1.35x to fit.
+- Mix: music 0.85, narration 1.3 (was 0.6 / 1.8).
+- Ballet went from 83% of the clip spoken to 44%, four lines: "Backlit in white, feet crossed in fifth." / "A soubresaut,
+  springing with feet tight together." / "Grand jeté, leaping high in a split." / "She arches toward the light."
+- Pose detection is cached per video in `data/killtest/cache/` (gitignored), so re-renders skip the slow part.
+- **Hard speech cap** (`SPEECH_SHARE = 0.35` in `scripts/killtest.py`): Argon gives each line a `priority` (1 essential,
+  2 helpful, 3 optional colour); if speech would exceed 35% of the piece, optional then helpful description lines are
+  cut, most crowded first; callouts are never cut. Judas went from 51% to 36% (6 lines cut), Andrii 32% (1 cut).
+- Checker: "roll" only counts as floor work when it isn't a head/shoulder/hip/chest/body roll.
+- Known weak spot: when the checker strips a direction, Argon's revision can produce an odd phrase ("A natural return
+  back to profile"); worth a describer pass over the script before a show.
+- **Annotated demos (script mode):** `docs/media/ballet-script-demo.mp4` and `docs/media/andrii-script-demo.mp4` in this
+  repo; the Judas group render is a release asset in the private clips repo (release `annotated-1`), because it's
+  another crew's choreography and this repo is public.
+
+## Tuning workflow (Anusha + Nastia, from Sat 19:00)
+
+Anusha and Nastia each find clips, render them in script mode, watch, and write feedback; the feedback drives
+changes to the describer. Steps in `feedback/README.md`.
+- Every `--script` render writes `data/killtest/<clip>-script-review.md`: each line with its time, status (spoken, cut for
+  space, no room, rejected by the checker), kind, pace, priority and the moment it describes, plus blank feedback
+  fields and the brief version. Filled-in reviews go to `feedback/<clip>-<name>.md`.
+- **For Claude reading feedback:** look for patterns across reviews before changing anything; most fixes belong in
+  the BRIEF in `server/scriptwriter.py` (what to say, how long, how often), the checker (false rejections), or the
+  pacing constants (`SPEECH_SHARE`, `RATE`, `in_beats`). Quote the feedback that motivated a change in the commit.
+- **One person edits `server/scriptwriter.py` at a time** (pull first, say so in the team chat), so the two of you
+  don't conflict. Changing the BRIEF changes its hash, so Argon writes a fresh script (the cache is keyed on it);
+  pose is cached per clip, so a re-render takes minutes.
+- Cost: each new script is one Argon call on the whole video with high thinking. Keep clips under ~3 minutes, and
+  keep an eye on the key's spending.
+- **Finding clips:** your own or teammates' footage, or free stock (Mixkit, Pexels). Never download from YouTube or
+  Instagram (their terms forbid it); Gemini can read a public YouTube link directly (`scripts/argon_script.py`) for
+  script-only tests. Raw clips stay out of this public repo.
+- Aim for a spread: solo, couple and group; lyrical and explosive music; ballet, ballroom, contemporary, hip hop,
+  commercial; fixed and handheld camera.
+
+**Pipeline explainer for the team (24 Oct, 19:30):** https://claude.ai/artifact/1YMrgTFi7Dks4vueFZyiKP (diagram, each
+stage, how checking works, pacing rules, what's built vs not, commands). Submission text: https://claude.ai/artifact/9wqknz9gKac4m97zJkZNNj.
+
+### Ballet fixes (24 Oct, 19:45)
+
+Anusha: "tracking is worse for the ballet, and where are the names of the steps?"; "sometimes the voice doesn't say what
+the captions are saying".
+- **Names first:** the short-line rule had squeezed step names out ("Glides left, springs up" instead of glissade). The
+  brief now says lead with the step's name, every recognisable step gets its name, and the opening line (scene and
+  starting position) and every named step are priority 1, so the speech cap never cuts them. Ballet now: "Fifth
+  position, feet neatly crossed." / "Soubresaut, springing with legs tight." / "Glissade into a split sissonne." /
+  "Port de bras, arching back."
+- **Tracking:** it wasn't worse; the new render drew skeletons in backlit frames the old one left blank, with wrong legs.
+  Now `--model` works without `--seed` too (pose cache keyed per model), and only keypoints with confidence > 0.5 are
+  drawn (`DRAW_CONF`). For uploads use `--model yolo11x-pose.pt`: on the ballet it follows her cambré properly and draws
+  nothing mid-leap instead of wrong legs (3 min for 23 s on the Mac).
+- **Voice vs caption:** `speech._faithful` now asks Gemini Flash whether the clip says exactly the caption (nothing added,
+  dropped or swapped; dance-term pronunciation allowed) and re-records up to three takes (tone note twice, then plain),
+  printing what was heard on each mismatch and a WARNING if all three fail.
+
+### Two-pass Argon (24 Oct, ~20:15)
+
+Anusha's Judas feedback (`feedback/judas-anusha.md`): canons missing, tutting called "miming crowns", a whole floorwork
+section silent, some motion language inaccurate.
+- Script mode now calls `director.performance_map` first. Its sections now carry `formation`, `group` (unison, canon and
+  its direction, soloists, pairs) and `techniques` [{name, evidence}]; the map cache is keyed on the prompt and schema.
+  `scriptwriter.structure_notes` feeds the map into the script prompt.
+- Brief: every section gets a line and its first line is priority 1; canons and group-structure changes are priority 1;
+  name the technique, not a mime ("tutting, hands framing a crown").
+- Judas result: 7 sections mapped (canon at 69–90 s, floorwork at 90–122 s, tutting at 122–144 s); script now has "Canon, a
+  wave left to right, dropping to sit!", "Tight central block, tutting, geometric hand frames.", "Floorwork in the
+  center, seated leg extensions left.", "Kneeling waacking, fast overhead arm circles." Speech 41% (priority-1 lines
+  aren't cut, so the cap can be exceeded). Weak spot: the 128–144 s chorus got one line, no callouts.
+- The caption check caught the voice reading "Director's notes: Driving, bold", saying "whacking" for waacking and "one
+  leg hype" for "one leg high"; all re-recorded until they matched.
+
+## YouTube demos (24 Oct, ~21:00)
+
+`scripts/youtube_demo.py` makes narration demos for public YouTube videos **without downloading them**: Gemini reads the
+link directly (`director.video_part`, with `start`/`end` clipping through `VideoMetadata`), Argon maps then scripts the
+piece (no music map: it keeps time by ear; no pose: lines are unchecked, and the page says so), each line is voiced,
+checked against its caption and fitted, the 35% cap applies, and `web/youtube-demo/index.html` plays the narration over
+YouTube's own embedded player (captions in a live region, music ducked to 70%, current section, clickable script with cut
+lines struck through). Serve with `cd web/youtube-demo && python -m http.server 8765`.
+- 16 videos in `VIDEOS`: Anusha's 7 links (Paris Cavanagh x2, Ponyboy, Streetstar 2013 vogue femme battle/solos, Saumya
+  Red Bull fusion) plus ballet, contemporary, waacking, tutting, Bharatanatyam, flamenco, amapiano, afrobeats, ballroom.
+- Audio files are named by a hash of their text + tone (a stale file can't pair with a new caption) and reused if present.
+- Gemini clients are created before the worker threads (lazily created clients raced: "client has been closed").
+- Brief additions from Anusha's feedback (`feedback/youtube-demos-anusha.md`): fusion (name each influence and use its
+  vocabulary); arm-driven styles (arms' path and dynamics; callouts on accents for sharpness); the piece's signature is
+  priority 1; `SPEECH_CEILING` 0.40 (essential lines cut only past it).
+
+### Taste, not hardcoding (24 Oct, ~21:30)
+
+Anusha: "don't hardcode it, make the detection have more taste. I can see it because I have eyes, but don't make those who
+can't see miss out on it... for all of them, don't miss out on key features of the choreo." So the style-specific lists in
+the brief were removed and replaced with three general mechanisms:
+- **Signature in the map:** `performance_map` returns `signature` [{quality, body, dynamics, times}]: the 2–4 things a
+  sighted viewer notices and remembers about this choreography. The script must convey every one; such lines are
+  priority 1. (Track 10: "sculptural overhead arm and wrist framing", "grounded, wide-stance upper-body isolations".)
+- **A second describer** (`scriptwriter.review_script`, cached): Argon watches the video with the map and the script, asks
+  what a blind listener would miss, and returns up to 10 replace/add/drop edits. Its notes show on the demo page.
+- **A line budget up front** (`scriptwriter.room`): "this piece runs N s, room for about M lines" (35% of the length at
+  ~3 s a line), for both the writer and the reviewer, so Argon chooses what to keep instead of the blunt cutter. The
+  cutter stays as a safety net and never cuts the opening line. Over-long lines go back to Argon once (`revise`).
+
+### Texture changes (24 Oct, ~22:00)
+
+Anusha: Track 10 "loses the bit where the texture changes from sharp to fluid for the buildup at about 12 s... this kind of
+thing needs to be picked up on for styles I can't comment on as well. It's important." Also: hits missed (the clap and
+turn before the vocals), first line cut, nothing on the arm work, 10 s silent while a lot happens.
+- Map: `dynamics` timeline [{start, end, texture, energy, music}], a new entry whenever the quality of movement changes,
+  even mid-section. Every change is priority 1 in the script and checked by the reviewer.
+- Pose (local renders, solo/couple): `killtest.measured_texture` measures jerk-for-speed at wrists and ankles, labels
+  half-seconds clearly sharp / clearly fluid, and reports switches between runs of 3 s or more; passed to Argon as
+  evidence. Quiet on Andrii's waltz and the ballet (correct for steady pieces); not yet tested on a clip with a real change.
+- Budget in seconds, not lines (callouts ~1 s, descriptions ~3 s), so sharp passages can carry callouts; big accents
+  (a hit, a clap, a turn into a new phrase) are called; no more than ~6 s of quiet while new movement happens; the cap
+  never opens a gap over 8 s and never cuts the opening line.
+- Terms must meet their definitions (plié and ballet positions need turnout); `turnout` measured from knees vs ankles when
+  facing the camera; the checker rejects plié/positions when knees measure turned in.
+- **Trimming with taste** (`scriptwriter.trim`): when speech runs over 35%, Argon is given the real line lengths and the
+  allowed time and picks what to drop (keeping opening context, signature, texture changes, big accents, key shapes;
+  never more than ~6 s of silence during new movement). If a gap over 8 s remains, the shortest dropped line inside it
+  comes back. The blunt cutter is only a final safety net. Aquamarine (Anusha's reference, "70% there"): 10 of 17 lines
+  kept at 38%, signature line kept, gaps ~6–7 s.
+- **Pose rule:** at holds, hits and arrivals, give the shape (limbs, line of the body, level, gaze); the reviewer checks it.
+
+## Reset: principles, 5 fps, no speech cap (24 Oct, ~22:45)
+
+Anusha: "take my feedback generally... always find the root complaint"; "why is there so much silence and so many lines
+cut they may as well not be there"; "it missed the canon on ponyboy, why is this degrading in quality".
+**Root causes found:**
+1. The ballet note ("drags, talks over the music") was a delivery problem (slow voice, long lines, placement), but it
+   became a hard 35% speech cap plus cutting machinery (line budgets, priorities, cutter, trim, gap restoring). Every
+   piece of it deleted lines Argon wrote while watching: long silences, good lines cut, Ponyboy's canon lost.
+2. **Gemini watches video at 1 frame per second by default.** At that rate it can't see sharp vs fluid, hits or arm
+   detail, and it guesses timings. Checked on Aquamarine 15–26 s at 5 fps: far richer, second-by-second detail.
+3. The brief had grown a rule per note, and each change was only checked on one video.
+**Changes:**
+- `director.FPS = 5` for every Gemini video read (`video_part`), YouTube and uploaded files; caches keyed on it.
+- The cap, budgets, priority cutting and trim are gone. Only collision handling remains (a line can't talk over the
+  previous one). How much to say is Argon's call: dense passages carry more short lines and callouts, repeated or
+  resting movement gets the music alone.
+- The brief is rewritten as principles from all her feedback: the goal (a blind listener gets what a sighted viewer
+  gets), signature, every texture/energy change as it happens, shapes at holds/hits/arrivals, group structure, big
+  accents, sections, precise vocabulary (definitions, turnout, technique over mime, fusion), expression; short lines in
+  the music, never continuous. The second describer only fixes and fills (up to 12 edits), no budget.
+- **`scripts/regress.py`:** must-haves per video from `feedback/*.md` (Ponyboy canon; Track 10 arm work, sharpness,
+  sharp-to-fluid at ~12 s, clap and turn before the vocals, rich end groove, opening context; Aquamarine texture and
+  poses; Judas canon, tutting, floorwork; ballet fifth position and step names), judged by Gemini Flash from the
+  timed lines, plus longest silence (> 8 s flagged) and longest line (> 10 words). Run after every change.
+  Baseline before the reset: 9/14. The judge is lenient on "arm work" (passed Track 10 when Anusha said it was missing).

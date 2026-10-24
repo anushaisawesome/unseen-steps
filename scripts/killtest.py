@@ -88,13 +88,13 @@ def seated(box, xy, conf):
     return thigh < 0.12 * h
 
 
-def detect(video: str):
+def detect(video: str, model_name: str = "yolo11n-pose.pt"):
     """Every sampled frame: (t, [(box, keypoints xy, keypoint conf, (colour hist, saturation), activity), ...]).
 
     Activity is how much a person moves relative to the crowd as a whole, so a panning camera
     doesn't make standing spectators look like they're dancing.
     """
-    model = load_pose("yolo11n-pose.pt")
+    model = load_pose(model_name)
     cap = cv2.VideoCapture(video)
     fps = cap.get(cv2.CAP_PROP_FPS)
     size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
@@ -125,6 +125,24 @@ def detect(video: str):
                     people.append((box, xy, conf, look, activity[tid]))
             frames.append((i / fps, people))
         i += 1
+    return frames, size
+
+
+def detected(video, model_name="yolo11n-pose.pt"):
+    """detect(), cached per video file: pose on a long group clip takes half an hour, and re-renders only
+    change the script or the sound."""
+    import hashlib
+    import pickle
+    data = Path(video).read_bytes()
+    model_tag = "" if model_name == "yolo11n-pose.pt" else "-" + Path(model_name).stem
+    cache = ROOT / "data/killtest/cache" / f"{Path(video).stem}-{hashlib.sha1(data[:20_000_000]).hexdigest()[:12]}-{len(data)}{model_tag}.pkl"
+    if cache.exists():
+        frames, size, seated_people = pickle.loads(cache.read_bytes())
+        SEATED.update(seated_people)
+        return frames, size
+    frames, size = detect(video, model_name)
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_bytes(pickle.dumps((frames, size, SEATED)))
     return frames, size
 
 
@@ -465,6 +483,7 @@ def phrase_features(path, size, solo, start, end, phrase, beats=None):
             current, pending = f, None
             events.append((tt, f"now {FACING_WORDS[f]}"))
 
+    turnout = turnout_of(lead, faces)
     steps, pattern = footwork(t, lead, beats, start, end, size) if beats is not None else ([], None)
     if pattern:
         label = pattern if not turns or not rotation or rotation == "mixed" else f"{pattern} turning to his/her {rotation}"
@@ -532,7 +551,83 @@ def phrase_features(path, size, solo, start, end, phrase, beats=None):
         "steps": " ".join(steps) if steps else None,  # per beat: fb (forward/back), side, close, hold
         "footwork": pattern,
         "facing": FACING_WORDS.get(facing, "unclear"),  # where the dancer faces most of the phrase
+        "turnout": turnout,  # "out", "parallel" or "in" when the knees bend facing the camera, else None
     }
+
+
+def measured_texture(path, size, window=1.0, min_run=3.0):
+    """Where the movement's texture changes, from the followed dancer's wrists and ankles: sharp movement has sudden
+    stops and starts (high jerk for its speed), fluid movement is smooth and continuous. Returns lines like
+    "12.4 s: sharp to fluid". Works for any style; it measures how the body moves, not what the step is."""
+    times = sorted(path)
+    if len(times) < SAMPLE_FPS * 6 or not size:
+        return []
+    joints = [L_WRI, R_WRI, L_ANK, R_ANK]
+    xy = np.array([[path[t][0][1][j] for j in joints] for t in times]) / size  # frames x joints x 2, body heights
+    conf = np.array([[path[t][0][2][j] for j in joints] for t in times])
+    xy = np.where(conf[..., None] > 0.3, xy, np.nan)
+    k = np.ones(3) / 3  # light smoothing, so tracking jitter doesn't read as sharpness
+    for j in range(len(joints)):
+        for d in range(2):
+            col = xy[:, j, d]
+            ok = ~np.isnan(col)
+            if ok.sum() > 3:
+                col[~ok] = np.interp(np.flatnonzero(~ok), np.flatnonzero(ok), col[ok])
+                xy[:, j, d] = np.convolve(col, k, mode="same")
+    dt = 1 / SAMPLE_FPS
+    vel = np.linalg.norm(np.diff(xy, axis=0), axis=2) / dt           # frames x joints
+    jerk = np.abs(np.diff(vel, n=2, axis=0)) / dt ** 2
+    t = np.array(times[2:-1])
+    sharp = np.nanmean(jerk, axis=1) / (np.nanmean(vel[1:-1], axis=1) + 0.3)  # jerk for its speed
+    per_window = []
+    for start in np.arange(t[0], t[-1] - window, window / 2):
+        m = (t >= start) & (t < start + window)
+        if m.sum() >= 5:
+            per_window.append((start + window / 2, float(np.nanmedian(sharp[m]))))
+    if len(per_window) < 8:
+        return []
+    centres, values = np.array([w[0] for w in per_window]), np.array([w[1] for w in per_window])
+    # A texture is a sustained state: label each half-second clearly sharp, clearly fluid or neither, smooth the
+    # labels, and keep only runs lasting at least min_run seconds. Report where a sharp run gives way to a fluid
+    # one (or the reverse), so the rhythm of a step or tracking jitter doesn't count as a change.
+    level = np.median(values)
+    labels = np.where(values > 1.5 * level, 1, np.where(values < 0.67 * level, -1, 0))
+    labels = np.array([int(np.sign(np.sum(labels[max(0, i - 1):i + 2]))) for i in range(len(labels))])
+    runs, i = [], 0
+    while i < len(labels):
+        j = i
+        while j + 1 < len(labels) and labels[j + 1] == labels[i]:
+            j += 1
+        if labels[i] != 0 and centres[j] - centres[i] >= min_run:
+            runs.append((labels[i], centres[i], centres[j]))
+        i = j + 1
+    changes = []
+    for (state_a, _, end_a), (state_b, start_b, _) in zip(runs, runs[1:]):
+        if state_a != state_b and start_b - end_a <= 2.5:
+            changes.append(f"{(end_a + start_b) / 2:.1f} s: " + ("sharp to fluid" if state_a == 1 else "fluid to sharp"))
+    return changes
+
+
+def turnout_of(lead, faces):
+    """Do bent knees open out over the feet (turnout) or fall in? Only measurable facing the camera with the legs
+    clearly bent: knees wider apart than the ankles means turned out, narrower means turned in. The feet themselves
+    aren't tracked, so this catches knees turning in, not perfect turnout."""
+    ratios = []
+    for p, face in zip(lead, faces):
+        xy, conf = p[1], p[2]
+        if face != "front" or min(conf[L_HIP], conf[R_HIP], conf[L_KNE], conf[R_KNE], conf[L_ANK], conf[R_ANK]) < 0.5:
+            continue
+        thigh = np.linalg.norm(xy[L_KNE] - xy[L_HIP]) + np.linalg.norm(xy[R_KNE] - xy[R_HIP])
+        leg = np.linalg.norm(xy[L_ANK] - xy[L_HIP]) + np.linalg.norm(xy[R_ANK] - xy[R_HIP])
+        if leg > 0.85 * (thigh + np.linalg.norm(xy[L_ANK] - xy[L_KNE]) + np.linalg.norm(xy[R_ANK] - xy[R_KNE])):
+            continue  # legs nearly straight: nothing to judge
+        ankles = abs(xy[L_ANK][0] - xy[R_ANK][0])
+        if ankles > 1:
+            ratios.append(abs(xy[L_KNE][0] - xy[R_KNE][0]) / ankles)
+    if len(ratios) < 5:
+        return None
+    r = float(np.median(ratios))
+    return "out" if r > 1.05 else "in" if r < 0.9 else "parallel"
 
 
 def group_features(frames, start, end):
@@ -682,12 +777,15 @@ FONT = next((f for f in ["/System/Library/Fonts/HelveticaNeue.ttc", "C:/Windows/
             "/System/Library/Fonts/HelveticaNeue.ttc")
 
 
+DRAW_CONF = 0.5  # points the model is unsure of are hidden rather than drawn in the wrong place
+
+
 def draw_skeleton(frame, xy, conf, colour, thickness):
     for a, b in SKELETON:
-        if conf[a] > 0.3 and conf[b] > 0.3:
+        if conf[a] > DRAW_CONF and conf[b] > DRAW_CONF:
             cv2.line(frame, tuple(int(v) for v in xy[a]), tuple(int(v) for v in xy[b]), colour, thickness, cv2.LINE_AA)
     for k in range(5, 17):
-        if conf[k] > 0.3:
+        if conf[k] > DRAW_CONF:
             cv2.circle(frame, tuple(int(v) for v in xy[k]), thickness + 1, colour, -1, cv2.LINE_AA)
 
 
@@ -771,10 +869,10 @@ def render(video, frames, path, results, out_path, focus=None, everyone=False):
     # Mix each spoken line into the soundtrack at its clean space, with the music a little lower.
     said = [r["speech"] for r in results if r.get("speech")]
     inputs = ["-i", str(silent), "-i", video]
-    graph = ["[1:a]volume=0.6[m]"]
+    graph = ["[1:a]volume=0.85[m]"]  # the music stays the main reference
     for k, sp in enumerate(said):
         inputs += ["-i", sp["path"]]
-        graph.append(f"[{k + 2}:a]adelay=delays={int(sp['at'] * 1000)}:all=1,volume=1.8[n{k}]")
+        graph.append(f"[{k + 2}:a]adelay=delays={int(sp['at'] * 1000)}:all=1,volume=1.3[n{k}]")
     graph.append("[m]" + "".join(f"[n{k}]" for k in range(len(said))) +
                  f"amix=inputs={len(said) + 1}:normalize=0:duration=first[a]")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", ";".join(graph),
@@ -813,7 +911,7 @@ def main():
     if seed:  # marked couple: follow her dress, pose only inside a steady frame around them
         frames, path, solo, size, focus = track_focus(args.clip, seed, args.model)
     else:
-        frames, frame_size = detect(args.clip)
+        frames, frame_size = detected(args.clip, args.model)
         path, solo, size = follow(frames, frame_size, seed)
     print(f"following {'one dancer' if solo else 'a couple'} in {len(path)}/{len(frames)} sampled frames")
 
@@ -822,14 +920,24 @@ def main():
         results = scripted(args, song, frames, path, solo, size, group)
     else:
         results = phrased(args, song, frames, path, solo, size)
-    finish(args, results, frames, path, focus, group)
+    finish(args, results, frames, path, focus, group, song)
+
+
+def in_beats(start, until, song, text, pace, max_bars=2):
+    """Time a line should take: the whole beats its words need at its pace, never past the next line or
+    max_bars bars. The voice is tightened and sped up to fit."""
+    from scriptwriter import RATE
+    beat = float(np.median(np.diff(song["beats"])))
+    needed = int(np.ceil(len(text.split()) / RATE.get(pace, 2.8) / beat))
+    room = min(int((until - start) / beat + 0.05), max_bars * song["beats_per_bar"])
+    return round(max(1, min(needed, room)) * beat - 0.05, 2)
 
 
 def scripted(args, song, frames, path, solo, size, group):
     """Argon writes the whole timed description (pace and delivery included); each line is checked against the
     pose measurements for the moment it describes; rejected lines go back to Argon once, then stay silent."""
     from checker import check
-    from scriptwriter import budget, revise, write_script
+    from scriptwriter import budget, review_script, revise, write_script
     glossary = []
     if args.style:
         from db import db, spoken_name
@@ -842,7 +950,19 @@ def scripted(args, song, frames, path, solo, size, group):
         body = body3d.measure(body3d.load(args.body3d))
         measured = body3d.events(body)
         print(f"3D body: {len(measured)} measured events")
-    script = write_script(args.clip, song, glossary, args.style, measured=body3d.timeline(measured) if body else "")
+    # First pass: Argon maps the piece (sections, formations, group structure, techniques, motifs);
+    # second pass: it writes the script from that map, so no section or canon is lost.
+    from director import performance_map
+    plan = performance_map(args.clip, style_hint=args.style)
+    if not group:  # texture changes measured from pose, as evidence for Argon
+        plan["measured_texture"] = measured_texture(path, size)
+        print(f"measured texture changes: {plan['measured_texture']}")
+    print(f"Argon map: {plan['style']['name']}, " + "; ".join(
+        f"{s['start']:.0f}-{s['end']:.0f}s {s['label']}" for s in plan["sections"]))
+    script = write_script(args.clip, song, glossary, args.style, plan,
+                          measured=body3d.timeline(measured) if body else "")
+    script = review_script(args.clip, script, plan, song)  # a second describer: what would a listener miss?
+    print(f"Second describer: {script.get('review', '')}")
     lines = script["lines"]
     end = song["beats"][-1] + 2
     words = budget(lines, end)
@@ -857,8 +977,9 @@ def scripted(args, song, frames, path, solo, size, group):
             features.update(body3d.features(body, measured, start, stop))
         until = lines[n + 1]["time"] if n + 1 < len(lines) else end
         r = {"n": n, "time": line["time"], "moment": [start, stop], "who": line["who"], "kind": line["kind"],
+             "priority": line.get("priority"),
              "pace": line["pace"], "delivery": line["delivery"], "features": features, "max_words": words[n],
-             "clean_space": [line["time"], until], "fit": round(until - line["time"] - 0.15, 2)}
+             "clean_space": [line["time"], until], "fit": in_beats(line["time"], until, song, line["text"], line["pace"])}
         if features["tracking"] == "poor":  # nothing measured for this moment: can't confirm or contradict
             r.update(line=line["text"], attempts=[{"draft": line["text"], "passed": True, "reason": "unchecked: not tracked"}])
         else:
@@ -941,7 +1062,7 @@ def phrased(args, song, frames, path, solo, size):
     return results
 
 
-def finish(args, results, frames, path, focus, group):
+def finish(args, results, frames, path, focus, group, song):
     """Translate, voice, and render the annotated video."""
     out_dir = ROOT / "data/killtest"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -956,24 +1077,61 @@ def finish(args, results, frames, path, focus, group):
             with wave.open(str(wav)) as f:
                 seconds = f.getnframes() / f.getframerate()
             r["speech"] = {"path": str(wav), "at": r["clean_space"][0], "seconds": round(seconds, 2)}
-    # Never talk over the previous line: start after it, or drop the line if that's over 2 s late.
+    # How much is said is Argon's call (it watched the piece); here we only keep lines from talking over each other.
+    # Never talk over the previous line: move to the next free beat (within a beat for a callout, a bar
+    # otherwise, so it stays in meter and near its moment), or drop it.
+    beats = np.array(song["beats"])
+    bar = float(np.median(np.diff(beats))) * song["beats_per_bar"]
     end = 0.0
     for r in results:
         sp = r.get("speech")
         if not sp:
             continue
-        late = 0.6 if r.get("kind") == "callout" else 2.0  # a callout late by more than ~a beat misses its hit
-        if sp["at"] < end + 0.2:
-            if end + 0.2 - sp["at"] > late:
+        if sp["at"] < end + 0.1:
+            later = beats[beats >= end + 0.1]
+            limit = bar / song["beats_per_bar"] if r.get("kind") == "callout" else bar
+            if not len(later) or later[0] - sp["at"] > limit:
                 print(f"   dropped (no room to speak): {r['line']}")
                 r.pop("speech")
+                r["status"] = "no room to speak"
                 continue
-            sp["at"] = round(end + 0.2, 2)
+            sp["at"] = round(float(later[0]), 2)
         end = sp["at"] + sp["seconds"]
     (out_dir / f"{stem}.json").write_text(json.dumps(results, indent=2, default=float))
     name = f"{stem}-annotated.mp4" if args.lang == "en" else f"{stem}-annotated-{args.lang}.mp4"
     render(args.clip, frames, path, results, out_dir / name, focus, everyone=group)
     print(f"\nannotated video: {out_dir / name}")
+    if args.script:
+        review = out_dir / f"{stem}-review.md"
+        review.write_text(review_sheet(args, results, name))
+        print(f"review sheet: {review}  (fill it in while watching, then save it to feedback/)")
+
+
+def review_sheet(args, results, video_name):
+    """A sheet to watch the render with: every line, when it's spoken and what happened to it, with a blank
+    feedback field each. Filled-in sheets go in feedback/ so everyone's Claude can learn from them."""
+    import hashlib
+    from datetime import date
+    from scriptwriter import BRIEF
+    version = hashlib.sha1(BRIEF.encode()).hexdigest()[:8]
+    def mmss(t):
+        return f"{int(t // 60)}:{t % 60:04.1f}"
+    out = [f"# Review: {Path(args.clip).name}", "",
+           f"Video: `data/killtest/{video_name}` · brief `{version}` · rendered {date.today()} · reviewer: ",
+           f"Command: `python scripts/killtest.py {' '.join(sys.argv[1:])}`", "",
+           "Overall (timing, amount of speech, voice, vocabulary, what a dancer would have said instead):", "", "",
+           "## Lines", ""]
+    for r in results:
+        at = r["speech"]["at"] if r.get("speech") else r["time"]
+        status = ("spoken" if r.get("speech") else r.get("status")
+                  or ("rejected by the checker" if r["attempts"] and not r["attempts"][-1]["passed"] else "silent"))
+        out.append(f"**{mmss(at)}** · {status} · {r.get('kind')}, {r.get('pace')}, priority {r.get('priority')} "
+                   f"· describes {mmss(r['moment'][0])}-{mmss(r['moment'][1])}")
+        for a in r["attempts"]:
+            if not a["passed"]:
+                out.append(f"> rejected: \"{a['draft']}\" ({a['reason']})")
+        out += [f"> {r['line'] or '(no line)'}", "", "Feedback: ", ""]
+    return "\n".join(out) + "\n"
 
 
 if __name__ == "__main__":
