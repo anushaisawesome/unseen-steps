@@ -608,3 +608,21 @@ writing as the main pipeline** (`--script` in `scripts/killtest.py`; the old pat
   leaps again" / "a soaring sissonne, legs split wide in the air"; the checker caught "gliding left" (no travel
   measured) and Argon's revision dropped the direction.
 - Competition test clip `clips/judas.mp4` (Anusha's own download, not in any repo): 20-dancer commercial piece.
+
+### Pacing rules (Anusha, 24 Oct evening): the music is the star
+
+Feedback on the first script render: "far too slow, dragging, over the music too much. It's not reading a speech, it's
+tastefully providing commentary while the music remains the main reference. Lines stay in meter and don't become the
+star of the show."
+- Brief: most lines 3 to 8 words, inside one bar (a few take two); speech at most a third of the running time; in
+  lyrical passages at most one line every two bars; no slow pace (paces: steady 2.8, brisk 3.2, rapid 3.8 words/s).
+- **In meter:** `scriptwriter.in_meter` snaps every line start to a beat; `killtest.in_beats` gives each line the whole
+  beats its words need at its pace (never past the next line, max 2 bars); a collision moves to the next free beat
+  (within a beat for callouts, a bar otherwise) or is dropped.
+- **Voice was the drag:** every Gemini voice measured ~1.7 words/s because each clip has ~0.25 s of silence at both ends
+  and 0.25–0.4 s pauses at every comma. `speech._tighten` trims ends and shortens pauses (ffmpeg silenceremove, -35 dB
+  rms); a 4.2 s clip became 2.9 s. Then `atempo` up to 1.35x to fit.
+- Mix: music 0.85, narration 1.3 (was 0.6 / 1.8).
+- Ballet went from 83% of the clip spoken to 44%, four lines: "Backlit in white, feet crossed in fifth." / "A soubresaut,
+  springing with feet tight together." / "Grand jeté, leaping high in a split." / "She arches toward the light."
+- Pose detection is cached per video in `data/killtest/cache/` (gitignored), so re-renders skip the slow part.

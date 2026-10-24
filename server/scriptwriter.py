@@ -27,8 +27,9 @@ except ImportError:
     from director import CACHE, MODEL, client, upload
     from retry import with_retry
 
-# Words per second at each pace (the voice is time-stretched to fit, up to about 1.3x).
-RATE = {"calm": 2.0, "measured": 2.5, "brisk": 3.0, "rapid": 3.6}
+# Words per second at each pace (the voice is time-stretched to fit, up to about 1.35x). There is no slow pace:
+# slow lines drag and pull attention off the music.
+RATE = {"steady": 2.8, "brisk": 3.2, "rapid": 3.8}
 
 BRIEF = """You are an expert audio describer for dance, preparing the audio description for blind and partially
 sighted audience members from this recording (watch and listen). It is spoken over the music. Write the script.
@@ -47,16 +48,19 @@ What to say, like the best dance describers:
 - Choose the moments that matter; never repeat a description. Present tense. Only describe what you can see; if
   unsure of a term, describe the shape plainly.
 
-How and when to say it, like a live describer riding the music:
-- Match the music. In quiet, lyrical stretches: fewer, fuller lines at a calm or measured pace, placed in the gaps.
-  When the music builds: brisk. When it explodes (a big chorus, a run of hard hits): call the movement as it
-  happens, in rapid bursts of two to six words timed on the hits, e.g. "Hit above the head! To the side! Fold to
-  the right!" Each burst is its own line.
-- time is when the line starts being spoken: just after the movement it describes, or on the hit for callouts.
-- Lines must not overlap. A line at a given pace lasts (words / rate) seconds; rates in words per second:
-  calm 2.0, measured 2.5, brisk 3.0, rapid 3.6. Leave room before the next line.
-- delivery: a short note for the voice actor (under 12 words), e.g. "hushed, tender, unhurried" or "punchy,
-  explosive, on the beat".
+How and when to say it: the music is the star, the description is tasteful commentary inside it.
+- Be sparse and short. Most lines are 3 to 8 words and fit inside one bar; a few may take two bars. Speak for at
+  most a third of the running time overall; in lyrical passages, at most one line every two bars. Leave the rest
+  to the music. Never narrate continuously and never read like a speech.
+- Stay in meter: every line starts on a beat and lasts a whole number of beats (see the beat grid below), so it
+  sits inside the music's phrasing rather than across it. Prefer the quieter gaps.
+- Match the music's energy. Lyrical passages: occasional short, steady lines. Builds: brisk. When the music
+  explodes (a big chorus, a run of hard hits), call the movement on the hits in bursts of two to five words, e.g.
+  "Hit above the head! To the side! Fold to the right!" Each burst is its own line, on its hit.
+- time is the beat the line starts on: just after the movement it describes, or on the hit for callouts.
+- Lines never overlap. Rates in words per second: steady 2.8, brisk 3.2, rapid 3.8.
+- delivery: a short tone note for the voice (under 10 words), e.g. "light, warm" or "punchy, explosive". Never slow
+  or drawn out.
 
 For each line give: time, moment_start and moment_end (seconds: the movement it describes), who (solo, pair,
 group or subgroup), kind (description or callout), pace (calm, measured, brisk or rapid), delivery, and text."""
@@ -88,7 +92,11 @@ def music_notes(song: dict) -> str:
     energy = " ".join(f"{t:.0f}s:{e:.1f}" for t, e in song["energy"])
     gaps = " ".join(f"{s[0]:.1f}-{s[1]:.1f}" for s in song["clean_spaces"] if s)
     hits = " ".join(f"{h:.1f}" for h in song["hits"])
-    return (f"Music: {song['bpm']} bpm, {song['beats_per_bar']} beats per bar.\n"
+    beat = (song["beats"][-1] - song["beats"][0]) / max(1, len(song["beats"]) - 1)
+    bar = beat * song["beats_per_bar"]
+    return (f"Music: {song['bpm']} bpm, {song['beats_per_bar']} beats per bar: a beat is {beat:.2f} s, a bar is "
+            f"{bar:.2f} s, so one bar holds about {int(bar * RATE['steady'])} words at a steady pace.\n"
+            f"Beat grid: the first beat is at {song['beats'][0]:.2f} s; bars start at the times listed under energy.\n"
             f"Energy per bar (bar start: 0 quietest to 1 loudest): {energy}\n"
             f"Quieter gaps good for fuller lines (seconds): {gaps}\n"
             f"Strongest hits (seconds): {hits}")
@@ -116,10 +124,28 @@ def write_script(video: str, song: dict, glossary: list[str] = (), style_hint: s
         ),
     ))
     script = json.loads(response.text)
-    script["lines"].sort(key=lambda l: l["time"])
+    script["lines"] = in_meter(script["lines"], song["beats"])
     CACHE.mkdir(parents=True, exist_ok=True)
     cached.write_text(json.dumps(script, indent=2, ensure_ascii=False))
     return script
+
+
+def in_meter(lines: list[dict], beats: list[float]) -> list[dict]:
+    """Start every line on a beat (the nearest one, never more than half a beat early), in order, and drop a line
+    whose beat is already taken by the line before it."""
+    import bisect
+    out, taken = [], -1
+    for line in sorted(lines, key=lambda l: l["time"]):
+        k = bisect.bisect_left(beats, line["time"])
+        if k > 0 and (k == len(beats) or line["time"] - beats[k - 1] < beats[k] - line["time"]):
+            k -= 1
+        if k <= taken:
+            k = taken + 1
+        if k >= len(beats):
+            break
+        out.append({**line, "time": beats[k], "asked_time": line["time"]})
+        taken = k
+    return out
 
 
 def budget(lines: list[dict], end: float) -> list[int]:
@@ -127,7 +153,7 @@ def budget(lines: list[dict], end: float) -> list[int]:
     out = []
     for n, line in enumerate(lines):
         until = lines[n + 1]["time"] if n + 1 < len(lines) else end
-        out.append(max(2, int((until - line["time"] - 0.2) * RATE.get(line["pace"], 2.5) * 1.3)))
+        out.append(max(2, int((until - line["time"] - 0.2) * RATE.get(line["pace"], 2.8) * 1.3)))
     return out
 
 

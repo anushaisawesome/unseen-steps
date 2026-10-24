@@ -63,6 +63,7 @@ def speak(line: str, path: Path, delivery: str | None = None, max_seconds: float
             _synthesise(line, path)
     else:
         _synthesise(line, path)
+    _tighten(path)
     if max_seconds:
         with wave.open(str(path)) as f:
             seconds = f.getnframes() / f.getframerate()
@@ -73,6 +74,18 @@ def speak(line: str, path: Path, delivery: str | None = None, max_seconds: float
                             str(stretched)], check=True)
             stretched.replace(path)
     return path
+
+
+def _tighten(path: Path) -> None:
+    """Trim the silence the model leaves at both ends and shorten the long pauses it puts at commas, which make
+    lines drag (a third of a typical clip is silence)."""
+    tight = path.with_suffix(".tight.wav")
+    trim = "silenceremove=start_periods=1:start_threshold=-35dB"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(path), "-af",
+                    f"{trim},areverse,{trim},areverse,"
+                    "silenceremove=stop_periods=-1:stop_duration=0.1:stop_threshold=-35dB:detection=rms",
+                    str(tight)], check=True)
+    tight.replace(path)
 
 
 def _synthesise(contents: str, path: Path) -> Path:

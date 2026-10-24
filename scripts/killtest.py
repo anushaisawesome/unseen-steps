@@ -124,6 +124,23 @@ def detect(video: str):
     return frames, size
 
 
+def detected(video):
+    """detect(), cached per video file: pose on a long group clip takes half an hour, and re-renders only
+    change the script or the sound."""
+    import hashlib
+    import pickle
+    data = Path(video).read_bytes()
+    cache = ROOT / "data/killtest/cache" / f"{Path(video).stem}-{hashlib.sha1(data[:20_000_000]).hexdigest()[:12]}-{len(data)}.pkl"
+    if cache.exists():
+        frames, size, seated_people = pickle.loads(cache.read_bytes())
+        SEATED.update(seated_people)
+        return frames, size
+    frames, size = detect(video)
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_bytes(pickle.dumps((frames, size, SEATED)))
+    return frames, size
+
+
 def centre(box):
     return np.array([(box[0] + box[2]) / 2, (box[1] + box[3]) / 2])
 
@@ -766,10 +783,10 @@ def render(video, frames, path, results, out_path, focus=None, everyone=False):
     # Mix each spoken line into the soundtrack at its clean space, with the music a little lower.
     said = [r["speech"] for r in results if r.get("speech")]
     inputs = ["-i", str(silent), "-i", video]
-    graph = ["[1:a]volume=0.6[m]"]
+    graph = ["[1:a]volume=0.85[m]"]  # the music stays the main reference
     for k, sp in enumerate(said):
         inputs += ["-i", sp["path"]]
-        graph.append(f"[{k + 2}:a]adelay=delays={int(sp['at'] * 1000)}:all=1,volume=1.8[n{k}]")
+        graph.append(f"[{k + 2}:a]adelay=delays={int(sp['at'] * 1000)}:all=1,volume=1.3[n{k}]")
     graph.append("[m]" + "".join(f"[n{k}]" for k in range(len(said))) +
                  f"amix=inputs={len(said) + 1}:normalize=0:duration=first[a]")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex", ";".join(graph),
@@ -806,7 +823,7 @@ def main():
     if seed:  # marked couple: follow her dress, pose only inside a steady frame around them
         frames, path, solo, size, focus = track_focus(args.clip, seed, args.model)
     else:
-        frames, frame_size = detect(args.clip)
+        frames, frame_size = detected(args.clip)
         path, solo, size = follow(frames, frame_size, seed)
     print(f"following {'one dancer' if solo else 'a couple'} in {len(path)}/{len(frames)} sampled frames")
 
@@ -815,7 +832,17 @@ def main():
         results = scripted(args, song, frames, path, solo, size, group)
     else:
         results = phrased(args, song, frames, path, solo, size)
-    finish(args, results, frames, path, focus, group)
+    finish(args, results, frames, path, focus, group, song)
+
+
+def in_beats(start, until, song, text, pace, max_bars=2):
+    """Time a line should take: the whole beats its words need at its pace, never past the next line or
+    max_bars bars. The voice is tightened and sped up to fit."""
+    from scriptwriter import RATE
+    beat = float(np.median(np.diff(song["beats"])))
+    needed = int(np.ceil(len(text.split()) / RATE.get(pace, 2.8) / beat))
+    room = min(int((until - start) / beat + 0.05), max_bars * song["beats_per_bar"])
+    return round(max(1, min(needed, room)) * beat - 0.05, 2)
 
 
 def scripted(args, song, frames, path, solo, size, group):
@@ -843,7 +870,7 @@ def scripted(args, song, frames, path, solo, size, group):
         until = lines[n + 1]["time"] if n + 1 < len(lines) else end
         r = {"n": n, "time": line["time"], "moment": [start, stop], "who": line["who"], "kind": line["kind"],
              "pace": line["pace"], "delivery": line["delivery"], "features": features, "max_words": words[n],
-             "clean_space": [line["time"], until], "fit": round(until - line["time"] - 0.15, 2)}
+             "clean_space": [line["time"], until], "fit": in_beats(line["time"], until, song, line["text"], line["pace"])}
         if features["tracking"] == "poor":  # nothing measured for this moment: can't confirm or contradict
             r.update(line=line["text"], attempts=[{"draft": line["text"], "passed": True, "reason": "unchecked: not tracked"}])
         else:
@@ -917,7 +944,7 @@ def phrased(args, song, frames, path, solo, size):
     return results
 
 
-def finish(args, results, frames, path, focus, group):
+def finish(args, results, frames, path, focus, group, song):
     """Translate, voice, and render the annotated video."""
     out_dir = ROOT / "data/killtest"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -932,19 +959,23 @@ def finish(args, results, frames, path, focus, group):
             with wave.open(str(wav)) as f:
                 seconds = f.getnframes() / f.getframerate()
             r["speech"] = {"path": str(wav), "at": r["clean_space"][0], "seconds": round(seconds, 2)}
-    # Never talk over the previous line: start after it, or drop the line if that's over 2 s late.
+    # Never talk over the previous line: move to the next free beat (within a beat for a callout, a bar
+    # otherwise, so it stays in meter and near its moment), or drop it.
+    beats = np.array(song["beats"])
+    bar = float(np.median(np.diff(beats))) * song["beats_per_bar"]
     end = 0.0
     for r in results:
         sp = r.get("speech")
         if not sp:
             continue
-        late = 0.6 if r.get("kind") == "callout" else 2.0  # a callout late by more than ~a beat misses its hit
-        if sp["at"] < end + 0.2:
-            if end + 0.2 - sp["at"] > late:
+        if sp["at"] < end + 0.1:
+            later = beats[beats >= end + 0.1]
+            limit = bar / song["beats_per_bar"] if r.get("kind") == "callout" else bar
+            if not len(later) or later[0] - sp["at"] > limit:
                 print(f"   dropped (no room to speak): {r['line']}")
                 r.pop("speech")
                 continue
-            sp["at"] = round(end + 0.2, 2)
+            sp["at"] = round(float(later[0]), 2)
         end = sp["at"] + sp["seconds"]
     (out_dir / f"{stem}.json").write_text(json.dumps(results, indent=2, default=float))
     name = f"{stem}-annotated.mp4" if args.lang == "en" else f"{stem}-annotated-{args.lang}.mp4"
