@@ -304,3 +304,36 @@ left: girl in a red dress, boy in black. Is that right?" Yes / no / describe aga
 
 This also deepens the Gemini use: transcription for dictation, Robotics-ER for choosing and confirming the
 target, TTS for spoken confirmations, Argon for the performance map, Flash for lines.
+
+## Accessibility review: what changed (24 Oct, 03:25)
+
+Realistic problems with the first plan, and the fixes. This **replaces** the earlier plan where they differ.
+
+Problems: too many steps for screen reader users; **custom dictation duplicates the OS dictation** blind users
+already use (and needs mic permission, can clash with screen reader gestures), so **drop it**; free-text
+"who to follow" assumes the user knows what's in the video; asking the style is a burden; the live venue page
+was undesigned and **"scan the QR code" is a visual task**; no control over amount or speed of narration
+(many screen reader users listen at 2–3x); partially sighted users (most people registered blind) were forgotten.
+
+**Live venue page (most important):**
+- Getting in without sight: a short URL the announcer reads out (e.g. "unseensteps.live/hall"), plus QR, an
+  NFC tag on the seat or programme, staff help, and a link in the ticket email.
+- One big "Start listening" button. Keeps playing with the screen locked (Media Session API, lock-screen
+  controls), reconnects automatically, remembers settings.
+- Settings: language, brief / detailed, speech speed.
+
+**Upload page (one action, sensible defaults):**
+1. One labelled native button "Choose or record a dance video" (+ Android share target).
+2. Only if there are several dancers: Robotics-ER **lists who it sees as buttons** ("1. Red dress and black
+   suit, centre. 2. Yellow dress, left. 3. Everyone"). No free text: also closes the injection risk.
+3. Style detected automatically; shown as "Style: waltz (detected)" with a "Change" link for sighted
+   describers. Unsure means plain descriptions.
+4. Progress announced only at milestones via a polite live region; focus moves to the result when ready.
+5. Result controls: language, brief / detailed, speech speed, **"Pause the video for descriptions"**
+   (extended audio description, the standard for recorded media), separate narration volume, transcript and
+   WebVTT descriptions download, keyboard shortcuts (space = play/pause).
+
+**Partially sighted:** large adjustable captions, high contrast, reflow at 400% zoom, bold skeleton overlay.
+
+**Testing:** VoiceOver (iPhone) and TalkBack (Android) before the demo; ideally 10 minutes with one blind
+user (one of Gerard's dancers). **Pitch:** 10 seconds of the page driven by VoiceOver.
