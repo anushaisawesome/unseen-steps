@@ -39,7 +39,14 @@ python scripts/killtest.py clips/waltz.mp4 --beats-per-bar 3 --seed 17,0.42,0.7 
   (`yolo11m/l-pose`) on Andrii's laptop at `imgsz=640` is fine if it stays above ~10 fps.
   Sapiens2 was considered and rejected: too heavy to run live.
 - **Phrases are 16 beats (4 bars), not 32.** Lines every ~6–8 s; 32 beats was too sparse.
-- **Following a couple:** by clothing colour (HSV histogram), with position as a tiebreak.
+- **Following a marked couple (`--seed`): `track_focus` in `scripts/killtest.py`.** Her dress colour
+  is followed with CamShift near where it was last seen; a steady focus frame glides around the
+  couple and pose runs only inside it (enlarged); skeletons are smoothed and single-frame jumps
+  capped. If the dress isn't visible it goes silent, and re-acquires only on the dance floor when
+  pose confirms a standing person whose clothes match. Tuned for precision over coverage: it would
+  rather say nothing than describe the wrong people. The waltz clip's camera keeps leaving the
+  couple, so it's a stress test, not demo footage.
+- **Following without a seed (old path):** by clothing colour (HSV histogram), with position as a tiebreak.
   People not moving relative to the camera pan, and seated people, are ignored (spectators).
   A missing partner counts as "together" (usually hidden behind the other dancer), and a
   separation must last 1 s and exceed 0.8 body heights.

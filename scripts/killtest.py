@@ -195,6 +195,166 @@ def follow(frames, frame_size, seed=None):
     return path, solo, float(np.median(sizes)) if sizes else 0.0
 
 
+def dress_histogram(frame, box):
+    """Hue-saturation fingerprint of the clothes in the middle of a box (the dress, for her)."""
+    x0, y0, x1, y1 = [int(v) for v in box]
+    w, h = x1 - x0, y1 - y0
+    region = frame[y0 + int(0.25 * h):y1 - int(0.1 * h), x0 + int(0.25 * w):x1 - int(0.25 * w)]
+    hsv = cv2.cvtColor(region, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, (0, 60, 40), (180, 255, 255))
+    hist = cv2.calcHist([hsv], [0, 1], mask, [30, 32], [0, 180, 0, 256])
+    cv2.normalize(hist, hist, 0, 255, cv2.NORM_MINMAX)
+    return hist
+
+
+def smooth_points(prev, xy, conf, body):
+    """Steady the skeleton: blend with the last frame and cap any single-frame jump, so one bad
+    detection can't throw a limb across the picture."""
+    if prev is None:
+        return xy
+    out = xy.copy()
+    for k in range(len(xy)):
+        if conf[k] < 0.3:
+            out[k] = prev[k]
+            continue
+        step = xy[k] - prev[k]
+        dist = np.linalg.norm(step)
+        if dist > 0.35 * body:
+            step = step / dist * 0.35 * body
+        out[k] = prev[k] + 0.7 * step
+    return out
+
+
+def track_focus(video, seed, model_name="yolo11n-pose.pt"):
+    """Follow one couple through a crowd the way a person would.
+
+    Her dress colour is followed with CamShift, searching only near where it was last seen. A steady
+    frame glides around the couple, and pose runs only inside that frame (enlarged), so everyone
+    else is ignored. Skeletons are smoothed over time. Starts at the seed time.
+    """
+    model = YOLO(str(ROOT / "models" / model_name))
+    cap = cv2.VideoCapture(video)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    W, H = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    step = max(1, round(fps / SAMPLE_FPS))
+    t0, fx, fy = seed
+    cap.set(cv2.CAP_PROP_POS_MSEC, t0 * 1000)
+    i = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+    ok, frame = cap.read()
+    r = model.predict(frame, imgsz=1280, conf=0.25, verbose=False, device="mps")[0]
+    people = list(zip(r.boxes.xyxy.cpu().numpy(), r.keypoints.xy.cpu().numpy(), r.keypoints.conf.cpu().numpy()))
+    point = np.array([fx * W, fy * H])
+    first = min(people, key=lambda p: np.linalg.norm(centre(p[0]) - point))
+    body = height(first[0])
+    others = [p for p in people if p is not first and np.linalg.norm(centre(p[0]) - centre(first[0])) < body]
+    second = min(others, key=lambda p: np.linalg.norm(centre(p[0]) - centre(first[0]))) if others else None
+    dress = dress_histogram(frame, first[0])
+    first_look = appearance(frame, first[0], first[1], first[2])[0]
+    second_look = appearance(frame, second[0], second[1], second[2])[0] if second is not None else None
+    solo = second is None
+
+    window = tuple(int(v) for v in (first[0][0], first[0][1], first[0][2] - first[0][0], first[0][3] - first[0][1]))
+    roi = None
+    prev = {0: None, 1: None}
+    partner_pos = centre(second[0]) if second is not None else None
+    frames, path, focus = [], {}, {}
+    term = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
+    while ok:
+        if i % step == 0:
+            t = round(i / fps, 3)
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            back = cv2.calcBackProject([hsv], [0, 1], dress, [0, 180, 0, 256], 1)
+            back &= cv2.inRange(hsv, (0, 60, 40), (180, 255, 255))
+            # Search only near where the dress was last seen.
+            x, y, w, h = window
+            keep = np.zeros_like(back)
+            keep[max(0, y - h):min(H, y + 2 * h), max(0, x - 2 * w):min(W, x + 3 * w)] = 1
+            box, new_window = cv2.CamShift(back * keep, window, term)
+            if new_window[2] > 4 and new_window[3] > 4:
+                window = new_window
+            dress_at = np.array(box[0])
+            wx, wy, ww, wh = window
+            strength = back[wy:wy + wh, wx:wx + ww].mean() if ww > 0 and wh > 0 else 0
+            visible = strength > 40 and ww * wh > 0.02 * body * body
+            if not visible:
+                # Lost: look for her dress anywhere in the frame, a patch about her size.
+                blur = cv2.GaussianBlur(back, (0, 0), max(2, body / 15))
+                _, blobs = cv2.threshold(blur, 60, 255, cv2.THRESH_BINARY)
+                n, labels, stats, cents = cv2.connectedComponentsWithStats(blobs.astype(np.uint8))
+                best = None
+                for k in range(1, n):
+                    area = stats[k, cv2.CC_STAT_AREA]
+                    on_floor = cents[k][1] > 0.45 * H  # the audience sits in the upper part of the picture
+                    if on_floor and 0.03 * body * body < area < 0.6 * body * body and (best is None or area > stats[best, cv2.CC_STAT_AREA]):
+                        best = k
+                if best is not None:
+                    # Confirm with pose: a standing person there whose clothes match hers.
+                    cx, cy = cents[best]
+                    r = model.predict(frame, imgsz=1280, conf=0.3, verbose=False, device="mps")[0]
+                    match = [b for b, xy, conf in zip(r.boxes.xyxy.cpu().numpy(), r.keypoints.xy.cpu().numpy(), r.keypoints.conf.cpu().numpy())
+                             if b[0] <= cx <= b[2] and b[1] <= cy <= b[3] and not seated(b, xy, conf)
+                             and (look := appearance(frame, b, xy, conf)) is not None and colour_distance(first_look, look[0]) < 0.45]
+                    if not match:
+                        best = None
+                if best is not None:
+                    bx, by, bw, bh = stats[best, :4]
+                    window = (int(bx), int(by), int(max(bw, 5)), int(max(bh, 5)))
+                    dress_at = np.array(cents[best])
+                    roi = None  # jump straight to her rather than gliding across the floor
+                    visible = True
+            if not visible:
+                prev = {0: None, 1: None}
+                frames.append((t, []))
+                ok, frame = cap.read()
+                i += 1
+                continue
+
+            # Steady focus frame around the couple, gliding rather than jumping.
+            target = np.array([dress_at[0] - 1.3 * body, dress_at[1] - 0.75 * body,
+                               dress_at[0] + 1.3 * body, dress_at[1] + 0.75 * body])
+            roi = target if roi is None else 0.75 * roi + 0.25 * target
+            x0, y0 = int(max(0, roi[0])), int(max(0, roi[1]))
+            x1, y1 = int(min(W, roi[2])), int(min(H, roi[3]))
+            focus[t] = (x0, y0, x1, y1)
+
+            chosen = []
+            if x1 - x0 > 20 and y1 - y0 > 20:
+                r = model.predict(frame[y0:y1, x0:x1], imgsz=640, conf=0.3, verbose=False, device="mps")[0]
+                found = []
+                for b, xy, conf in zip(r.boxes.xyxy.cpu().numpy(), r.keypoints.xy.cpu().numpy(), r.keypoints.conf.cpu().numpy()):
+                    b = b + np.array([x0, y0, x0, y0]); xy = xy + np.array([x0, y0])
+                    look = appearance(frame, b, xy, conf)
+                    if look is not None:
+                        found.append((b, xy, conf, look, 1.0))
+                if found:
+                    # Her: the person standing where the dress is, and looking like her.
+                    main = min(found, key=lambda p: np.linalg.norm(centre(p[0]) - dress_at) / body
+                               + colour_distance(first_look, p[3][0]))
+                    chosen.append(main)
+                    if not solo:
+                        rest = [p for p in found if p is not main
+                                and np.linalg.norm(centre(p[0]) - centre(main[0])) < 0.6 * body
+                                and colour_distance(second_look, p[3][0]) < 0.6]
+                        if rest:
+                            mate = min(rest, key=lambda p: colour_distance(second_look, p[3][0])
+                                       + 0.5 * min(np.linalg.norm(centre(p[0]) - partner_pos) / body, 2))
+                            chosen.append(mate)
+                            partner_pos = centre(mate[0])
+                    body = 0.9 * body + 0.1 * height(main[0])
+            steady = []
+            for role, p in enumerate(chosen):
+                xy = smooth_points(prev[role], p[1], p[2], body)
+                prev[role] = xy
+                steady.append((p[0], xy, p[2], p[3], p[4]))
+            if steady:
+                path[t] = steady
+            frames.append((t, []))
+        ok, frame = cap.read()
+        i += 1
+    sizes = [height(people[0][0]) for people in path.values()]
+    return frames, path, solo, float(np.median(sizes)) if sizes else 0.0, focus
+
+
 def phrase_features(path, size, solo, start, end, phrase):
     rows = [(t, people) for t, people in sorted(path.items()) if start <= t < end]
     expected = (end - start) * SAMPLE_FPS
@@ -277,7 +437,10 @@ def phrase_features(path, size, solo, start, end, phrase):
                 events.append((tt, "partners break apart" if now else "partners come back together"))
 
     if separation in ("in hold", "close"):
-        events = [e for e in events if e[1] != "arm raised high"]
+        # In a ballroom hold, raised arms are the hold itself, and long dresses hide the legs,
+        # so arm, kick and low readings are unreliable.
+        events = [e for e in events if e[1] not in ("arm raised high", "leg kick or high leg")]
+        lowest = "standing"
     events = sorted(events)[:10]
     conf = np.mean([p[2].mean() for p in lead])
     coverage = len(rows) / expected
@@ -355,7 +518,7 @@ def draw_text(frame, caption, note):
     return cv2.cvtColor(np.array(out), cv2.COLOR_RGB2BGR)
 
 
-def render(video, frames, path, results, out_path):
+def render(video, frames, path, results, out_path, focus=None):
     """Demo video: skeletons on the dancers (the followed couple highlighted), each line as a caption
     while it's spoken, any line the checker rejected flagged, and the spoken lines mixed into the music."""
     cap = cv2.VideoCapture(video)
@@ -386,6 +549,11 @@ def render(video, frames, path, results, out_path):
                 on_floor = p[0][3] > 0.55 * h and 0.6 * ref_h < height(p[0]) < 1.6 * ref_h
                 if p[4] >= 2 * MOVING and on_floor and not any(p is q for q in followed):
                     draw_skeleton(frame, p[1], p[2], OTHER_COLOUR, 1)
+        if focus and len(times):
+            near = times[np.abs(times - t).argmin()]
+            f = focus.get(near)
+            if f and abs(near - t) < 0.15:
+                cv2.rectangle(frame, (f[0], f[1]), (f[2], f[3]), (255, 255, 255), 1, cv2.LINE_AA)
         for n, p in enumerate(followed):
             draw_skeleton(frame, p[1], p[2], LEAD_COLOUR if n == 0 else PARTNER_COLOUR, thick)
         caption, note = None, None
@@ -421,6 +589,7 @@ def main():
     parser.add_argument("--beats-per-bar", type=int, default=4)
     parser.add_argument("--bars-per-phrase", type=int, default=4)
     parser.add_argument("--no-frames", action="store_true", help="features only, no close-up crops")
+    parser.add_argument("--model", default="yolo11n-pose.pt", help="pose model file in models/")
     parser.add_argument("--lang", default="en", help="narration language: en, uk, de, hi")
     parser.add_argument("--seed", help="who to follow: time,x,y with x and y as fractions of the frame, e.g. 18,0.6,0.7")
     args = parser.parse_args()
@@ -429,9 +598,13 @@ def main():
                     bars_per_phrase=args.bars_per_phrase, speech_seconds=2.5)
     print(f"music: {song['bpm']} bpm, {len(song['phrases'])} phrases")
 
-    frames, frame_size = detect(args.clip)
     seed = tuple(float(x) for x in args.seed.split(",")) if args.seed else None
-    path, solo, size = follow(frames, frame_size, seed)
+    focus = None
+    if seed:  # marked couple: follow her dress, pose only inside a steady frame around them
+        frames, path, solo, size, focus = track_focus(args.clip, seed, args.model)
+    else:
+        frames, frame_size = detect(args.clip)
+        path, solo, size = follow(frames, frame_size, seed)
     print(f"following {'one dancer' if solo else 'a couple'} in {len(path)}/{len(frames)} sampled frames")
 
     results, previous = [], []
@@ -463,7 +636,7 @@ def main():
             r["speech"] = {"path": str(wav), "at": r["clean_space"][0], "seconds": round(seconds, 2)}
     (out_dir / f"{stem}.json").write_text(json.dumps(results, indent=2, default=float))
     name = f"{stem}-annotated.mp4" if args.lang == "en" else f"{stem}-annotated-{args.lang}.mp4"
-    render(args.clip, frames, path, results, out_dir / name)
+    render(args.clip, frames, path, results, out_dir / name, focus)
     print(f"\nannotated video: {out_dir / name}")
 
 
