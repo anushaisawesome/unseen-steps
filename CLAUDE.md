@@ -112,3 +112,43 @@ its translation in one call (the English is still what gets checked).
 - **Planned: style glossaries from Deep Research.** Per style: move names, what each looks like in body
   terms (that description is what vector search matches against the phrase's features summary), names in
   uk/de/hi, and source links. Stored in MongoDB `terms`.
+
+## Gemini plan: Argon directs, every model has one job (decided 24 Oct, 02:15)
+
+Why: DeepMind scores 15% on "only possible with Argon" and 50% on using Argon and companion models
+effectively with a real verification loop. Flash can describe one phrase; only Argon can hold a whole
+performance in one context, find its structure and recurring motifs, and direct the other models.
+
+| Model (all on our key) | Job | Tested? |
+| --- | --- | --- |
+| `gemini-4-argon` (lead) | **Director.** Watches the whole performance (video + full pose timeline + music map + glossary in one context) and builds the *performance map*: style + confidence, sections, motifs with times, key moments. Live: keeps the show memory in the background and refreshes notes for the writer every few phrases. Uploads: writes the full narration itself. Decides which glossary terms are missing. | Yes: 23 s ballet clip, 3.5 s; found style (0.99), sections, glissade motif at 2.0 s and 5.8 s, 5 key moments |
+| `gemini-robotics-er-2-preview` | **Eyes.** Picks who to follow from a description ("the couple in the red dress", "couple number 8"), re-finds them when lost, and checks every few seconds that the tracker is still on them. Fast tracking in between stays CamShift + YOLO. | Yes: boxed the red-dress couple in a crowded frame in 4.4 s, ignoring pink spectators |
+| `gemini-robotics-er-2-streaming-preview` | Possible live version of the above | No |
+| `gemini-3.8-flash` | Live writer, one line per phrase, using Argon's notes; translation | Yes |
+| `gemini-3.8-flash-tts` / `-lite-tts` | Voice (lite may cut live latency) | flash-tts yes, lite no |
+| `gemini-3.8-live` | Live voice and ask mode ("what is she wearing?") | No |
+| `gemini-3.5-transcribe-live` | Listens to the competition announcer ("Viennese waltz, couple 8") so the song map loads via Atlas Search and Robotics-ER finds couple 8, hands-free | No |
+| `deep-research-preview-04-2026` | Glossary: move names, body-terms description, uk/de/hi names, sources, into MongoDB | No (Andrii) |
+| `gemini-embedding-2` | Vectors for the glossary, unless Atlas Automated Embedding is used (more MongoDB points) | No |
+| `lyria-3.5` | Licence-free music for stock and demo clips | No |
+| Later: `antigravity-preview-*`, `gemma-4-*` | Agent that processes uploaded clips end to end; on-device writer for venues without internet | No |
+
+**Verification loops (judges look for these):**
+1. Checker: every live line's words must match the measured movement (`server/checker.py`).
+2. Argon cross-check: every claim in the performance map ("entrechat at 9 s") must agree with the pose
+   data at that time (a jump measured at 9 s); disagreements go back to Argon to revise or drop.
+3. Robotics-ER spot-checks that the focus frame is still on the right dancers.
+
+**People stay in control:** the user confirms the style if Argon disagrees with their choice; a describer
+can edit the performance map and glossary before the show.
+
+**On screen in the demo:** the performance map panel (sections, motifs), at least one line that calls back
+a motif ("the glissade from the opening returns"), the checker badge, and the ER-chosen target.
+
+**Build order (Saturday):**
+1. `server/director.py`: Argon performance map + cross-check against pose (Anusha)
+2. Robotics-ER target selection: `--target "the girl in the red dress"` replaces `--seed` (Anusha)
+3. Writer uses Argon's notes and motif callbacks (Anusha)
+4. `scripts/live.py` (both)
+5. Glossary via Deep Research into MongoDB (Andrii)
+6. If time: announcer transcription, Live ask mode, Lyria music
