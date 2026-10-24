@@ -465,6 +465,9 @@ problem and who it's for, live demo). Rehearsal in the demo spot **Sat 20:00**. 
   each frame; the clothing-colour check and the "moving" filter only apply to crowds (plain dark clothes in
   changing light broke the colour check; glass-door reflections are ignored by size). Render command:
   `python scripts/killtest.py clips/andrii720.mp4 --beats-per-bar 3` (720p30 copy for speed).
-- **Anusha's Gemini key hit its monthly spending cap** (429 RESOURCE_EXHAUSTED), which blocks writer, Argon,
-  TTS. Fix: DeepMind booth credits, raise the cap in AI Studio billing, or temporarily use a teammate's key.
+- **The team's hackathon project hit its spending cap** (429 RESOURCE_EXHAUSTED on key ...71sw, project
+  `encode26lon-3459`, Tier 3, billing account ...7F15). All keys on that project share the cap, so switching keys
+  there doesn't help. Likely cause: Deep Research glossary jobs (by far the most expensive calls). Anusha emailed
+  Amit (DeepMind) ~15:50. Meanwhile use a key from a teammate's **own** temporary account, and **pause Deep
+  Research** until there's fresh budget.
 - Tip for filming: his feet leave the bottom of the frame when he comes close; start further back.
