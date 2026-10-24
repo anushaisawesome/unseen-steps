@@ -396,7 +396,7 @@ def track_focus(video, seed, model_name="yolo11n-pose.pt"):
     return frames, path, solo, float(np.median(sizes)) if sizes else 0.0, focus
 
 
-def phrase_features(path, size, solo, start, end, phrase):
+def phrase_features(path, size, solo, start, end, phrase, beats=None):
     rows = [(t, people) for t, people in sorted(path.items()) if start <= t < end]
     expected = (end - start) * SAMPLE_FPS
     base = {"phrase": phrase, "start": round(start, 1), "end": round(end, 1), "people": 1 if solo else 2}
@@ -425,18 +425,28 @@ def phrase_features(path, size, solo, start, end, phrase):
     facing = [(tt, np.sign(p[1][L_SHO][0] - p[1][R_SHO][0])) for tt, p in zip(t, lead)]
     facing = [(tt, s) for tt, s in facing if s != 0]
     turns, current, since = 0, None, None
+    directions = []
     for tt, s in facing:
         if current is None:
             current = s
         elif s != current:
             since = since if since is not None else tt
             if tt - since >= TURN_HOLD:
+                way = turn_direction(t, lead, tt, size)
                 current, since = s, None
                 turns += 1
-                events.append((tt, "turn"))
+                directions.append(way)
+                events.append((tt, f"turn to his/her {way}" if way else "turn"))
         else:
             since = None
     turns = (turns + 1) // 2  # two swaps make one full turn; a single swap counts as a turn
+    known = [d for d in directions if d]
+    rotation = None if not known else known[0] if len(set(known)) == 1 else max(set(known), key=known.count) if known.count(max(set(known), key=known.count)) >= 0.75 * len(known) else "mixed"
+
+    steps, pattern = footwork(t, lead, beats, start, end, size) if beats is not None else ([], None)
+    if pattern:
+        label = pattern if not turns or not rotation or rotation == "mixed" else f"{pattern} turning to his/her {rotation}"
+        events.append((start, label))
 
     # Arms raised above the head, kicks (ankle above knee), and partners separating or joining.
     def intervals(flags, label, min_len=0.25):
@@ -496,7 +506,76 @@ def phrase_features(path, size, solo, start, end, phrase):
                    round(float(np.mean([min(p[1][L_WRI][1], p[1][R_WRI][1]) < p[1][NOSE][1] for p in lead])), 2),
         "stillness": round(float(np.mean(speed < 0.15)), 2) if len(speed) else 0.0, "separation": separation,
         "events": [f"{tt - start:.1f}s: {label}" for tt, label in events],
+        "rotation": rotation,  # the dancer's own right or left (clockwise = right), not the audience's
+        "steps": " ".join(steps) if steps else None,  # per beat: fb (forward/back), side, close, hold
+        "footwork": pattern,
     }
+
+
+def turn_direction(t, lead, swap_t, size):
+    """Which way a turn goes, from the dancer's point of view ("right" = clockwise seen from above).
+
+    Facing the camera, the nose leads the shoulders into a turn: turning to their right, the face moves to
+    the left of the picture just before the shoulders swap; coming back round to face the camera after a
+    turn to their right, the face appears on the right of the picture first."""
+    def offsets(lo, hi):
+        out = []
+        for tt, p in zip(t, lead):
+            if lo <= tt <= hi and min(p[2][NOSE], p[2][L_SHO], p[2][R_SHO]) > 0.5 and p[1][L_SHO][0] > p[1][R_SHO][0]:
+                width = max(abs(p[1][L_SHO][0] - p[1][R_SHO][0]), 0.05 * size)
+                out.append((p[1][NOSE][0] - (p[1][L_SHO][0] + p[1][R_SHO][0]) / 2) / width)
+        return out
+    before, after = offsets(swap_t - 0.6, swap_t), offsets(swap_t, swap_t + 0.6)
+    votes = [-np.sign(np.mean(before))] if len(before) >= 2 else []  # leaving the camera: face leads
+    votes += [np.sign(np.mean(after))] if len(after) >= 2 else []    # coming round to the camera
+    total = sum(votes)
+    return "right" if total > 0 else "left" if total < 0 else None
+
+
+def body_height(lead, t, when):
+    """The followed dancer's box height at the sampled frame nearest `when`."""
+    k = int(np.abs(np.asarray(t) - when).argmin())
+    box = lead[k][0]
+    return box[3] - box[1]
+
+
+def footwork(t, lead, beats, start, end, size):
+    """What the feet did on each beat of the phrase, and whether that makes a box step.
+
+    Between consecutive beats: "close" if the feet come together, "side" for a mostly sideways step,
+    "fb" for a step forward or back (seen as movement up or down the picture), else "hold". A box step
+    is forward/back, side, close, then the same again: two halves in a row."""
+    feet = [(tt, p[1][L_ANK], p[1][R_ANK]) for tt, p in zip(t, lead) if min(p[2][L_ANK], p[2][R_ANK]) > 0.4]
+    if len(feet) < 4:
+        return [], None
+    times = np.array([f[0] for f in feet])
+    on_beat = [b for b in beats if start <= b < end]
+    steps = []
+    for b0, b1 in zip(on_beat, on_beat[1:]):
+        i0, i1 = int(np.abs(times - b0).argmin()), int(np.abs(times - b1).argmin())
+        if i0 == i1:
+            steps.append("hold")
+            continue
+        (_, l0, r0), (_, l1, r1) = feet[i0], feet[i1]
+        move = ((l1 + r1) / 2 - (l0 + r0) / 2) / size
+        gap0, gap1 = np.linalg.norm(l0 - r0) / size, np.linalg.norm(l1 - r1) / size
+        # Facing the camera, stepping forward or back barely moves the feet across the picture but
+        # makes the dancer bigger or smaller in it, so the body's height change counts as well.
+        grow = (body_height(lead, t, feet[i1][0]) - body_height(lead, t, feet[i0][0])) / size
+        if gap1 < 0.2 and gap0 > gap1 + 0.1:
+            steps.append("close")
+        elif (abs(move[1]) > 0.03 or abs(grow) > 0.05) and abs(move[0]) < 0.12:
+            steps.append("fb")
+        elif abs(move[0]) > 0.1:
+            steps.append("side")
+        else:
+            steps.append("hold")
+    halves = sum(steps[i:i + 3] == ["fb", "side", "close"] for i in range(len(steps) - 2))
+    # A full box is six steps, so in a two-bar phrase the second half often spills into the next phrase:
+    # half a box plus another forward/back step counts as a box step.
+    pattern = ("box step" if halves >= 2 or (halves == 1 and steps.count("fb") >= 2)
+               else "half a box step (forward or back, side, close)" if halves == 1 else None)
+    return steps, pattern
 
 
 def crops(video, path, start, end, n=3):
@@ -654,7 +733,7 @@ def main():
 
     results, previous = [], []
     for n, ((start, end), space) in enumerate(zip(song["phrases"], song["clean_spaces"])):
-        features = phrase_features(path, size, solo, start, end, n)
+        features = phrase_features(path, size, solo, start, end, n, beats=song["beats"])
         shots = [] if args.no_frames or features["tracking"] == "poor" else crops(args.clip, path, start, end)
         vocab = []
         if args.style and features["tracking"] != "poor":
@@ -662,7 +741,9 @@ def main():
             parts = [f"travels {features['travel']}" if features.get("travel") not in (None, "none") else "stays in place",
                      f"{features['turns']} turn(s)" if features.get("turns") else "no turns",
                      "pauses" if (features.get("stillness") or 0) > 0.3 else "keeps moving",
-                     "rises" if (features.get("max_rise") or 0) > 0.05 else ""]
+                     "rises" if (features.get("max_rise") or 0) > 0.05 else "",
+                     features.get("footwork") or "",
+                     f"rotates to the {features['rotation']}" if features.get("rotation") in ("left", "right") else ""]
             movement = "; ".join([p for p in parts if p] + (features.get("events") or []))
             vocab = [f"{name} ({t['description']})" for t in
                      match_terms(movement, args.style, include_drafts=args.include_drafts)
@@ -673,7 +754,7 @@ def main():
         if result.line:
             previous.append(result.line)
         results.append({"features": features, "line": result.line, "attempts": result.attempts, "clean_space": space})
-        print(f"\nphrase {n} ({start:.1f}-{end:.1f}s) tracking={features['tracking']} events={features.get('events')}")
+        print(f"\nphrase {n} ({start:.1f}-{end:.1f}s) tracking={features['tracking']} rotation={features.get('rotation')} steps={features.get('steps')} footwork={features.get('footwork')}")
         for a in result.attempts:
             if not a["passed"]:
                 print(f"   rejected: \"{a['draft']}\" ({a['reason']})")

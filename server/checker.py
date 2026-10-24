@@ -48,6 +48,13 @@ def check(line: str, features: dict) -> Verdict:
     travel = features.get("travel")
     for side in ("left", "right"):
         # "left"/"right" as a direction of travel, not a body part ("his right arm").
+        rotating = (rf"\b(turn|spin|pivot|rotat|circl|twirl|whirl)\w*\b[^.,;]*?\b(his|her|their)\s+{side}\b"
+                    rf"(?!\s+(arm|hand|leg|foot|shoulder|hip|knee|elbow))")
+        if re.search(rotating, text):  # the dancer's own side, about a turn: check against rotation instead
+            if features.get("rotation") != side:
+                measured = features.get("rotation") or "no clear direction"
+                return Verdict(False, f"it says the turn goes to the {side}, but the measured rotation was {measured}")
+            continue
         moving = rf"\b{side}(ward)?\b(?!\s+(arm|hand|leg|foot|shoulder|hip|knee|elbow|side))"
         facing = rf"\b(fac\w*|point\w*|look\w*)\s+(to\s+(the\s+)?)?{side}\b"  # facing/pointing isn't travel
         if re.search(moving, text) and not re.search(facing, text) and travel != side:

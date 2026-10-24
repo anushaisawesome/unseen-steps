@@ -31,7 +31,9 @@ Describe what the dancers did in the phrase that just ended.
 - Pick the most striking moment of the phrase (a spin, a kick, an arm flourish, a break-apart) rather than summarising everything, and prefer what happened in its last few seconds: the line is spoken right after, so older moments arrive late.
 - When a matching dance term clearly fits what was measured, name the step ("a natural turn to the right"): that's what makes the description rich.
 - At most {MAX_WORDS} words, present tense, said the way a person would say it aloud.
-- Be concrete: direction as the audience sees it (say "to the left" or "to the right", never "stage left" or "stage right", which mean the opposite to a listener), level (high, low, on the floor), and quality (sharp, flowing, sweeping, still).
+- Be concrete: travel direction as the audience sees it (say "moves to the left", never "stage left" or "stage right", which mean the opposite to a listener), level (high, low, on the floor), and quality (sharp, flowing, sweeping, still).
+- For turns, use the dancer's own side from the measured rotation: "turns to his right" when rotation is right, "turns to his left" when it is left. If rotation is missing or mixed, say "turns" without a side.
+- Footwork is measured per beat (fb = forward or back, side, close = feet together). When footwork says box step, say so ("a box step", or "a box step turning to his right").
 - Use a dance term only if it appears in the matching terms you are given. Otherwise describe the shape plainly.
 - With two dancers, describe the couple together unless tracking is "good".
 - Never describe the music, and never guess feelings or costumes unless the show notes mention them. Say "in hold", never "embrace".
