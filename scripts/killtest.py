@@ -46,7 +46,8 @@ def load_pose(name):
 
 
 # COCO keypoints
-NOSE, L_SHO, R_SHO, L_WRI, R_WRI, L_HIP, R_HIP, L_KNE, R_KNE, L_ANK, R_ANK = 0, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16
+NOSE, L_EYE, R_EYE, L_EAR, R_EAR = 0, 1, 2, 3, 4
+L_SHO, R_SHO, L_WRI, R_WRI, L_HIP, R_HIP, L_KNE, R_KNE, L_ANK, R_ANK = 5, 6, 9, 10, 11, 12, 13, 14, 15, 16
 SAMPLE_FPS = 15
 TURN_HOLD = 0.3   # seconds a new facing must last to count as a turn
 APART_GAP = 0.8   # hip distance between partners, in body heights
@@ -443,6 +444,19 @@ def phrase_features(path, size, solo, start, end, phrase, beats=None):
     known = [d for d in directions if d]
     rotation = None if not known else known[0] if len(set(known)) == 1 else max(set(known), key=known.count) if known.count(max(set(known), key=known.count)) >= 0.75 * len(known) else "mixed"
 
+    faces = [facing_of(p, size) for p in lead]
+    facing = max(set(faces), key=faces.count)
+    # A change of facing counts once it has lasted half a second.
+    current, pending = faces[0], None
+    for tt, f in zip(t, faces):
+        if f == current or f == "unclear":
+            pending = None
+        elif pending is None:
+            pending = (tt, f)
+        elif tt - pending[0] >= 0.5 and pending[1] == f:
+            current, pending = f, None
+            events.append((tt, f"now {FACING_WORDS[f]}"))
+
     steps, pattern = footwork(t, lead, beats, start, end, size) if beats is not None else ([], None)
     if pattern:
         label = pattern if not turns or not rotation or rotation == "mixed" else f"{pattern} turning to his/her {rotation}"
@@ -509,7 +523,35 @@ def phrase_features(path, size, solo, start, end, phrase, beats=None):
         "rotation": rotation,  # the dancer's own right or left (clockwise = right), not the audience's
         "steps": " ".join(steps) if steps else None,  # per beat: fb (forward/back), side, close, hold
         "footwork": pattern,
+        "facing": FACING_WORDS.get(facing, "unclear"),  # where the dancer faces most of the phrase
     }
+
+
+FACING_WORDS = {"front": "facing the audience", "back": "with back to the audience",
+                "left": "side-on, facing the audience's left", "right": "side-on, facing the audience's right"}
+
+
+def facing_of(p, size):
+    """Which way the dancer faces in one frame: front, back, left, right (as the audience sees it) or unclear.
+
+    Facing the audience, their left shoulder is on the right of the picture and the face is visible; with their
+    back to us the shoulders swap and the face disappears; side-on the shoulders narrow and the nose points the
+    way they face."""
+    xy, conf = p[1], p[2]
+    if min(conf[L_SHO], conf[R_SHO]) < 0.4:
+        return "unclear"
+    width = (xy[L_SHO][0] - xy[R_SHO][0]) / size
+    face = conf[NOSE] > 0.5 and max(conf[L_EYE], conf[R_EYE]) > 0.5
+    if abs(width) < 0.07:
+        if conf[NOSE] > 0.4:
+            mid = (xy[L_SHO][0] + xy[R_SHO][0]) / 2
+            return "left" if xy[NOSE][0] < mid else "right"
+        return "unclear"
+    if width > 0 and face:
+        return "front"
+    if width < 0 and not face:
+        return "back"
+    return "unclear"
 
 
 def turn_direction(t, lead, swap_t, size):
@@ -710,6 +752,7 @@ def main():
     parser.add_argument("--bars-per-phrase", type=int, default=4)
     parser.add_argument("--no-frames", action="store_true", help="features only, no close-up crops")
     parser.add_argument("--model", default="yolo11n-pose.pt", help="pose model file in models/")
+    parser.add_argument("--director", action="store_true", help="Argon watches the whole clip first and directs the lines")
     parser.add_argument("--style", help="dance style for glossary terms, e.g. waltz")
     parser.add_argument("--terms", choices=["beginner", "professional"], default="beginner",
                         help="which names to speak (SPEC.md 5b); beginner falls back to plain description")
@@ -731,9 +774,22 @@ def main():
         path, solo, size = follow(frames, frame_size, seed)
     print(f"following {'one dancer' if solo else 'a couple'} in {len(path)}/{len(frames)} sampled frames")
 
+    all_features = [phrase_features(path, size, solo, start, end, n, beats=song["beats"])
+                    for n, (start, end) in enumerate(song["phrases"])]
+    plan = None
+    if args.director:  # Argon watches the whole clip; its claims are checked against the pose data
+        from director import cross_check, notes_for, performance_map
+        plan = cross_check(performance_map(args.clip, style_hint=args.style), all_features)
+        dropped = [m for m in plan["moments"] if m.get("check") == "dropped"]
+        print(f"director: {plan['style']['name']} ({plan['style']['confidence']}), {len(plan['sections'])} sections, "
+              f"{len(plan['motifs'])} motifs, {len(dropped)} key moments dropped by the pose cross-check")
+
     results, previous = [], []
     for n, ((start, end), space) in enumerate(zip(song["phrases"], song["clean_spaces"])):
-        features = phrase_features(path, size, solo, start, end, n, beats=song["beats"])
+        features = all_features[n]
+        notes = ""
+        if plan:
+            notes = f"Style: {plan['style']['name']}\n" + notes_for(plan, start, end)
         shots = [] if args.no_frames or features["tracking"] == "poor" else crops(args.clip, path, start, end)
         vocab = []
         if args.style and features["tracking"] != "poor":
@@ -750,7 +806,7 @@ def main():
                      if (name := spoken_name(t, args.terms))]
         if vocab:
             print(f"   terms offered: {[v.split(' (')[0] for v in vocab]}")
-        result = describe(features, previous, vocab=vocab, frames=shots)
+        result = describe(features, previous, notes=notes, vocab=vocab, frames=shots)
         if result.line:
             previous.append(result.line)
         results.append({"features": features, "line": result.line, "attempts": result.attempts, "clean_space": space})

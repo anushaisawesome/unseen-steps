@@ -7,7 +7,7 @@ the measurements don't support is rejected with a reason the writer can fix.
 import re
 from dataclasses import dataclass
 
-MAX_WORDS = 10
+MAX_WORDS = 14
 
 # word stems -> (what must be true of the features, reason if it isn't)
 CLAIMS = [
