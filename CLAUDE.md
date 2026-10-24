@@ -420,3 +420,15 @@ problem and who it's for, live demo). Rehearsal in the demo spot **Sat 20:00**. 
    Geneviève about Robotics-ER streaming for live tracking).
 7. **Sunday 08:00–11:00:** demo video per `docs/demo-video.md`, README, submission text. Submit by 12:00.
 8. Upload page and live venue page only after `live.py` works.
+
+## Pose model candidates considered (24 Oct)
+
+- **SAM-Body4D** (arXiv 2512.08406, github.com/gaomingqi/sam-body4d), suggested by Nastia: training-free 4D
+  body-mesh recovery from video (SAM 3 tracking + diffusion occlusion fill + SAM 3D Body), identity-consistent,
+  handles occlusion and crowds. **Not for this weekend and never for live:** tested on an A100 80 GB, no frame
+  rate reported, explicitly not real time, no quantitative comparison with standard pose models, three large
+  models to install. Worth it later for the **upload path on a cloud GPU**: true 3D body orientation would fix
+  turn counting (our noisiest feature), and SAM 3's text-prompted tracking (from memory, check) fits "follow the
+  girl in the red dress". Roadmap line for the pitch.
+- **Sapiens2:** rejected Friday, too heavy to run live.
+- **Live demo stays on YOLO-pose** (`yolo11n/m/l-pose`, pick the biggest that holds 10+ fps on the demo laptop).
