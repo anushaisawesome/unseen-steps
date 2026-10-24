@@ -8,6 +8,7 @@ Check the connection and see what's in the database:
 
 import os
 from pathlib import Path
+from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 from pymongo import MongoClient
@@ -21,8 +22,11 @@ def db():
     global _db
     if _db is None:
         uri = os.environ.get("MONGODB_URI")
-        if not uri:
-            raise RuntimeError("MONGODB_URI isn't set: add Andrii's Atlas connection string to .env")
+        if not uri:  # or build it from parts, so the password sits on its own line in .env
+            user, password, host = (os.environ.get(k) for k in ("MONGODB_USER", "MONGODB_PASSWORD", "MONGODB_HOST"))
+            if not (user and password and host):
+                raise RuntimeError("Set MONGODB_URI, or MONGODB_USER + MONGODB_PASSWORD + MONGODB_HOST, in .env")
+            uri = f"mongodb+srv://{quote_plus(user)}:{quote_plus(password)}@{host}/?appName=unseen-steps"
         _db = MongoClient(uri, serverSelectionTimeoutMS=8000)[os.environ.get("MONGODB_DB", "unseen_steps")]
     return _db
 
