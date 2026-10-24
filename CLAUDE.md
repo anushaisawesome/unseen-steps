@@ -644,3 +644,6 @@ star of the show."
 - Checker: "roll" only counts as floor work when it isn't a head/shoulder/hip/chest/body roll.
 - Known weak spot: when the checker strips a direction, Argon's revision can produce an odd phrase ("A natural return
   back to profile"); worth a describer pass over the script before a show.
+- **Annotated demos (script mode):** `docs/media/ballet-script-demo.mp4` and `docs/media/andrii-script-demo.mp4` in this
+  repo; the Judas group render is a release asset in the private clips repo (release `annotated-1`), because it's
+  another crew's choreography and this repo is public.
