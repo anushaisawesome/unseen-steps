@@ -1,0 +1,322 @@
+<title>Ballet in 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a rehearsal-studio console. The 3D stage is the hero; the two source videos sit beside it
+   as monitors; one transport bar drives all three on the same 24 fps frame clock. Single dark look by choice. */
+:root {
+  color-scheme: dark;
+  --ink: #ece6e1;          /* main text, warm off-white like the studio walls */
+  --muted: #a39a97;        /* secondary text */
+  --ground: #16171c;       /* page */
+  --panel: #1f2027;        /* raised surfaces */
+  --line: #33343d;         /* hairlines */
+  --accent: #e7a6b8;       /* tights pink: playhead, body tint, focus */
+  --yolo: #ff6fd8;         /* the YOLO skeleton's magenta, used only to label it */
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--ground); color: var(--ink); }
+body {
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.5;
+  padding-block: 20px 28px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1320px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 4px 0 0; max-width: 68ch; }
+.meta { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.meta b { color: var(--ink); font-weight: 500; }
+
+.stage-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 860px) { .stage-grid { grid-template-columns: 1fr; } }
+
+.stage { position: relative; background: radial-gradient(120% 90% at 50% 0%, #262833 0%, var(--panel) 55%, #18191f 100%);
+  border: 1px solid var(--line); border-radius: 10px; overflow: hidden; aspect-ratio: 16 / 10; min-height: 320px; }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.stage .tag { position: absolute; left: 12px; top: 10px; }
+.views { position: absolute; right: 10px; top: 8px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.hint { position: absolute; left: 12px; bottom: 10px; font-size: 12px; color: var(--muted); }
+.missing { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 14px; pointer-events: none; }
+
+.monitors { display: grid; gap: 16px; align-content: start; }
+figure { margin: 0; display: grid; gap: 6px; }
+figure video { width: 100%; max-width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; border: 1px solid var(--line); display: block; }
+figcaption { font-size: 13px; color: var(--muted); }
+figcaption .tag { margin-right: 6px; }
+figcaption code { font-family: var(--mono); font-size: 12px; color: var(--ink); }
+[hidden] { display: none !important; }
+.tag { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px;
+  background: rgba(0,0,0,.35); border: 1px solid var(--line); color: var(--ink); }
+.tag.yolo { color: var(--yolo); border-color: color-mix(in srgb, var(--yolo) 45%, transparent); }
+.tag.sam { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+
+.transport { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+@media (max-width: 560px) { .transport { grid-template-columns: auto 1fr; } .transport .right { grid-column: 1 / -1; } }
+.scrub { display: grid; gap: 4px; }
+.scrub input { width: 100%; accent-color: var(--accent); }
+.clock { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; display: flex; justify-content: space-between; gap: 12px; }
+.clock b { color: var(--ink); font-weight: 500; }
+.right { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+button { font: 500 13px/1 var(--body); color: var(--ink); background: #2a2b33; border: 1px solid var(--line);
+  border-radius: 6px; padding: 8px 11px; cursor: pointer; }
+button:hover { background: #33343e; }
+button[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 22%, #2a2b33); border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.play { width: 44px; height: 44px; border-radius: 50%; padding: 0; display: grid; place-items: center; font-size: 15px;
+  background: var(--accent); color: #2a1820; border: none; }
+.play:hover { background: #f0bccb; }
+.views button { padding: 6px 9px; font-size: 12px; background: rgba(30,31,38,.85); }
+
+.notes { color: var(--muted); font-size: 13px; max-width: 90ch; display: grid; gap: 4px; }
+.notes p { margin: 0; }
+.notes code { font-family: var(--mono); font-size: 12px; color: var(--ink); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Ballet in 3D</h1>
+      <p class="sub">SAM-Body4D's full 3D body for the Unseen Steps ballet clip, next to the YOLO skeleton we use today. All three views run on one frame clock, so frame 300 is the same instant everywhere.</p>
+    </div>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <div class="stage-grid">
+    <div class="stage" id="stage">
+      <span class="tag sam">SAM-Body4D · 3D body</span>
+      <div class="views" role="group" aria-label="Camera angle">
+        <button type="button" id="v-cam" aria-pressed="true">Camera</button>
+        <button type="button" id="v-front" aria-pressed="false">Front</button>
+        <button type="button" id="v-side" aria-pressed="false">Side</button>
+        <button type="button" id="v-top" aria-pressed="false">Above</button>
+        <button type="button" id="v-follow" aria-pressed="true" title="Keep the dancer centred as she travels">Follow</button>
+      </div>
+      <div class="missing" id="missing" hidden>No body found in this frame</div>
+      <div class="hint">Drag to orbit · scroll or pinch to zoom · right-drag to pan</div>
+    </div>
+    <div class="monitors">
+      <figure>
+        <video id="vid-yolo" src="__DEMO__" muted playsinline preload="auto" aria-label="YOLO demo video"></video>
+        <figcaption><span class="tag yolo">YOLO-pose</span> Today's pipeline: 17-point 2D skeleton and narration (<code>docs/media/ballet-demo.mp4</code>)</figcaption>
+      </figure>
+      <figure>
+        <video id="vid-sam" src="__OVERLAY__" muted playsinline preload="auto" aria-label="SAM-Body4D overlay video"></video>
+        <figcaption><span class="tag sam">SAM-Body4D</span> Its own render of the body, from the film camera</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="transport">
+    <button type="button" class="play" id="play" aria-label="Play">▶</button>
+    <div class="scrub">
+      <label class="sr" for="scrub">Frame</label>
+      <input type="range" id="scrub" min="0" max="546" step="1" value="0">
+      <div class="clock"><span>frame <b id="f-now">0</b> / <span id="f-max">546</span></span><span><b id="t-now">0.00</b> s</span></div>
+    </div>
+    <div class="right" role="group" aria-label="Playback speed">
+      <button type="button" data-rate="0.25" aria-pressed="false">¼×</button>
+      <button type="button" data-rate="0.5" aria-pressed="false">½×</button>
+      <button type="button" data-rate="1" aria-pressed="true">1×</button>
+    </div>
+  </div>
+
+  <div class="notes">
+    <p>Keys: <code>Space</code> play or pause, <code>←</code> <code>→</code> one frame, <code>Shift</code> + arrow ten frames.</p>
+    <p id="note-data"></p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const DATA = __DATA__;
+
+(async function () {
+  const FPS = DATA.fps, TOTAL = DATA.totalFrames, N = DATA.vertexCount;
+  const $ = (id) => document.getElementById(id);
+  const yolo = $("vid-yolo"), sam = $("vid-sam");
+
+  // ---- decode vertices: gzip -> uint16 frame-to-frame deltas -> positions. SAM-Body4D's .ply files are
+  //      already in OpenGL camera axes (y up, camera looking down -z), the same as three.js.
+  const bin = Uint8Array.from(atob(DATA.packed), (c) => c.charCodeAt(0));
+  const raw = await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+  const q = new Uint16Array(raw);
+  for (let i = N * 3; i < q.length; i++) q[i] = (q[i] + q[i - N * 3]) & 0xffff;
+  const K = DATA.frames.length;
+  const pos = new Float32Array(q.length);
+  const lo = DATA.lo, span = DATA.hi.map((h, a) => (h - lo[a]) / 65535);
+  for (let i = 0; i < q.length; i++) { const a = i % 3; pos[i] = lo[a] + q[i] * span[a]; }
+
+  // per-frame centre, overall floor, overall centre
+  const centres = [];
+  let floorY = Infinity; const mid = new THREE.Vector3();
+  for (let k = 0; k < K; k++) {
+    let x = 0, y = 0, z = 0;
+    for (let v = 0; v < N; v++) { const o = (k * N + v) * 3; x += pos[o]; y += pos[o + 1]; z += pos[o + 2]; if (pos[o + 1] < floorY) floorY = pos[o + 1]; }
+    const c = new THREE.Vector3(x / N, y / N, z / N); centres.push(c); mid.add(c);
+  }
+  mid.divideScalar(K);
+
+  // frame number -> slot in the mesh list (null when SAM-Body4D found nobody near that frame)
+  // gaps of up to 2 frames hold the previous body; longer gaps show "No body found"
+  const found = new Array(TOTAL).fill(null);
+  DATA.frames.forEach((f, k) => { if (f < TOTAL) found[f] = k; });
+  const slotOf = new Array(TOTAL).fill(null);
+  for (let f = 0, prev = null, gap = 0; f < TOTAL; f++) {
+    if (found[f] !== null) { prev = found[f]; gap = 0; slotOf[f] = prev; }
+    else if (prev !== null && ++gap <= 2) slotOf[f] = prev;
+  }
+
+  // ---- scene
+  const stage = $("stage");
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  stage.prepend(renderer.domElement);
+  const scene = new THREE.Scene();
+  const vfov = 2 * Math.atan(DATA.height / 2 / DATA.focal) * 180 / Math.PI;
+  const camera = new THREE.PerspectiveCamera(vfov, 16 / 10, 0.05, 100);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+
+  scene.add(new THREE.HemisphereLight(0xfff4ee, 0x2a2430, 0.85));
+  const key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(-2, 4, 2); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xe7a6b8, 0.5); rim.position.set(3, 2, -4); scene.add(rim);
+
+  const geo = new THREE.BufferGeometry();
+  const posAttr = new THREE.BufferAttribute(new Float32Array(N * 3), 3);
+  geo.setAttribute("position", posAttr);
+  geo.setIndex(DATA.faces);
+  const body = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: 0xe9c3cc, roughness: 0.55, metalness: 0.05, side: THREE.DoubleSide }));
+  scene.add(body);
+
+  // floor grid at the lowest foot, and the dancer's path across it
+  const grid = new THREE.GridHelper(12, 24, 0x5a5560, 0x34333c);
+  grid.position.set(mid.x, floorY - 0.002, mid.z); scene.add(grid);
+  const pathPts = centres.map((c) => new THREE.Vector3(c.x, floorY + 0.003, c.z));
+  const path = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pathPts), new THREE.LineBasicMaterial({ color: 0x8a7f88 }));
+  scene.add(path);
+  const travelled = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pathPts), new THREE.LineBasicMaterial({ color: 0xe7a6b8 }));
+  scene.add(travelled);
+  const dot = new THREE.Mesh(new THREE.CircleGeometry(0.05, 24), new THREE.MeshBasicMaterial({ color: 0xe7a6b8 }));
+  dot.rotation.x = -Math.PI / 2; scene.add(dot);
+
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(stage); resize();
+
+  // ---- camera presets
+  let follow = true, view = "cam";
+  const viewBtns = { cam: $("v-cam"), front: $("v-front"), side: $("v-side"), top: $("v-top") };
+  function setView(v) {
+    view = v;
+    for (const [k, b] of Object.entries(viewBtns)) b.setAttribute("aria-pressed", String(k === v));
+    const c = follow ? centres[currentSlot ?? 0] : mid;
+    const d = Math.max(3.5, mid.length() * 0.9);
+    // the film camera: at the origin, looking straight ahead, so the body lines up with the videos
+    if (v === "cam") { camera.position.set(0, 0, 0); controls.target.set(0, 0, mid.z); }
+    else if (v === "front") { camera.position.set(c.x, c.y + 0.2, c.z + d); controls.target.copy(c); }
+    else if (v === "side") { camera.position.set(c.x + d, c.y + 0.2, c.z); controls.target.copy(c); }
+    else { camera.position.set(c.x, c.y + d * 1.4, c.z + 0.01); controls.target.copy(c); }
+    controls.update();
+  }
+  for (const [k, b] of Object.entries(viewBtns)) b.addEventListener("click", () => setView(k));
+  $("v-follow").addEventListener("click", (e) => { follow = !follow; e.currentTarget.setAttribute("aria-pressed", String(follow)); });
+
+  // ---- one frame clock for all three views
+  let frame = 0, playing = false, rate = 1, currentSlot = null, last = performance.now();
+  const scrub = $("scrub"); scrub.max = TOTAL - 1; $("f-max").textContent = TOTAL - 1;
+  let prevCentre = null;
+
+  function showFrame(f) {
+    const slot = slotOf[f];
+    $("missing").hidden = slot !== null;
+    body.visible = slot !== null;
+    if (slot !== null) {
+      posAttr.array.set(pos.subarray(slot * N * 3, (slot + 1) * N * 3));
+      posAttr.needsUpdate = true; geo.computeVertexNormals(); geo.computeBoundingSphere();
+      const c = centres[slot];
+      dot.position.set(c.x, floorY + 0.004, c.z);
+      travelled.geometry.setDrawRange(0, slot + 1);
+      if (follow && view !== "cam" && prevCentre) {
+        const dlt = c.clone().sub(prevCentre);
+        camera.position.add(dlt); controls.target.add(dlt);
+      }
+      prevCentre = c.clone();
+      currentSlot = slot;
+    }
+    scrub.value = f;
+    $("f-now").textContent = f;
+    $("t-now").textContent = (f / FPS).toFixed(2);
+  }
+  function syncVideos(force) {
+    const t = (frame + 0.5) / FPS;
+    for (const v of [yolo, sam]) {
+      if (force || Math.abs(v.currentTime - t) > 0.12) { try { v.currentTime = t; } catch (e) {} }
+    }
+  }
+  function setPlaying(p) {
+    playing = p;
+    $("play").textContent = p ? "❚❚" : "▶";
+    $("play").setAttribute("aria-label", p ? "Pause" : "Play");
+    for (const v of [yolo, sam]) { v.playbackRate = rate; if (p) v.play().catch(() => {}); else v.pause(); }
+    if (!p) syncVideos(true);
+    last = performance.now();
+  }
+  let acc = 0;
+  function tick(now) {
+    if (playing) {
+      acc += (now - last) / 1000 * rate * FPS;
+      const step = Math.floor(acc);
+      if (step > 0) {
+        acc -= step; frame += step;
+        if (frame >= TOTAL) { frame = 0; syncVideos(true); }
+        showFrame(frame); syncVideos(false);
+      }
+    }
+    last = now;
+    controls.update(); renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  function seek(f) { frame = Math.max(0, Math.min(TOTAL - 1, f)); acc = 0; showFrame(frame); syncVideos(true); }
+
+  $("play").addEventListener("click", () => setPlaying(!playing));
+  scrub.addEventListener("input", () => seek(+scrub.value));
+  document.querySelectorAll("[data-rate]").forEach((b) => b.addEventListener("click", () => {
+    rate = +b.dataset.rate;
+    document.querySelectorAll("[data-rate]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    for (const v of [yolo, sam]) v.playbackRate = rate;
+  }));
+  addEventListener("keydown", (e) => {
+    if (e.target.tagName === "INPUT" && e.key !== " ") return;
+    if (e.key === " ") { e.preventDefault(); setPlaying(!playing); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); setPlaying(false); seek(frame + (e.shiftKey ? 10 : 1)); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); setPlaying(false); seek(frame - (e.shiftKey ? 10 : 1)); }
+  });
+
+  // ---- facts about this run
+  const nFound = DATA.frames.length;
+  $("meta").innerHTML =
+    `<span><b>${TOTAL}</b> frames · <b>${FPS}</b> fps</span>` +
+    `<span>body found in <b>${nFound}</b> (${Math.round(nFound / TOTAL * 100)}%)</span>` +
+    `<span><b>${N.toLocaleString()}</b> of ${DATA.fullVertexCount.toLocaleString()} mesh points shown</span>`;
+  $("note-data").textContent = DATA.note;
+
+  showFrame(0); setView("cam"); syncVideos(true);
+  requestAnimationFrame(tick);
+})();
+</script>
