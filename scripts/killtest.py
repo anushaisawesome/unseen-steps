@@ -856,7 +856,7 @@ def scripted(args, song, frames, path, solo, size, group):
     """Argon writes the whole timed description (pace and delivery included); each line is checked against the
     pose measurements for the moment it describes; rejected lines go back to Argon once, then stay silent."""
     from checker import check
-    from scriptwriter import budget, revise, write_script
+    from scriptwriter import budget, review_script, revise, write_script
     glossary = []
     if args.style:
         from db import db, spoken_name
@@ -870,6 +870,8 @@ def scripted(args, song, frames, path, solo, size, group):
     print(f"Argon map: {plan['style']['name']}, " + "; ".join(
         f"{s['start']:.0f}-{s['end']:.0f}s {s['label']}" for s in plan["sections"]))
     script = write_script(args.clip, song, glossary, args.style, plan)
+    script = review_script(args.clip, script, plan, song)  # a second describer: what would a listener miss?
+    print(f"Second describer: {script.get('review', '')}")
     lines = script["lines"]
     end = song["beats"][-1] + 2
     words = budget(lines, end)
@@ -986,7 +988,7 @@ def finish(args, results, frames, path, focus, group, song):
         while share() > SPEECH_SHARE:
             optional = [r for r in results if r.get("speech") and r.get("kind") != "callout" and r.get("priority", 2) > 1]
             if not optional and share() > SPEECH_CEILING:
-                optional = [r for r in results if r.get("speech") and r.get("kind") != "callout"]
+                optional = [r for r in results[1:] if r.get("speech") and r.get("kind") != "callout"]
             if not optional:
                 break
             r = max(optional, key=lambda r: (r.get("priority", 2), crowding(r)))

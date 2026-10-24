@@ -47,6 +47,9 @@
   .transcript .tag { color: var(--muted); font-size: 12.5px; }
   .transcript li.cut button { color: var(--cut); text-decoration: line-through; }
   .transcript li.now button { background: var(--accent-soft); }
+  .about { margin-top: 14px; font-size: 14px; color: var(--muted); }
+  .about summary { cursor: pointer; color: var(--ink); font-weight: 600; }
+  .about ul { margin: 6px 0; padding-left: 20px; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
 </head>
@@ -72,6 +75,7 @@
       </div>
       <p class="note">These lines are written from the YouTube video and haven't been checked against pose tracking (that needs the video file). Struck-through lines were cut so the music stays the main thing.</p>
     </div>
+    <details class="about" id="about"><summary>What Argon noticed</summary><div id="about-body"></div></details>
     <div class="transcript">
       <h2 id="lines-h">Script</h2>
       <ol id="lines" aria-labelledby="lines-h"></ol>
@@ -115,6 +119,13 @@ function choose(i) {
     b.addEventListener("click", () => { player.seekTo(Math.max(demo.start, l.at - 1.5), true); player.playVideo(); });
     li.appendChild(b); linesEl.appendChild(li);
   });
+  const about = document.getElementById("about-body");
+  about.replaceChildren();
+  const h = document.createElement("p"); h.textContent = "Signature of this piece:"; about.appendChild(h);
+  const ul = document.createElement("ul");
+  (demo.signature || []).forEach(x => { const li = document.createElement("li"); li.textContent = x; ul.appendChild(li); });
+  about.appendChild(ul);
+  if (demo.review) { const r = document.createElement("p"); r.textContent = "Second describer: " + demo.review; about.appendChild(r); }
   played = new Set(); stopVoice();
   if (player) player.loadVideoById({ videoId: demo.id, startSeconds: demo.start, endSeconds: demo.end });
 }

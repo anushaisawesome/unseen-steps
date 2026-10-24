@@ -43,8 +43,10 @@ Watch the whole performance and return JSON with:
   techniques: [{name, evidence}] the dance techniques used, each with what the body visibly does (e.g. tutting:
   forearms and hands make sharp right angles and boxes; floorwork: rolls, slides, spins on the floor). Be precise
   about technique versus mime: a geometric hand shape that suggests an image is still the technique. If the piece
-  fuses styles, name the style each technique comes from (e.g. "popping (hip hop): sharp muscle hits"; "mudra
-  (Bharatanatyam): a precise hand gesture").
+  fuses styles, name the style each technique comes from.
+- signature: [{quality, body, dynamics, times: [seconds]}] the two to four things a sighted viewer notices and
+  remembers most about this particular choreography (not the style in general): what it is, where it lives in the
+  body, its dynamics and texture, and the times it is strongest.
 - motifs: [{name, description, times: [seconds]}] movements that recur; give every time each one appears
 - moments: [{time, what, claim}] the most striking moments, described in body terms with direction as
   the audience sees it ("to the left"). claim is one of: jump, turn, floor, still, travel_left,
@@ -66,6 +68,10 @@ SCHEMA = {
             "techniques": {"type": "array", "items": {"type": "object", "properties": {
                 "name": {"type": "string"}, "evidence": {"type": "string"}}, "required": ["name", "evidence"]}}},
             "required": ["start", "end", "label", "description", "formation", "group", "techniques"]}},
+        "signature": {"type": "array", "items": {"type": "object", "properties": {
+            "quality": {"type": "string"}, "body": {"type": "string"}, "dynamics": {"type": "string"},
+            "times": {"type": "array", "items": {"type": "number"}}},
+            "required": ["quality", "body", "dynamics", "times"]}},
         "motifs": {"type": "array", "items": {"type": "object", "properties": {
             "name": {"type": "string"}, "description": {"type": "string"},
             "times": {"type": "array", "items": {"type": "number"}}},
@@ -75,7 +81,7 @@ SCHEMA = {
             "claim": {"type": "string", "enum": ["jump", "turn", "floor", "still", "travel_left", "travel_right", "other"]}},
             "required": ["time", "what", "claim"]}},
     },
-    "required": ["style", "sections", "motifs", "moments"],
+    "required": ["style", "sections", "signature", "motifs", "moments"],
 }
 
 _client = None

@@ -35,38 +35,28 @@ BRIEF = """You are an expert audio describer for dance, preparing the audio desc
 sighted audience members from this recording (watch and listen). It is spoken over the music. Write the script.
 
 What to say, like the best dance describers:
-- Name what dancers do in the style's own vocabulary, accurately (ballet: positions such as fifth, steps such as
-  glissade, sissonne, grand jeté, pas de bourrée, pirouette, port de bras, arabesque, épaulement; ballroom: hold,
-  frame, rise and fall, natural/reverse turn; street and commercial: tutting, waacking, popping, body roll, hits,
-  and so on). The first time a term appears, add a few plain words so a newcomer can picture it.
-- Capture quality, dynamics and expression, not just mechanics: weight (light, grounded), time (sudden,
-  sustained), flow (free, bound), shape and line, where the gaze goes, and the feeling (playful, yearning,
-  defiant). Ground the feeling in what is visible. Vivid, plain words, not purple prose.
-- Say where dancers are and how they relate: facing, travel, and for groups the formation (lines, circles,
-  diagonals, wedge), unison or canon, a soloist breaking out, pairs forming. Directions as the audience sees them
-  ("to the left"), never "stage left" or "stage right".
-- Follow the structure of the piece given below (from your first viewing). Every section gets at least one line,
-  and the first line of each section is priority 1: a listener must hear when the piece changes (into floorwork,
-  into a chorus, into pairs).
-- Group structure is priority 1: unison, a canon (the same move rippling through dancers one after another: say it
-  is a canon and which way it travels), a soloist breaking out, pairs forming, formation changes.
-- Name the technique, not a mime: sharp geometric hand and arm shapes are tutting even when they suggest an image;
-  say the technique, and the image only as a comparison ("tutting, hands framing a crown"). The same goes for
-  waacking, voguing, popping, locking, krump and floorwork.
-- In arm-driven choreography (commercial, waacking, tutting, vogue hands, much contemporary) the arms are the
-  content: say the arms' path and dynamics, not just the step: sliced, flicked, snapped, whipped, wrapped, staccato
-  hits or a sustained reach, and where they land (framing the face, across the chest, overhead). Convey sharpness
-  with callouts on the accents ("Slice! Flick! Wrap the face!") rather than a summary line.
-- Fusion: when a piece draws on several styles, pick out each influence as it appears and use that style's own
-  technical language for those moments (popping hits, a Bharatanatyam mudra, a contemporary release into the floor,
-  a vogue duckwalk), and say when the piece shifts from one influence to another.
-- Choose the moments that matter; never repeat a description. Present tense. Only describe what you can see; if
-  unsure of a term, describe the shape plainly.
+- First, what makes this piece this piece. Your first viewing (below) names its signature: the qualities a sighted
+  viewer notices and remembers most. Every one of them must come through, at the moments it's strongest, in
+  specific body language: where the movement lives in the body (arms, hands, torso, hips, legs, feet, head, gaze),
+  its dynamics (sharp or sustained, light or strong, bound or free), its texture and its relationship to the music.
+  A listener who can't see should come away with the same impression of the choreography as someone who can.
+- Use the style's own vocabulary, accurately, for steps and techniques; the first time a term appears, add a few
+  plain words so a newcomer can picture it. Name the technique a dancer is doing even when its shape suggests an
+  image, and give the image only as a comparison. If the piece fuses styles, notice each influence as it appears,
+  use that style's language for it, and say when the piece shifts between influences.
+- Capture expression: the feeling the movement gives, grounded in what is visible. Vivid, plain words, not purple
+  prose.
+- Say where dancers are and how they relate: facing, travel, formations, unison or canon (the same move rippling
+  through dancers one after another, and which way it travels), a soloist breaking out, pairs forming. Directions
+  as the audience sees them ("to the left"), never "stage left" or "stage right".
+- Follow the structure of the piece given below. Every section gets at least one line: a listener must hear when
+  the piece changes.
+- Spend words on what matters most, never on what is generic or incidental, and never repeat a description.
+  Present tense. Only describe what you can see; if unsure of a term, describe the shape plainly.
 
 How and when to say it: the music is the star, the description is tasteful commentary inside it.
-- Lead with the step's name whenever the style has one: the name carries the most in the fewest words
-  ("Glissade, then a sissonne, legs split wide." not "Glides left, springs up"; "Cambré, arching back." not
-  "Arches back"). Every recognisable step gets its name. Add a few plain words only where they help picture it.
+- Where a step or technique has a name, lead with it: a name carries the most in the fewest words. Add a few
+  plain words only where they help picture it.
 - Be sparse and short. Most lines are 3 to 8 words and fit inside one bar; a few may take two bars. Speak for at
   most a third of the running time overall; in lyrical passages, at most one line every two bars. Leave the rest
   to the music. Never narrate continuously and never read like a speech.
@@ -83,8 +73,8 @@ How and when to say it: the music is the star, the description is tasteful comme
 For each line give: time, moment_start and moment_end (seconds: the movement it describes), who (solo, pair,
 group or subgroup), kind (description or callout), pace (steady, brisk or rapid), delivery, priority (1 = a listener
 would miss something important without it, 2 = helpful, 3 = optional colour). Priority 1 is only for the opening
-line (scene and starting position), the first line of each section, canons or formation changes, and the piece's
-signature: whatever makes this choreography distinctive (intricate, sharp arm work; a recurring motif). Most other
+line (scene and starting position), the first line of each section, canons or formation changes, and lines that
+carry the piece's signature. Most other
 lines, including ones that name steps, are 2), and text."""
 
 SCHEMA = {
@@ -102,9 +92,28 @@ SCHEMA = {
     "required": ["style", "lines"],
 }
 
-REVISE = """These lines from your audio description script contradict the pose measurements for the moments they
-describe. Revise each so it only says what is consistent with the measurement, keeping its expressiveness and
-length, or return null for it if you can't. Return JSON: {"lines": [{"time": t, "text": "..." or null}]}.
+REVIEW = """You are a second expert dance describer reviewing a colleague's audio description script for blind and
+partially sighted listeners, against the video (watch and listen). The first viewing's map of the piece and the
+script are below.
+
+Ask: what would a blind listener miss that a sighted viewer gets from this choreography? Look for signature
+qualities that don't come through (where the movement lives in the body, its dynamics, texture, musicality),
+group structure or striking moments that are missing, lines that are generic, inaccurate or misname a technique, and
+words spent on what matters less. Keep the same rules as the script: lines stay short (most 3 to 8 words, inside one
+bar; callouts 2 to 5 words); a richer line is a better-chosen word, not a longer line. Callouts on the hits, the
+music stays the main thing, so prefer replacing a weaker line over adding one.
+
+Return JSON {"notes": "one or two sentences on what was missing", "edits": [...]}, at most 10 edits, each one of:
+{"action": "replace", "time": t, "text": "...", ...} (the line starting nearest t),
+{"action": "add", "time": t, "moment_start": s, "moment_end": e, "text": "...", ...},
+{"action": "drop", "time": t}.
+replace and add also give kind, pace, delivery, priority and who, as in the script.
+
+"""
+
+REVISE = """These lines from your audio description script break a rule (they contradict the pose measurements for
+the moment they describe, or they're too long for the time they have). Revise each so it keeps to the rule, keeping
+what matters most in it and its expressiveness, or return null for it if you can't. Return JSON: {"lines": [{"time": t, "text": "..." or null}]}.
 
 """
 
@@ -124,9 +133,26 @@ def music_notes(song: dict) -> str:
             f"Strongest hits (seconds): {hits}")
 
 
+def room(song: dict | None, start: float | None, end: float | None) -> str:
+    """How many lines the music has room for, so Argon chooses them (with taste) instead of a cutter later."""
+    if song:
+        length = song["beats"][-1] - song["beats"][0]
+    elif end:
+        length = end - (start or 0)
+    else:
+        return ""
+    lines = max(2, round(0.35 * length / 3.0))  # a spoken line takes about 3 s
+    return (f"\nRoom: this piece runs {length:.0f} s, so the music has room for about {lines} lines in total (callouts "
+            "count). Choose them so the signature and the key moments come through; leave the rest to the music.")
+
+
 def structure_notes(plan: dict) -> str:
     """The director's performance map as text: sections with formation, group structure and techniques; motifs."""
-    out = [f"Structure of the piece (style: {plan['style']['name']}):"]
+    out = [f"Signature of this piece (must come through):"]
+    for sig in plan.get("signature", []):
+        out.append(f"- {sig['quality']}: {sig['body']}; {sig['dynamics']}; strongest at "
+                   + ", ".join(f"{t:.0f} s" for t in sig["times"]))
+    out.append(f"Structure of the piece (style: {plan['style']['name']}):")
     for sec in plan["sections"]:
         techniques = "; ".join(f"{t['name']} ({t['evidence']})" for t in sec.get("techniques", []))
         out.append(f"- {sec['start']:.0f}-{sec['end']:.0f} s, {sec['label']}: {sec.get('description', '')} "
@@ -142,7 +168,7 @@ def write_script(video: str, song: dict | None, glossary: list[str] = (), style_
     (a YouTube link we can't analyse), Argon keeps time by ear."""
     prompt = BRIEF + "\n\n" + (music_notes(song) if song else
                                 "No beat grid is available: listen to the music and start each line on a beat yourself.")
-    prompt += clip_note(start, end)
+    prompt += clip_note(start, end) + room(song, start, end)
     if plan:
         prompt += "\n\n" + structure_notes(plan)
     if glossary:
@@ -187,6 +213,51 @@ def in_meter(lines: list[dict], beats: list[float]) -> list[dict]:
         out.append({**line, "time": beats[k], "asked_time": line["time"]})
         taken = k
     return out
+
+
+def review_script(video: str, script: dict, plan: dict | None, song: dict | None = None,
+                  start: float | None = None, end: float | None = None) -> dict:
+    """A second Argon pass watches the video with the script and fixes what a blind listener would miss. Cached."""
+    listing = "\n".join(f"{l['time']:.1f} s [{l['kind']}, {l['pace']}, priority {l.get('priority')}] {l['text']}"
+                         for l in script["lines"])
+    prompt = (REVIEW + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n" + listing + clip_note(start, end)
+              + room(song, start, end) + " Keep the total about the same: for every line you add, drop or merge a weaker one.")
+    key = hashlib.sha1(source_key(video)[:50_000_000] + prompt.encode()).hexdigest()[:16]
+    cached = CACHE / f"review-{key}.json"
+    if cached.exists():
+        review = json.loads(cached.read_text())
+    else:
+        response = with_retry(lambda: client().models.generate_content(
+            model=MODEL,
+            contents=[video_part(video, start, end), prompt],
+            config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_level="high"),
+                response_mime_type="application/json",
+            ),
+        ))
+        review = json.loads(response.text)
+        CACHE.mkdir(parents=True, exist_ok=True)
+        cached.write_text(json.dumps(review, indent=2, ensure_ascii=False))
+
+    lines = [dict(l) for l in script["lines"]]
+    for edit in review.get("edits", [])[:10]:
+        near = min(lines, key=lambda l: abs(l["time"] - edit.get("time", 0)), default=None)
+        if edit.get("action") in ("replace", "drop") and (near is None or abs(near["time"] - edit["time"]) > 1.5):
+            continue
+        if edit["action"] == "drop":
+            lines.remove(near)
+        elif edit["action"] == "replace" and edit.get("text"):
+            near.update({k: v for k, v in edit.items() if k in ("text", "kind", "pace", "delivery", "priority", "who")},
+                        reviewed=True)
+        elif edit["action"] == "add" and edit.get("text"):
+            t = edit["time"]
+            lines.append({"time": t, "moment_start": edit.get("moment_start", t - 2), "moment_end": edit.get("moment_end", t),
+                          "who": edit.get("who", "solo"), "kind": edit.get("kind", "description"),
+                          "pace": edit.get("pace", "steady"), "delivery": edit.get("delivery", ""),
+                          "priority": edit.get("priority", 1), "text": edit["text"], "reviewed": True})
+    lines = [l for l in lines if l.get("pace") in RATE] + [dict(l, pace="steady") for l in lines if l.get("pace") not in RATE]
+    lines = in_meter(lines, song["beats"]) if song else sorted(lines, key=lambda l: l["time"])
+    return {**script, "lines": lines, "review": review.get("notes", "")}
 
 
 def budget(lines: list[dict], end: float) -> list[int]:

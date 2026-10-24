@@ -720,3 +720,17 @@ lines struck through). Serve with `cd web/youtube-demo && python -m http.server 
 - Brief additions from Anusha's feedback (`feedback/youtube-demos-anusha.md`): fusion (name each influence and use its
   vocabulary); arm-driven styles (arms' path and dynamics; callouts on accents for sharpness); the piece's signature is
   priority 1; `SPEECH_CEILING` 0.40 (essential lines cut only past it).
+
+### Taste, not hardcoding (24 Oct, ~21:30)
+
+Anusha: "don't hardcode it, make the detection have more taste. I can see it because I have eyes, but don't make those who
+can't see miss out on it... for all of them, don't miss out on key features of the choreo." So the style-specific lists in
+the brief were removed and replaced with three general mechanisms:
+- **Signature in the map:** `performance_map` returns `signature` [{quality, body, dynamics, times}]: the 2–4 things a
+  sighted viewer notices and remembers about this choreography. The script must convey every one; such lines are
+  priority 1. (Track 10: "sculptural overhead arm and wrist framing", "grounded, wide-stance upper-body isolations".)
+- **A second describer** (`scriptwriter.review_script`, cached): Argon watches the video with the map and the script, asks
+  what a blind listener would miss, and returns up to 10 replace/add/drop edits. Its notes show on the demo page.
+- **A line budget up front** (`scriptwriter.room`): "this piece runs N s, room for about M lines" (35% of the length at
+  ~3 s a line), for both the writer and the reviewer, so Argon chooses what to keep instead of the blunt cutter. The
+  cutter stays as a safety net and never cuts the opening line. Over-long lines go back to Argon once (`revise`).

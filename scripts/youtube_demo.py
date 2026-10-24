@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
 from director import performance_map  # noqa: E402
-from scriptwriter import RATE, write_script  # noqa: E402
+from scriptwriter import RATE, budget, review_script, revise, write_script  # noqa: E402
 from speech import speak  # noqa: E402
 
 OUT = ROOT / "web" / "youtube-demo"
@@ -61,10 +61,20 @@ def build(video: tuple) -> dict:
     url = f"https://www.youtube.com/watch?v={vid}"
     plan = performance_map(url, style_hint=style, start=start, end=end)
     script = write_script(url, None, style_hint=style, plan=plan, start=start, end=end)
+    script = review_script(url, script, plan, None, start, end)  # a second describer: what would a listener miss?
     lines = [l for l in script["lines"] if start - 1 <= l["time"] <= end]
     if lines and max(l["time"] for l in lines) < start:  # times came back relative to the clip
         for l in lines:
             l["time"] += start
+    # Lines longer than the time they have go back to Argon once to tighten; still too long means cut.
+    limits = budget(lines, end)
+    long = [{"time": l["time"], "text": l["text"], "reason": f"it is {len(l['text'].split())} words; the limit is {m}"}
+            for l, m in zip(lines, limits) if len(l["text"].split()) > m]
+    for when, text in revise(long).items():
+        line = next((l for l in lines if abs(l["time"] - when) < 0.05), None)
+        if line and text:
+            line["text"] = text
+    lines = [l for l, m in zip(lines, budget(lines, end)) if len(l["text"].split()) <= m + 1]
     audio = OUT / "audio"
     audio.mkdir(parents=True, exist_ok=True)
     for n, line in enumerate(lines):
@@ -90,8 +100,8 @@ def build(video: tuple) -> dict:
         return sum(l["seconds"] for l in lines if l.get("audio")) / (end - start)
     while share() > SPEECH_SHARE:
         optional = [l for l in lines if l.get("audio") and l["kind"] != "callout" and l.get("priority", 2) > 1]
-        if not optional and share() > SPEECH_CEILING:
-            optional = [l for l in lines if l.get("audio") and l["kind"] != "callout"]
+        if not optional and share() > SPEECH_CEILING:  # never the opening line, which sets the scene
+            optional = [l for l in lines[1:] if l.get("audio") and l["kind"] != "callout"]
         if not optional:
             break
         def crowding(l):
@@ -115,6 +125,8 @@ def build(video: tuple) -> dict:
     spoken = [l for l in lines if l.get("audio")]
     print(f"{key}: {plan['style']['name']}, {len(spoken)}/{len(lines)} lines spoken, speech {share():.0%}")
     return {"key": key, "id": vid, "label": label, "style": plan["style"]["name"], "start": start, "end": end,
+            "review": script.get("review", ""),
+            "signature": [f"{x['quality']}: {x['body']}" for x in plan.get("signature", [])],
             "sections": [{"start": s["start"], "end": s["end"], "label": s["label"], "group": s.get("group", "")}
                          for s in plan["sections"]],
             "lines": [{"at": l["at"], "text": l["text"], "kind": l["kind"], "pace": l["pace"],
