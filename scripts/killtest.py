@@ -49,6 +49,7 @@ def load_pose(name):
 NOSE, L_EYE, R_EYE, L_EAR, R_EAR = 0, 1, 2, 3, 4
 L_SHO, R_SHO, L_WRI, R_WRI, L_HIP, R_HIP, L_KNE, R_KNE, L_ANK, R_ANK = 5, 6, 9, 10, 11, 12, 13, 14, 15, 16
 SAMPLE_FPS = 15
+SPEECH_SHARE = 0.35  # most of the piece belongs to the music
 TURN_HOLD = 0.3   # seconds a new facing must last to count as a turn
 APART_GAP = 0.8   # hip distance between partners, in body heights
 APART_HOLD = 1.0  # seconds a separation (or rejoining) must last to count
@@ -869,6 +870,7 @@ def scripted(args, song, frames, path, solo, size, group):
             phrase_features(path, size, solo, start, stop, n, beats=song["beats"])
         until = lines[n + 1]["time"] if n + 1 < len(lines) else end
         r = {"n": n, "time": line["time"], "moment": [start, stop], "who": line["who"], "kind": line["kind"],
+             "priority": line.get("priority", 2),
              "pace": line["pace"], "delivery": line["delivery"], "features": features, "max_words": words[n],
              "clean_space": [line["time"], until], "fit": in_beats(line["time"], until, song, line["text"], line["pace"])}
         if features["tracking"] == "poor":  # nothing measured for this moment: can't confirm or contradict
@@ -959,6 +961,24 @@ def finish(args, results, frames, path, focus, group, song):
             with wave.open(str(wav)) as f:
                 seconds = f.getnframes() / f.getframerate()
             r["speech"] = {"path": str(wav), "at": r["clean_space"][0], "seconds": round(seconds, 2)}
+    # The music stays the star: if speech would cover more than SPEECH_SHARE of the piece, drop the least
+    # important lines (optional colour first), densest spots first, until it doesn't. Callouts are kept.
+    spoken = [r for r in results if r.get("speech")]
+    if spoken and any("priority" in r for r in spoken):
+        length = song["beats"][-1] - song["beats"][0]
+        def share():
+            return sum(r["speech"]["seconds"] for r in results if r.get("speech")) / length
+        def crowding(r):
+            others = [x["speech"]["at"] for x in results if x.get("speech") and x is not r]
+            return -min((abs(t - r["speech"]["at"]) for t in others), default=99)
+        while share() > SPEECH_SHARE:
+            optional = [r for r in results if r.get("speech") and r.get("kind") != "callout" and r.get("priority", 2) > 1]
+            if not optional:
+                break
+            r = max(optional, key=lambda r: (r.get("priority", 2), crowding(r)))
+            print(f"   cut for space (priority {r.get('priority')}): {r['line']}")
+            r.pop("speech")
+        print(f"   speech covers {share():.0%} of the piece")
     # Never talk over the previous line: move to the next free beat (within a beat for a callout, a bar
     # otherwise, so it stays in meter and near its moment), or drop it.
     beats = np.array(song["beats"])

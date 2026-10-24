@@ -638,3 +638,9 @@ star of the show."
 - Ballet went from 83% of the clip spoken to 44%, four lines: "Backlit in white, feet crossed in fifth." / "A soubresaut,
   springing with feet tight together." / "Grand jeté, leaping high in a split." / "She arches toward the light."
 - Pose detection is cached per video in `data/killtest/cache/` (gitignored), so re-renders skip the slow part.
+- **Hard speech cap** (`SPEECH_SHARE = 0.35` in `scripts/killtest.py`): Argon gives each line a `priority` (1 essential,
+  2 helpful, 3 optional colour); if speech would exceed 35% of the piece, optional then helpful description lines are
+  cut, most crowded first; callouts are never cut. Judas went from 51% to 36% (6 lines cut), Andrii 32% (1 cut).
+- Checker: "roll" only counts as floor work when it isn't a head/shoulder/hip/chest/body roll.
+- Known weak spot: when the checker strips a direction, Argon's revision can produce an odd phrase ("A natural return
+  back to profile"); worth a describer pass over the script before a show.

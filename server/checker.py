@@ -21,7 +21,10 @@ CLAIMS = [
      # a change of facing ("turns to face the front") is a turn too
      "turns", lambda f: (f.get("turns") or 0) >= 1 or any("now " in e for e in (f.get("events") or [])),
      "it mentions turning, but no turn was measured"),
-    (r"\b((to|on|onto) the floor|floor ?work|kneel\w*|crouch\w*|roll\w*|sink\w*|low)\b",
+    (r"\b((to|on|onto) the floor|floor ?work|kneel\w*|crouch\w*|sink\w*|low)\b"
+     # rolling on the floor, not rolling a head, the shoulders or a body roll
+     r"|\broll\w*\b(?!\s+(their|his|her|the)?\s*(heads?|necks?|shoulders?|hips?|chests?|ribs?|ribcages?|torsos?|bod(y|ies)|wrists?|arms?))"
+     r"(?<!body roll)(?<!body rolls)",
      "lowest_level", lambda f: f.get("lowest_level") in ("floor", "low"),
      "it mentions going low or to the floor, but the dancer stayed standing"),
     # "still" only as stopping ("stands still"), not as "continuing" ("still facing us")

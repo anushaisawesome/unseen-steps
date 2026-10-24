@@ -63,7 +63,8 @@ How and when to say it: the music is the star, the description is tasteful comme
   or drawn out.
 
 For each line give: time, moment_start and moment_end (seconds: the movement it describes), who (solo, pair,
-group or subgroup), kind (description or callout), pace (calm, measured, brisk or rapid), delivery, and text."""
+group or subgroup), kind (description or callout), pace (steady, brisk or rapid), delivery, priority (1 = a listener
+would miss something important without it, 2 = helpful, 3 = optional colour), and text."""
 
 SCHEMA = {
     "type": "object",
@@ -74,8 +75,8 @@ SCHEMA = {
             "who": {"type": "string", "enum": ["solo", "pair", "group", "subgroup"]},
             "kind": {"type": "string", "enum": ["description", "callout"]},
             "pace": {"type": "string", "enum": list(RATE)},
-            "delivery": {"type": "string"}, "text": {"type": "string"}},
-            "required": ["time", "moment_start", "moment_end", "who", "kind", "pace", "delivery", "text"]}},
+            "delivery": {"type": "string"}, "priority": {"type": "integer"}, "text": {"type": "string"}},
+            "required": ["time", "moment_start", "moment_end", "who", "kind", "pace", "delivery", "priority", "text"]}},
     },
     "required": ["style", "lines"],
 }
