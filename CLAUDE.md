@@ -5,6 +5,8 @@ Anusha and Andrii. `SPEC.md` is the full specification; this file is the **curre
 decisions made since**, so read this first. When a decision changes, update this file in the same
 commit.
 
+**Standing rule for every Claude on this repo:** anything Anusha and Andrii decide or discuss goes into this file in the same session, so the other person's Claude has it after `git pull`.
+
 **Hard deadline:** submissions close **Sunday 25 October, 12:00 London time**. Demo video spec:
 `docs/demo-video.md`.
 
@@ -228,3 +230,23 @@ pieces mix styles, and model confidence numbers aren't calibrated. So the style 
 - If either fails, drop the term and describe the shape plainly ("balances on one leg, the other stretched
   behind"). A wrong style label then can't put a wrong term in anyone's ear.
 - "Not sure / mixed" means plain descriptions plus only terms that pass both checks.
+
+## Glossary pipeline (decided 24 Oct, 03:00)
+
+How the `terms` collection gets filled, with Andrii vetting before anything is translated:
+
+1. **Deep Research builds a skeleton glossary of ballroom terms in English** (start with waltz, since that's
+   the live demo). For each term: name, style, a plain body-language `description` of what it looks like
+   (written for Gemini and the pose data, e.g. "couple in closed hold rotates clockwise while travelling
+   along the line of dance"), a `signature` (the body-shape rule the pose check tests), and `sources`.
+   Status `draft`.
+2. **Andrii vets every term for accuracy** as a dancer: fix or delete anything wrong. Mark `status: "vetted"`
+   and `vetted_by: "Andrii"`. Nothing unvetted is used in narration.
+3. **Only after vetting: Deep Research again, once per language** (Ukrainian, German; Hindi later), pulling
+   the names dancers actually use from dance blogs, federation syllabi and teaching material in that
+   language, for nuance. Never machine translation. Store `names.<lang>` and per-language `sources`;
+   status `translated`.
+4. The writer only gets vetted terms; `localise.py` gets the vetted names per language as its glossary.
+
+Suggested document fields: `term, style, description, signature, names {en, uk, de, ...}, sources {en: [...],
+uk: [...], de: [...]}, status (draft | vetted | translated), vetted_by, embedding`.
