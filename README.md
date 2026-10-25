@@ -8,7 +8,10 @@ experience the dance, not just the music. Built at Encode London (23 to 25 Octob
 **Demo video:** _link to be added_
 
 **A live session, recorded:** [`clips_public/live_session6.mp4`](clips_public/live_session6.mp4) is Andrii dancing
-a waltz with `scripts/live.py` narrating him in real time (skeleton, captions, music and voice).
+a waltz with `scripts/live.py` narrating him in real time (skeleton, captions, music and voice). Its log,
+[`live_session6.json`](clips_public/live_session6.json), has every line with its time, latency to first sound and
+the checker's verdict; session 7 is there too, and the music played is
+[`with_you_im_born_again_slow_waltz.wav`](clips_public/with_you_im_born_again_slow_waltz.wav).
 
 ## The problem
 
@@ -83,7 +86,10 @@ its file instead of a path. Run `python server/db.py song "andri walts"` to see 
 Search: Atlas Vector Search (the meaning of the described movement) and Atlas Search (a term's name, aliases and
 description, index `term_text`) fused by reciprocal rank fusion in our code (the cluster is MongoDB 8.0, so not
 `$rankFusion`), vetted terms only. `python server/db.py terms waltz "steps forward, side, then closes the feet"` prints
-both rankings and the fused one.
+both rankings and the fused one. A recital is several shows (one per piece), and `--show` takes part of a show's name
+("andrii waltz"): `db.find_show` matches every typed word against the show's name, studio, song and style (a plain
+query, since the free cluster's three search indexes are in use) and lists the candidates rather than guess when
+several match. `python server/db.py show "andrii waltz"` shows the match.
 
 ## Setup
 
@@ -120,6 +126,7 @@ A show, start to finish:
 # 2. Optional: read and edit the notes
 .venv/bin/python scripts/edit_show.py "My show"
 # 3. On the night: camera 0, the same song; --record saves the session and a log of every line
+#    (--show and edit_show.py accept part of the name, e.g. "my show")
 .venv/bin/python scripts/live.py --show "My show" --song song.mp3 --camera 0 --beats-per-bar 3 --style waltz --record night.mp4
 ```
 
