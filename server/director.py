@@ -157,7 +157,11 @@ def performance_map(video: str, style_hint: str | None = None, start: float | No
                           + (style_hint or "").encode() + clip_note(start, end).encode()).hexdigest()[:16]
     cached = CACHE / f"{digest}.json"
     if cached.exists():
-        return json.loads(cached.read_text())
+        plan = json.loads(cached.read_text())
+        if not plan.get("style_checked"):
+            plan = check_style(video, plan, start, end)
+            cached.write_text(json.dumps(plan, indent=2))
+        return plan
 
     watched = video_part(video, start, end)
     prompt = PROMPT + (f"\nThe person who uploaded it says the style is: {style_hint}. Treat that as a hint, "
@@ -171,7 +175,7 @@ def performance_map(video: str, style_hint: str | None = None, start: float | No
             response_schema=SCHEMA,
         ),
     ))
-    result = zoom(video, json.loads(response.text), start, end)
+    result = check_style(video, zoom(video, json.loads(response.text), start, end), start, end)
     CACHE.mkdir(parents=True, exist_ok=True)
     cached.write_text(json.dumps(result, indent=2))
     return result
@@ -211,6 +215,33 @@ def zoom(video: str, plan: dict, start: float | None, end: float | None) -> dict
         details = list(pool.map(look, plan["sections"]))
     for section, detail in zip(plan["sections"], details):
         section["detail"] = detail
+    return plan
+
+
+STYLE_CHECK = """Here is the style label someone gave this dance, with their evidence. Be sceptical: for each style or
+influence it names, is it unmistakably there, with several distinct visible cues (not one gesture that resembles
+it)? Remove any influence that isn't; keep the rest in the same words. Return JSON {"name": "...", "evidence": [...],
+"removed": ["influences you removed, with why"]}."""
+STYLE_SCHEMA = {"type": "object", "properties": {"name": {"type": "string"},
+                "evidence": {"type": "array", "items": {"type": "string"}},
+                "removed": {"type": "array", "items": {"type": "string"}}}, "required": ["name", "evidence", "removed"]}
+
+
+def check_style(video: str, plan: dict, start: float | None = None, end: float | None = None) -> dict:
+    """Argon double-checks its own style label: every named influence needs several unmistakable cues (it kept
+    calling Track 10 'classical Indian' or 'Dai dance' from ornate wrist work)."""
+    if plan.get("style_checked"):
+        return plan
+    label = f"Label: {plan['style']['name']}\nEvidence: {'; '.join(plan['style'].get('evidence', []))}"
+    r = with_retry(lambda: client().models.generate_content(
+        model=MODEL, contents=[video_part(video, start, end), STYLE_CHECK + "\n\n" + label + clip_note(start, end)],
+        config=types.GenerateContentConfig(response_mime_type="application/json", response_schema=STYLE_SCHEMA,
+                                           thinking_config=types.ThinkingConfig(thinking_level="high"))))
+    checked = json.loads(r.text)
+    if checked["removed"]:
+        print(f"style check: {plan['style']['name']!r} -> {checked['name']!r} (removed: {checked['removed']})")
+    plan["style"].update(name=checked["name"], evidence=checked["evidence"])
+    plan["style_checked"] = checked["removed"] or True
     return plan
 
 

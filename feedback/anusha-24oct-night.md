@@ -47,6 +47,8 @@ Argon learns her taste from: what she valued, what she hated, and why.
 - Saumya: "said she was waacking rapidly when her arms were almost still."
 - Ballet: "she's holding a tambourine, not a fan."
 - Aquamarine: "where is the wide squat it's referring to? I'm not seeing it."
+- Track 10 labelled "commercial fusion with contemporary and classical Indian dance influences": "Track 10 does not
+  have classical influences." (Don't name an influence from one gesture that resembles it.)
 - Track 10's closing line "hips swaying into warm smiles": "warm smiles?" (not what the movement is; describe the
   groove).
 
