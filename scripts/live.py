@@ -492,6 +492,10 @@ class Live:
                     ok, frame = cap.read()
                 if not ok or t >= len(self.mixer.song) / RATE or (args.seconds and t >= args.seconds):
                     break
+                if frame.shape[0] > 720:  # some webcams send 1440p whatever is asked; YOLO works at 640 anyway, and
+                    # drawing, captions and recording at that size cost ~3x more (13 fps instead of the camera's 30)
+                    frame = cv2.resize(frame, (round(frame.shape[1] * 720 / frame.shape[0]), 720),
+                                       interpolation=cv2.INTER_AREA)
                 person = self.track(frame, t)
                 self.remember(frame, t)
                 self.schedule(t)
