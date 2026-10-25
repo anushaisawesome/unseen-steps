@@ -375,8 +375,10 @@ def verify_lines(video: str, lines: list[dict], start: float | None = None, end:
         prompt = (f"An audio describer says this at {line['time']:.1f} s in the video: \"{line['text']}\"\n"
                   f"It should describe what happens between {a:.1f} s and {line['time'] + 1:.1f} s (the clip shown). "
                   "Is it accurate: the right movement, at this time, the right technique or style term, the right "
-                  "speed and dynamics, and nothing that isn't there? If not, give a corrected line of about the same "
-                  "length that is accurate for this moment, or null to drop it.")
+                  "speed and dynamics, and nothing that isn't there? If not, give a corrected line that is accurate "
+                  "for this moment and written the way an expert dance describer would say it: one clear image, 5 to "
+                  "12 words, no times or numbers of seconds, never a list of details; or null to drop it."
+                  + dancer_feedback())
         try:
             r = with_retry(lambda: client().models.generate_content(
                 model=MODEL, contents=[video_part(video, a, b, fps=10), prompt],
