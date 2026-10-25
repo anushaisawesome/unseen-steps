@@ -6,6 +6,7 @@ part (Kore for Anusha, Charon for Andrii) so the cut always builds. Run from the
 Needs video/build.py's and build2.py's outputs in video/work (cards, crops) from earlier runs."""
 import json
 import re
+import os
 import subprocess
 import sys
 from html import escape
@@ -27,6 +28,12 @@ VOICE_DIR = Path(__file__).parent / "voice"
 A = ["-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2"]
 VID = ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", "-r", "30"]
 dur = build.dur
+# DUB=1: an English voice track for the video already on YouTube. Every part keeps the length it has there (seconds below,
+# measured from the uploaded cut), and each recorded voice is fitted into it: long pauses shortened, then sped up only if needed.
+DUB = bool(os.environ.get("DUB"))
+FIT = {1: 10.0, 2: 18.0, 3: 15.267, 4: 14.367, 5: 14.44, 6: 7.067, 7: 11.71, 8: 16.967, 9: 11.733, 10: 11.18, 11: 13.933,
+       13: 4.1, 14: 9.767, 15: 5.2}
+VO_AT = {1: 0.5, 2: 0.3}
 
 # (part, speaker, text) from video/SCRIPT.md
 PARTS = {
@@ -66,6 +73,15 @@ def voice(n):
     run("ffmpeg", "-loglevel", "error", "-y", "-i", src, "-af",
         "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,"
         "aresample=48000", "-ac", "2", out)
+    if DUB and n in FIT:
+        room = FIT[n] - VO_AT.get(n, 0.4) - 0.45
+        if dur(out) > room:
+            tight = V / f"vo{n}-tight.wav"
+            run("ffmpeg", "-loglevel", "error", "-y", "-i", out, "-af",
+                "silenceremove=stop_periods=-1:stop_duration=0.3:stop_threshold=-40dB:stop_silence=0.22", tight)
+            tempo = dur(tight) / room
+            run("ffmpeg", "-loglevel", "error", "-y", "-i", tight, "-af", f"atempo={max(1.0, tempo):.4f}", out)
+            print(f"part {n}: fitted into {room:.2f} s (pauses shortened, tempo {max(1.0, tempo):.2f}x)")
     return out
 
 
@@ -95,7 +111,7 @@ def sentences(text):
 def segment(n, video_args, vf, music_args, out, vo_at=0.4, tail=0.9, length=None, music_vol=0.32, captions=True, top=False, label=None, live_from=None):
     """One part: picture (input 0) + its own audio or the song (input 1) + the voice, captions timed by sentence."""
     vo = voice(n) if n in PARTS else None
-    total = length or ((vo_at + dur(vo) + tail) if vo else 6)
+    total = FIT[n] if DUB and n in FIT else (length or ((vo_at + dur(vo) + tail) if vo else 6))
     inputs = [*video_args, *music_args]
     graph, last, k = [f"[0:v]{vf},fps=30,setsar=1,format=yuv420p[v0]"], "v0", 2
     if vo:
@@ -271,7 +287,7 @@ def main():
     endv = layered(e, "endcard", [0.2, 0.9, 1.6, 2.3], 6)
     segs.append(segment(15, ["-i", endv], "scale=1920:1080", song(170, 8), V / "t15.mp4", length=5.2, music_vol=0.5))
     (V / "list4.txt").write_text("".join(f"file '{x}'\n" for x in segs))
-    out = V / "unseen-steps-final.mp4"
+    out = V / ("unseen-steps-dub.mp4" if DUB else "unseen-steps-final.mp4")
     run("ffmpeg", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0", "-i", V / "list4.txt", "-c", "copy", out)
     print(out, round(dur(out), 1), "s;", ", ".join(f"{x.name} {dur(x):.1f}" for x in segs))
 
