@@ -1,40 +1,43 @@
 # The demo video
 
-`unseen-steps-demo-final.mp4` (2:58, 1080p) is in the **private** clips repo release `video-1`
-(https://github.com/anushaisawesome/unseen-steps-clips/releases/tag/video-1), with the `work/` folder of every
-generated card, voice-over clip and segment. It isn't in this public repo because it includes other crews'
-choreography (1MILLION at IDL Seoul; the competition waltz).
+The submitted video (2:59, 1080p) is on YouTube: https://youtu.be/4aadm47Nk1g. The file, `unseen-steps-demo.mp4`, is in
+the **private** clips repo under `submission/` (https://github.com/anushaisawesome/unseen-steps-clips). It isn't in this
+public repo because it includes other crews' choreography (1MILLION at IDL Seoul; the competition waltz).
 
-## Structure (2:58)
+It follows the 15-part script in `SCRIPT.md`; `cut4.py` builds it.
 
-| Time | Segment | Source |
-| --- | --- | --- |
-| 0:00 | Blurred take, song only; "Most people with sight loss see some light and movement. At a dance show, this is often all they get." | `clips_public/live_session7.mp4` 34-44 s blurred + `with_you_im_born_again_slow_waltz.wav` (aligned: song time = take time) |
-| 0:10 | Same blur, the take's own audio: Gemini Live's real lines | take 44-64 s |
-| 0:30 | Reveal: take 44-64 s sharp, skeleton and captions, plus the "Under the hood, live" panel per line | `live_session7.json` (latency, checker), show `Demo: Andrii, waltz` in Atlas (gaps, rehearsal script) |
-| 0:50 | Why (2M+ card) | voice-over `w_why` |
-| 1:07 | What Argon prepared from Andrii's rehearsal, from Atlas | `w_notes` |
-| 1:37 | Prepared from rehearsal, delivered live (diagram) | `w_live` |
-| 1:50 | Crowded competition waltz, couple tracked, everyone else blurred | `data/killtest/waltz-annotated.mp4` 12 s on, `w_world` |
-| 2:04 | Where the words go (site waveform), eighteen styles | `w_styles` |
-| 2:18 | 20-dancer 1MILLION crew, every dancer tracked, its own narration | `data/killtest/judas-script-annotated.mp4` 66-77 s |
-| 2:29 | Open source, for every studio | `w_next` |
-| 2:50 | End card | `w_end` |
+## Structure (2:59)
 
-The voice-over is Gemini TTS (`gemini-3.8-flash-tts`, voice Kore), voiced sentence by sentence and checked against
-the script (`speech.speak`). Its text is the `VO` dict in `build2.py`.
+| Time | Part | Picture | Sound |
+| --- | --- | --- | --- |
+| 0:00 | 1 "Close your eyes." | Andrii's live take 34-44 s, blurred | The song only |
+| 0:10 | 2 "What about now?" | Same blur, 44-62 s, with sharp captions of Gemini Live's lines | The take's own audio: the song and the live narration |
+| 0:28 | 3 The difference | The blur clears: the take from 44 s with skeleton and captions | Voice over the take |
+| 0:43 | 4 Andrii, ballroom in Ukraine | Competition waltz 13-27 s, the described couple tracked, everyone else blurred | Song |
+| 0:58 | 5 Two million people, Gerard | The studio recital illustration, then Gerard Canal's KCL card | Song |
+| 1:12 | 6 How the idea came about | Ballet solo with tracked pose (`web/media/ballet-reveal.mp4`) | Its own music |
+| 1:19 | 7 Anusha's training | Ballet solo, narrated | Its own music |
+| 1:31 | 8 Argon's show notes | Notes card from Andrii's rehearsal, building up | Song |
+| 1:48 | 9 Live, under the hood | Take 46.5 s on, with the panel per line (gap, rehearsal note, latency, checker) | Take |
+| 2:00 | 10 The checker | Take 38.5 s on: the checker flags "rightwards" (measured travel was left) | Take |
+| 2:11 | 11 MongoDB Atlas | Hybrid Search, Atlas Search and show notes card, building up | Song |
+| 2:25 | 12 A 20-dancer crew | 1MILLION, IDL Seoul (`data/killtest/judas-script-annotated.mp4` 61.5 s on), every dancer tracked | Its own narration |
+| 2:40 | 13 "For me, dance is five years of my childhood." | Competition waltz 75 s on | Song |
+| 2:44 | 14 Gerard's dancers, open source | The venue page on a phone with the screen-reader test (10.5 s on) | Song |
+| 2:54 | 15 "That's what we want Unseen Steps to do." | End card | Song |
+
+The song is `with_you_im_born_again_slow_waltz.wav`, the music Andrii dances to in the live takes (kept in the private
+clips repo under `music/`); in the take, song time equals take time. Labels (pink, top right) say why each clip is
+there; spoken words are burned in as captions so the video works with the sound off.
 
 ## Rebuild
 
-Needs ffmpeg, Chrome (set `CHROME=` to its path if it isn't found) and the repo's `.venv`.
+Needs ffmpeg, Chrome (set `CHROME=` to its path if it isn't found), the repo's `.venv`, the clips in `clips_public/`
+and `data/killtest/` (from the clips repo), and the cards `build.py` and `build2.py` leave in `video/work/`.
 
 ```sh
-.venv/bin/python video/build.py     # cards and the older voice-over (c_how, c_end, labels)
-.venv/bin/python video/build2.py    # new cards, site crops, the voice-over (skips clips that exist)
-.venv/bin/python video/cut2.py clips_public/live_session7.mp4 clips_public/live_session7.json \
-    clips_public/with_you_im_born_again_slow_waltz.wav --hook 34
-# -> video/work/unseen-steps-demo-v2.mp4
+.venv/bin/python video/cut4.py      # -> video/work/unseen-steps-final.mp4
 ```
 
-To change a voice-over line: edit `VO` in `build2.py`, delete that line's `work/<name>.wav` and `work/<name>-*.wav`,
-run `build2.py` then `cut2.py`. Keep it under 3:00 (DeepMind's limit).
+Voices come from `video/voice/<part>.m4a` (or `<part>-*.m4a`) when present, otherwise a Gemini TTS stand-in (Kore for
+Anusha, Charon for Andrii). Keep it under 3:00 (DeepMind's limit). `cut2.py` and `cut3.py` are earlier cuts.

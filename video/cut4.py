@@ -1,8 +1,8 @@
-"""The final cut (video/SCRIPT.md, 15 parts): ten parts, cut on natural boundaries, the song under everything, captions burned in.
+"""The final cut (video/SCRIPT.md, 15 parts), cut on natural boundaries, the song under everything, captions burned in.
 
 Voice: video/voice/<n>-*.m4a|wav (Anusha's and Andrii's recordings) when present, else a temporary Gemini voice per
 part (Kore for Anusha, Charon for Andrii) so the cut always builds. Run from the repo root:
-    .venv/bin/python video/cut3.py            # -> video/work/unseen-steps-story.mp4
+    .venv/bin/python video/cut4.py            # -> video/work/unseen-steps-final.mp4
 Needs video/build.py's and build2.py's outputs in video/work (cards, crops) from earlier runs."""
 import json
 import re
@@ -17,6 +17,10 @@ import build  # noqa: E402
 REPO, V = build.REPO, build.V
 sys.path.insert(0, str(REPO / "server"))
 TAKE = REPO / "clips_public/live_session7.mp4"
+# the take burns in its own header and checker banner along the top (y < 84 of 720); cut that strip, keeping 16:9,
+# so it never shows beside our captions
+TOPCUT = "crop=1130:636:75:84"
+WALTZCUT = "crop=1202:676:39:44"  # the same for the waltz render's header (y < 44 of 720)
 TURNS = json.loads((REPO / "clips_public/live_session7.json").read_text())
 SONG = REPO / "clips_public/with_you_im_born_again_slow_waltz.wav"
 VOICE_DIR = Path(__file__).parent / "voice"
@@ -88,7 +92,7 @@ def sentences(text):
     return [s for s in re.split(r"(?<=[.?!])\s+", text) if s]
 
 
-def segment(n, video_args, vf, music_args, out, vo_at=0.4, tail=0.9, length=None, music_vol=0.32, captions=True, top=False, label=None):
+def segment(n, video_args, vf, music_args, out, vo_at=0.4, tail=0.9, length=None, music_vol=0.32, captions=True, top=False, label=None, live_from=None):
     """One part: picture (input 0) + its own audio or the song (input 1) + the voice, captions timed by sentence."""
     vo = voice(n) if n in PARTS else None
     total = length or ((vo_at + dur(vo) + tail) if vo else 6)
@@ -110,6 +114,13 @@ def segment(n, video_args, vf, music_args, out, vo_at=0.4, tail=0.9, length=None
                      f"[m][n]amix=inputs=2:normalize=0:duration=first[a0]")
     else:
         graph.append("[1:a]anull[a0]")
+    if live_from is not None:
+        # the take's own captions are blurred with it: the live lines it speaks, sharp, so it works with the sound off
+        for j, t in enumerate(t for t in TURNS if live_from <= t["at"] < live_from + total):
+            a = t["at"] - live_from
+            inputs += ["-i", caption_png(f"{n}_live{j}", t["line"], top)]
+            graph.append(f"[{last}][{k}:v]overlay=0:0:enable='between(t,{a:.2f},{min(total, a + t['seconds'] + 0.4):.2f})'[v{k}]")
+            last, k = f"v{k}", k + 1
     if label:
         inputs += ["-loop", "1", "-t", total, "-i", label_png(out.stem, label)]
         graph.append(f"[{k}:v]format=rgba,fade=t=in:st=0.4:d=0.5:alpha=1[lab];[{last}][lab]overlay=0:0[v{k}]")
@@ -155,7 +166,7 @@ def panel_clip(start, length, min_at, out):
     sys.argv = ["cut2.py", str(TAKE), str(REPO / "clips_public/live_session7.json")]
     import cut2
     turns = [t for t in TURNS if min_at <= t["at"] < start + length]
-    inputs, chain, last = ["-ss", start, "-t", length, "-i", TAKE], "[0:v]scale=1300:-2,setsar=1,pad=1920:1080:0:(1080-ih)/2:color=0x1e2a44,fps=30[b0]", "b0"
+    inputs, chain, last = ["-ss", start, "-t", length, "-i", TAKE], f"[0:v]{TOPCUT},scale=1300:-2,setsar=1,pad=1920:1080:0:(1080-ih)/2:color=0x1e2a44,fps=30[b0]", "b0"
     for k, t in enumerate(turns):
         png = V / f"p{out.stem}_{k}.png"
         build.shot(cut2.panel(t), png, transparent=True)
@@ -171,12 +182,12 @@ def panel_clip(start, length, min_at, out):
 ATLAS = build.HEAD + """ class="navy" style="padding:110px 140px">
 <h2 data-l="1" style="font-size:80px;font-weight:800;line-height:1.05;margin:0 0 70px">Every show lives in <span style="color:#ff6cc0">MongoDB Atlas</span></h2>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px">
-<div data-l="2" style="background:#2a3757;border-top:6px solid #ff6cc0;border-radius:14px;padding:36px"><p class="d" style="font-size:42px;font-weight:800;margin:0 0 14px">Glossary</p>
-<p style="font-size:30px;line-height:1.4;margin:0;color:#d5d9e3">Terms reviewed by dancers, researched with Deep Research, with professional and simpler names.</p></div>
-<div data-l="3" style="background:#2a3757;border-top:6px solid #ff6cc0;border-radius:14px;padding:36px"><p class="d" style="font-size:42px;font-weight:800;margin:0 0 14px">Hybrid Search</p>
-<p style="font-size:30px;line-height:1.4;margin:0;color:#d5d9e3">Vector Search and Atlas Search together: "rotates to the right as a couple" finds natural turn.</p></div>
+<div data-l="2" style="background:#2a3757;border-top:6px solid #ff6cc0;border-radius:14px;padding:36px"><p class="d" style="font-size:42px;font-weight:800;margin:0 0 14px">Hybrid Search</p>
+<p style="font-size:30px;line-height:1.4;margin:0;color:#d5d9e3">Movement matched to a dancer-vetted glossary: Vector Search and text search fused by rank.</p></div>
+<div data-l="3" style="background:#2a3757;border-top:6px solid #ff6cc0;border-radius:14px;padding:36px"><p class="d" style="font-size:42px;font-weight:800;margin:0 0 14px">Atlas Search</p>
+<p style="font-size:30px;line-height:1.4;margin:0;color:#d5d9e3">A show's song found by name, even misspelt: "andri walts" finds Andrii's waltz.</p></div>
 <div data-l="4" style="background:#2a3757;border-top:6px solid #ff6cc0;border-radius:14px;padding:36px"><p class="d" style="font-size:42px;font-weight:800;margin:0 0 14px">Show notes</p>
-<p style="font-size:30px;line-height:1.4;margin:0;color:#d5d9e3">Argon's notes, the song's gaps and the rehearsal script per show; found by song name, even misspelt.</p></div>
+<p style="font-size:30px;line-height:1.4;margin:0;color:#d5d9e3">Argon's notes, gaps and rehearsal script per show; the studio edits them before the night.</p></div>
 </div></body></html>"""
 
 
@@ -185,20 +196,20 @@ def main():
     import speech
     director.client(); speech.client()
     segs = []
-    blur = "crop=iw*0.84:ih*0.84:(iw-ow)/2:0,scale=1920:1080,setsar=1,gblur=sigma=55:steps=3,eq=brightness=-0.04"
+    blur = f"{TOPCUT},scale=1920:1080,setsar=1,gblur=sigma=55:steps=3,eq=brightness=-0.04"
     # still holds: ffmpeg's zoompan rounds to whole pixels each frame, so a slow push-in judders (Anusha)
     zoom = "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080"
     img = REPO / "web/media/recital.jpg"
     ANDRII = REPO / "clips/andrii720.mp4"
     # 1-2: the hook, blurred: the song alone, then Gemini Live's narration
     segs.append(segment(1, ["-ss", 34, "-t", 10, "-i", TAKE], blur, song(34, 10), V / "t1.mp4", vo_at=0.5, length=10, music_vol=1.0))
-    segs.append(segment(2, ["-ss", 44, "-t", 18, "-i", TAKE], blur, ["-ss", 44, "-t", 19, "-i", TAKE], V / "t2.mp4", vo_at=0.3, length=18, music_vol=1.0))
+    segs.append(segment(2, ["-ss", 44, "-t", 18, "-i", TAKE], blur, ["-ss", 44, "-t", 19, "-i", TAKE], V / "t2.mp4", vo_at=0.3, length=18, music_vol=1.0, live_from=44))
     # 3: the reveal
     v3 = voice(3)
-    segs.append(segment(3, ["-ss", 44, "-t", dur(v3) + 1.5, "-i", TAKE], "scale=1920:1080", ["-ss", 44, "-t", dur(v3) + 2.5, "-i", TAKE],
+    segs.append(segment(3, ["-ss", 44, "-t", dur(v3) + 1.5, "-i", TAKE], f"{TOPCUT},scale=1920:1080", ["-ss", 44, "-t", dur(v3) + 2.5, "-i", TAKE],
                         V / "t3.mp4", music_vol=0.28, top=True))
     # 4: Andrii dancing
-    segs.append(segment(4, ["-ss", 13, "-t", 40, "-i", REPO / "data/killtest/waltz-annotated.mp4"], "scale=1920:1080", song(40, 41), V / "t4.mp4", top=True, label="A crowded ballroom competition: the couple being described is tracked, everyone else blurred"))
+    segs.append(segment(4, ["-ss", 13, "-t", 40, "-i", REPO / "data/killtest/waltz-annotated.mp4"], f"{WALTZCUT},scale=1920:1080", song(40, 41), V / "t4.mp4", top=True, label="A crowded ballroom competition: the couple being described is tracked, everyone else blurred"))
     # 5-7: the why, over the studio recital print; 7 ends on the site
     gcard = V / "gerard-card.png"
     photo = (V / "gerard-photo.png").as_uri()
@@ -248,7 +259,7 @@ def main():
         "-map", "[v]", "-map", "[a]", "-t", 15.6, *VID, *A, V / "t12.mp4")
     segs.append(V / "t12.mp4")
     # 13: Andrii; 14: the recital print; 15: both, over the end card building up
-    segs.append(segment(13, ["-ss", 74, "-t", 16, "-i", REPO / "data/killtest/waltz-annotated.mp4"], "scale=1920:1080", song(150, 21), V / "t13.mp4", tail=1.4, top=True, label="Ballroom, where Andrii started"))
+    segs.append(segment(13, ["-ss", 75, "-t", 16, "-i", REPO / "data/killtest/waltz-annotated.mp4"], f"{WALTZCUT},scale=1920:1080", song(150, 21), V / "t13.mp4", tail=1.4, top=True, label="Ballroom, the style Andrii grew up dancing"))
     phone = "scale=-2:840,pad=1920:1080:(ow-iw)/2:28:color=0xf3ede2"
     segs.append(segment(14, ["-ss", 10.5, "-t", 30, "-i", V / "venue-test.mp4"], phone, song(156, 30), V / "t14.mp4", label="The venue page with a screen reader: every control labelled, each line read aloud"))
     e = build.cards["c_end"]
