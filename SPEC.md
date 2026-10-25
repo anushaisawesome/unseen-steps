@@ -285,6 +285,27 @@ the weekend: a training tool for blind dancers, with Gerard's haptic-suit idea.
 
 ## 15. Room for improvement
 
+### Immediate website fixes (25 Oct, ~10:30, Andrii; for Anusha, before the demo video)
+
+Andrii's review of unseen-steps-studio.vercel.app. Not implemented yet. Make the pages look like one site, with the main
+page (`web/index.html`, `web/styles.css`) as the reference.
+
+1. **"18 styles" page (`web/youtube-demo/index.html`) doesn't match the rest of the site.** It has no normal site header
+   (only a small "Unseen Steps" home link with a tiny logo), its own inline colours and styles, and looks cheap next to the
+   main page. Redesign it in the main page's style: the same `site-head` header (logo, name at the same size, the same
+   nav), fonts, colours, spacing and card treatment.
+2. **"At the venue" page (`web/listen.html`): nav names differ from the main page.** Main page nav: "Listen", "18 styles",
+   "How it works", "At the venue"; venue page nav: "Watch and listen", "Any style", "How it works", "Live venue demo".
+   Use the main page's names on every page (also the eyebrow "Live venue demo"). Add the accent drop shadow where the main
+   page uses it, and change the font of the section names ("Director's notes", "What it said", "Getting in at a real
+   show") to match the main page's section headings.
+3. **Main page, "What the system saw and said" (`#reveal-title`):** restyle it to fit the format of the other sections.
+   Spoken lines get a **green** shadow, rejected lines a **red** shadow. **"Built to be trusted"** (`#trust-title`) cards
+   get a **pink** shadow.
+
+Keep the accessibility bar (WCAG 2.2 AA): colour is never the only signal, so spoken/rejected lines keep (or get) a text
+label alongside the green/red shadows, and the contrast stays as it is.
+
 ### 15a. Live narration names figures that weren't danced (25 Oct, Andrii)
 
 **Observed.** With the shared dancer's-eye brief (`scriptwriter.DANCERS_EYE` + `LIVE_RULES` in

@@ -1049,3 +1049,6 @@ song or style contains every typed word at the start of a word ("andrii waltz", 
 `python server/db.py show "andrii waltz"`. **A plain MongoDB query, not Atlas Search** (no typo tolerance): the free
 cluster's three search indexes are taken (`vector_index`, `term_text` for Hybrid Search, `song_name`), so don't claim it
 as Atlas Search.
+
+**Website fixes for Anusha (25 Oct, ~10:30, from Andrii):** consistent header/nav names across pages, redesign of the
+"18 styles" page, green/red/pink shadows on the main page. Details in `SPEC.md` 15, "Immediate website fixes". Not implemented yet.
