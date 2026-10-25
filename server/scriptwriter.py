@@ -116,6 +116,21 @@ def music_notes(song: dict) -> str:
             f"Musical phrases start at (seconds): " + " ".join(f"{p[0]:.1f}" for p in song["phrases"]))
 
 
+FEEDBACK = Path(__file__).resolve().parents[1] / "feedback"
+
+
+def dancer_feedback() -> str:
+    """Everything a dancer has said about earlier narrations (feedback/*.md, in her words), for Argon to learn her taste
+    from on every run. New reviews dropped into feedback/ are picked up automatically; nothing here is a hand-written
+    rule or a fix for one video."""
+    notes = [f.read_text() for f in sorted(FEEDBACK.glob("*.md")) if f.name != "README.md"]
+    if not notes:
+        return ""
+    return ("\n\nA dancer's feedback on your earlier narrations, in her own words. Learn what she values and what she "
+            "dislikes, and why, and apply it to this piece in every style (the root of each complaint, not just the "
+            "example). The narration should satisfy her dance eye:\n\n" + "\n\n---\n\n".join(notes))
+
+
 def structure_notes(plan: dict) -> str:
     """The director's performance map as text: sections with formation, group structure and techniques; motifs."""
     out = ["Signature of this piece (must come through):"]
@@ -175,24 +190,34 @@ def write_script(video: str, song: dict | None, glossary: list[str] = (), style_
     return script
 
 
-def key_moments(plan: dict) -> list[tuple[float, str]]:
-    """The timed moments a blind listener must hear, from the map: changes in group structure (canons, breakouts,
-    pairs, a soloist), every change of texture or energy, the signature at its strongest, and the striking moments."""
-    out = []
+def key_moments(plan: dict, every: float = 8.0) -> list[tuple[float, str]]:
+    """The timed moments a blind listener must hear, from the map, chosen like a describer would: changes in group
+    structure first (canons, breakouts, pairs, a soloist), then changes of texture or energy, then striking moments
+    and accents, then the signature once. At most about one every `every` seconds, and none within 4 s of another:
+    taking every small shift made 24 'key moments' in two minutes and nothing could thin them."""
+    ranked = []
     for sec in plan.get("sections", []):
         group = sec.get("group", "")
         if any(w in group.lower() for w in ("canon", "ripple", "break", "split", "solo", "pair", "trade")):
-            out.append((sec["start"], f"group structure: {group}"))
+            ranked.append((0, sec["start"], f"group structure: {group}"))
     dyn = plan.get("dynamics", [])
     for a, b in zip(dyn, dyn[1:]):
-        out.append((b["start"], f"texture or energy changes from {a['texture']} ({a['energy']}) to {b['texture']} ({b['energy']})"))
-    for q in plan.get("signature", []):
-        if q.get("times"):
-            out.append((q["times"][0], f"signature: {q['quality']} ({q['body']}; {q['dynamics']})"))
+        ranked.append((1, b["start"], f"texture or energy changes from {a['texture']} ({a['energy']}) to {b['texture']} ({b['energy']})"))
     for m in plan.get("moments", []):
         if m.get("check") != "dropped":
-            out.append((m["time"], f"striking moment: {m['what']}"))
-    return sorted(out)
+            ranked.append((2, m["time"], f"striking moment: {m['what']}"))
+    for q in plan.get("signature", [])[:2]:
+        if q.get("times"):
+            ranked.append((3, q["times"][0], f"signature: {q['quality']} ({q['body']}; {q['dynamics']})"))
+    sections = plan.get("sections", [])
+    length = (sections[-1]["end"] - sections[0]["start"]) if sections else 60
+    chosen = []
+    for rank, t, what in sorted(ranked):
+        if len(chosen) >= max(2, int(length / every)):
+            break
+        if all(abs(t - c[0]) >= 4 for c in chosen):
+            chosen.append((t, what))
+    return sorted(chosen)
 
 
 def windows(plan: dict, start: float | None, end: float | None, longest: float = 20.0) -> list[tuple[float, float]]:
@@ -227,6 +252,7 @@ def write_script_windowed(video: str, song: dict | None, glossary: list[str] = (
                  + "\n".join(f"- {g}" for g in glossary))
     if style_hint:
         base += f"\n\nThe person who uploaded it says the style is {style_hint}; treat that as a hint, not a fact."
+    base += dancer_feedback()
 
     def write(window):
         a, b = window
@@ -285,8 +311,8 @@ def review_script(video: str, script: dict, plan: dict | None, song: dict | None
     spoken = sum(len(l["text"].split()) / RATE.get(l["pace"], 2.8) + 0.4 for l in script["lines"])
     density = (f"\nMeasured density: about {spoken:.0f} s of speech in {length:.0f} s ({spoken / length:.0%})."
                if length else "")
-    prompt = (REVIEW + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n" + listing + density
-              + clip_note(start, end))
+    prompt = (REVIEW + dancer_feedback() + "\n\n" + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n"
+              + listing + density + clip_note(start, end))
     key = hashlib.sha1(source_key(video)[:50_000_000] + prompt.encode()).hexdigest()[:16]
     cached = CACHE / f"review-{key}.json"
     if cached.exists():
@@ -399,7 +425,7 @@ def select_lines(video: str, lines: list[dict], plan: dict | None, length: float
         return set(range(len(lines)))
     listing = "\n".join(f"{n}. {l['at']:.1f} s ({l['seconds']:.1f} s spoken){' [key moment: kept]' if l.get('key_moment') else ''} "
                          f"{l['text']}" for n, l in enumerate(lines))
-    prompt = (SELECT.format(target=share * length, length=length, total=total)
+    prompt = (SELECT.format(target=share * length, length=length, total=total) + dancer_feedback() + "\n\n"
               + (structure_notes(plan) + "\n\n" if plan else "") + "Script:\n" + listing + clip_note(start, end))
     response = with_retry(lambda: client().models.generate_content(
         model=MODEL, contents=[video_part(video, start, end), prompt],
