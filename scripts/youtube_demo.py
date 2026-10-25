@@ -36,7 +36,6 @@ WINDOWED = "--whole" not in sys.argv  # write one short stretch at a time (--who
 VIDEOS = [
     ("arcamarine", "cRil1jtScjI", "Aquamarine, Paris Cavanagh choreography", "commercial / contemporary, leaning contemporary", 0, 63),
     ("track10", "HA22LboHCww", "Track 10, Paris Cavanagh choreography", "commercial / contemporary, leaning contemporary", 0, 41),
-    ("ponyboy", "8qm6Pn9kYas", "Ponyboy, Isaiah Southall choreography", "commercial", 0, 24),
     ("hiphop", "-mKzJIW9w2c", "The Royal Family: HHI NZ megacrew, 1st place 2019", "hip-hop crew choreography", 0, 180),
     ("vogue", "ZSSfdbDXzDQ", "NJ Center of Dance: Vogue (studio piece, 2022)", "vogue femme", 0, 150),
     ("fusion", "Saj65ySCOSo", "Usha Jey: Hybrid Bharatham, episode 5 (\"Uproar\")", "fusion: identify each style influence", 0, 84),
@@ -48,6 +47,9 @@ VIDEOS = [
     ("flamenco", "9JhUBiJPHMM", "Rocío Garrido: soleá", "flamenco", 0, 180),
     ("amapiano", "VV__i-NBNcU", "Amapiano Dance Championship: Gugulethu United We Stand Dancers", "amapiano", 0, 177),
     ("afrobeats", "uWqCqv6pmmU", "HomeBros: Afro dance choreography", "afrobeats", 0, 164),
+    ("salsa", "9KBF0BJlCSk", "Javi & Alice: 1st place salsa cabaret couples, ULDC 2017", "salsa", 0, 155),
+    ("tap", "5xxTkB5bGy4", "Tap Dance World Championship 2012: adult male solo", "tap", 0, 135),
+    ("recital", "R9snlDcU9bA", "Ascendance Studio Company: \"Trolls\" (studio recital, 2022)", "studio recital, jazz or commercial", 0, 141),
     ("ballroom", "0GHkCRM8DBc", "WDSF World Open Prague: Standard final, waltz", "ballroom waltz", 0, 141),
 ]
 
