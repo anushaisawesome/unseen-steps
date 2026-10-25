@@ -974,3 +974,27 @@ output, 3 to 8 words), never read `feedback/`, and was handed raw pose numbers t
   turn to face front." Median first sound 0.80 s -> 1.02 s (the longer system instruction). Some lines repeat the
   rehearsal wording when the movement is the same, by design.
 - **After `git pull`, re-run `prepare_show.py` for any show prepared before this** (Demo: Andrii, waltz is done).
+
+## DeepMind track: where we stand (25 Oct, morning; Andrii's Claude)
+
+Pathway 2 (real-world video, live voice) fits. Judging: live demo 50%, problem and usefulness 25%, needed Argon 15%,
+pitch clarity 10%.
+
+| Criterion | Where we are | Rough score |
+| --- | --- | --- |
+| Working live demo (50%) | Andrii dances live, unscripted; voice ~0.8–1 s after each prompt (`live.py`, 3.8 Live). Real verification loops: pose checker vetoes contradicted lines, per-line visual check, caption check on the voice, live corrections on the next line. Argon builds the performance map and show notes from the rehearsal, plus notes every 20 s live. | Strong |
+| Problem and usefulness (25%) | Small studios without audio description; blind and partially sighted audience members. **Gap: no named user, no blind-user test yet.** | Medium |
+| Needed Argon (15%) | Argon watches the whole rehearsal with its music at 5–8 fps, zooms into sections, writes and checks the script (thinking high). **Weak: live speech is 3.8 Live, not Argon** ("isn't this just Gemini Live?"); no show-notes editor yet for "people stay in control". | Medium–strong |
+| Pitch clarity (10%) | Eyes-closed hook, live product, no slides. Depends on rehearsal. | Depends on rehearsal |
+
+**To raise the score, cheapest first:**
+1. **Name a person:** Gerard Canal (KCL) and the blind dancers he works with; a quote from one of them if possible.
+2. **Show a verification loop live:** a checker flag on screen, plus one sentence saying what it caught.
+3. **Answer "why Argon?":** "Argon is the choreographer's eye: it watches the whole rehearsal with its music in one context, finds
+   sections, motifs and texture changes, and writes the show notes. Live is the voice that delivers them in time." Show the
+   map / show notes on screen for a few seconds.
+4. **Human control:** say a describer can edit the Atlas show notes before the show; a minimal edit step would make it true.
+
+**Don't claim:** Robotics-ER, Lyria, Antigravity (none are in the code; Robotics-ER was one manual test). The only
+`background=True` call is the Deep Research glossary job, not Argon.
+**Main risk:** live failure on stage (camera, audio routing, WiFi). Keep a recorded `live.py --record` session as backup.
