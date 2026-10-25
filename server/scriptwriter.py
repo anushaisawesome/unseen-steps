@@ -363,10 +363,26 @@ VERIFY = {"type": "object", "properties": {"accurate": {"type": "boolean"}, "iss
           "fix": {"type": "string", "nullable": True}}, "required": ["accurate", "issue", "fix"]}
 
 
-def verify_lines(video: str, lines: list[dict], start: float | None = None, end: float | None = None) -> list[dict]:
+def style_context(plan: dict | None, t: float) -> str:
+    """The piece's style and what the map named in the section around time t (its techniques and motifs), so a check
+    of one short moment still knows what it is watching."""
+    if not plan:
+        return ""
+    sec = next((s for s in plan.get("sections", []) if s["start"] <= t < s["end"]), None)
+    named = [f"{x['name']} ({x['evidence']})" for x in (sec or {}).get("techniques", [])]
+    named += [f"{m['name']} ({m['description']})" for m in plan.get("motifs", [])]
+    return (f"\n\nThe piece is {plan['style']['name']}. Elements of its styles that the describer's map of the whole "
+            f"piece found{' in this section' if sec else ''}: " + "; ".join(named) + "." if named else "")
+
+
+def verify_lines(video: str, lines: list[dict], start: float | None = None, end: float | None = None,
+                 plan: dict | None = None) -> list[dict]:
     """Check every line against the moment it's spoken, at 10 frames a second: the right movement, at the right time,
     the right technique, and nothing that isn't there. Wrong lines are corrected or dropped. The visual counterpart of
-    the pose checker, so it works on any video and style (including YouTube links, which have no pose)."""
+    the pose checker, so it works on any video and style (including YouTube links, which have no pose).
+    It sees the piece's style and the elements the map named: checked blind, a few seconds at a time, its corrections
+    swapped the style's own vocabulary for plain words (a vogue catwalk became a strut, face framing became arms by
+    the head)."""
     from concurrent.futures import ThreadPoolExecutor
 
     def check_one(line):
@@ -375,10 +391,12 @@ def verify_lines(video: str, lines: list[dict], start: float | None = None, end:
         prompt = (f"An audio describer says this at {line['time']:.1f} s in the video: \"{line['text']}\"\n"
                   f"It should describe what happens between {a:.1f} s and {line['time'] + 1:.1f} s (the clip shown). "
                   "Is it accurate: the right movement, at this time, the right technique or style term, the right "
-                  "speed and dynamics, and nothing that isn't there? If not, give a corrected line that is accurate "
-                  "for this moment and written the way an expert dance describer would say it: one clear image, 5 to "
-                  "12 words, no times or numbers of seconds, never a list of details; or null to drop it."
-                  + dancer_feedback())
+                  "speed and dynamics, and nothing that isn't there? If not, correct what is wrong and keep what is "
+                  "right: the corrected line should be as rich and as fluent in the style's own vocabulary as a "
+                  "dancer of this style would be, naming its elements where they are visible and letting a newcomer "
+                  "picture them (a correction that swaps a correct style term for a plain word loses what a dancer "
+                  "sees). One clear image, 5 to 12 words, no times or numbers of seconds, never a list of details; "
+                  "or null to drop it." + style_context(plan, line["time"]) + dancer_feedback())
         try:
             r = with_retry(lambda: client().models.generate_content(
                 model=MODEL, contents=[video_part(video, a, b, fps=10), prompt],

@@ -38,6 +38,8 @@ Argon learns her taste from: what she valued, what she hated, and why.
 - Leiomy: "missing the arm performance into a freeze, and the hand performance at the start"; "nothing on hair
   performance! She is constantly whipping her head."
 - "Why aren't you watching legs and feet, for styles where they're important?"
+- Vogue studio piece: "it picks up on none of the vogue influences stuff they're actually doing. I see catwalks, hand
+  performance, dips, duckwalks, none of which it picks up on."
 
 ## What was wrong
 

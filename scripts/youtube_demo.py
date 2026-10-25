@@ -89,7 +89,7 @@ def build(video: tuple) -> dict:
     script = writer(url, None, style_hint=style, plan=plan, start=start, end=end)
     if not MOMENTS_FIRST:
         script = review_script(url, script, plan, None, start, end)  # a second describer: what would a listener miss?
-    script["lines"] = verify_lines(url, script["lines"], start, end)  # every line checked against its moment
+    script["lines"] = verify_lines(url, script["lines"], start, end, plan)  # every line checked against its moment
     lines = [l for l in script["lines"] if start - 1 <= l["time"] <= end]
     if lines and max(l["time"] for l in lines) < start:  # times came back relative to the clip
         for l in lines:

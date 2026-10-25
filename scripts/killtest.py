@@ -973,7 +973,7 @@ def scripted(args, song, frames, path, solo, size, group):
         f"{s['start']:.0f}-{s['end']:.0f}s {s['label']}" for s in plan["sections"]))
     script = write_script_windowed(args.clip, song, glossary, args.style, plan)
     script = review_script(args.clip, script, plan, song)  # a second describer: what would a listener miss?
-    script["lines"] = verify_lines(args.clip, script["lines"])  # every line checked against its moment
+    script["lines"] = verify_lines(args.clip, script["lines"], plan=plan)  # every line checked against its moment
     print(f"Second describer: {script.get('review', '')}")
     lines = script["lines"]
     end = song["beats"][-1] + 2
