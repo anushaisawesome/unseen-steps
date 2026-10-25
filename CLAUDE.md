@@ -1032,7 +1032,10 @@ routine's own (SPEC 15a); checker false flags from SPEC 15c fixed.
 song's music map whenever `prepare_show.py` or `live.py` maps a file. Both scripts accept `--song "<name>"` as well as a
 file path: a name is looked up in Atlas and its stored map and file are used. Andrii's rehearsal soundtrack is stored as
 "Andrii's waltz (rehearsal soundtrack)". Atlas features in use: Vector Search (glossary) and Atlas Search (songs).
-**Hybrid Search not built:** the free cluster allows 3 search indexes and all 3 are taken (`vector_index`, `song_name`,
-and the sample dataset's `sample_mflix.movies` `default`). Deleting that sample index would free a slot for a text
-index on `terms` and a hybrid glossary search (the cluster is MongoDB 8.0, so `$rankFusion` (8.1+) isn't available;
-fuse the two rankings client-side). Anusha's call, since it deletes something in the cluster.
+**Hybrid Search (built 25 Oct, ~09:30):** Anusha had the sample dataset's `sample_mflix.movies` `default` search index
+deleted to free the third slot. `term_text` (Atlas Search on terms: term, aliases, description; style and status as
+tokens) is READY. `db.match_terms_hybrid(text, style)` runs `$vectorSearch` and `$search` and fuses them by reciprocal
+rank fusion in Python (1/(60+rank)); MongoDB 8.0 has no `$rankFusion`. Vetted terms only unless include_drafts. Used where
+`killtest.py` offers glossary terms. Test: "rotates to the right as a couple, a natural turn" -> natural turn, natural
+spin turn, turning lock; "steps forward, side, then closes the feet together" -> closed change first. Atlas features in
+use: Vector Search, Atlas Search, Hybrid Search. The cluster's 3 search-index slots are now all ours.

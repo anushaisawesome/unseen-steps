@@ -114,8 +114,48 @@ def find_song(name: str, beats_per_bar: int | None = None) -> dict | None:
     return next(db()["songs"].aggregate(pipeline), None)
 
 
+def _text_terms(text: str, style: str, statuses: list[str], limit: int = 10) -> list[dict]:
+    """Atlas Search over the glossary's words: a term's name and aliases (boosted) and its description."""
+    pipeline = [
+        {"$search": {"index": "term_text", "compound": {
+            "should": [{"text": {"query": text, "path": ["term", "aliases"], "score": {"boost": {"value": 3}}}},
+                       {"text": {"query": text, "path": "description"}}],
+            "minimumShouldMatch": 1,
+            "filter": [{"equals": {"path": "style", "value": style}}]}}},
+        {"$match": {"status": {"$in": statuses}}},
+        {"$limit": limit},
+        {"$project": {"_id": 0, "term": 1, "description": 1, "status": 1, "aliases": 1, "display_names": 1,
+                      "score": {"$meta": "searchScore"}}},
+    ]
+    return list(db()["terms"].aggregate(pipeline))
+
+
+def match_terms_hybrid(text: str, style: str, k: int = 4, include_drafts: bool = False,
+                       explain: bool = False):
+    """Hybrid Search over the glossary: Atlas Vector Search (what the described movement means) and Atlas Search
+    (the words: a term's name, aliases, description), fused by reciprocal rank fusion (1 / (60 + rank)) in our code,
+    since the cluster is MongoDB 8.0 and $rankFusion needs 8.1. A line that names the step ranks it first even when
+    the description alone is vague; a description with no name still finds it by meaning. Vetted terms only unless
+    include_drafts. With explain=True, also returns both rankings."""
+    statuses = list(SPOKEN_STATUSES) + (["draft"] if include_drafts else [])
+    vector = match_terms(text, style, k=10, include_drafts=include_drafts)
+    words = _text_terms(text, style, statuses)
+    fused, docs = {}, {}
+    for ranking in (vector, words):
+        for rank, d in enumerate(ranking, 1):
+            fused[d["term"]] = fused.get(d["term"], 0.0) + 1 / (60 + rank)
+            docs.setdefault(d["term"], d)
+    best = [{**docs[t], "score": round(fused[t], 5)} for t in sorted(fused, key=fused.get, reverse=True)[:k]]
+    return (best, vector, words) if explain else best
+
+
 if __name__ == "__main__" and len(__import__("sys").argv) > 2:
     import sys
     if sys.argv[1] == "song":       # python server/db.py song "andrii waltz"
         hit = find_song(sys.argv[2])
         print({k: hit[k] for k in ("name", "file", "bpm", "beats_per_bar", "score")} if hit else "no match")
+    elif sys.argv[1] == "terms":    # python server/db.py terms waltz "turning right as a couple, a natural turn"
+        best, vector, words = match_terms_hybrid(sys.argv[3], sys.argv[2], explain=True)
+        print("vector: ", [d["term"] for d in vector[:5]])
+        print("text:   ", [d["term"] for d in words[:5]])
+        print("hybrid: ", [(d["term"], d["score"]) for d in best])

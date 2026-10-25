@@ -79,7 +79,11 @@ MongoDB Atlas holds the dance glossary (canonical and beginner names, plain desc
 review status; `$vectorSearch` over 3072-dimension vectors, filtered by style), each show's notes, map, gaps and
 rehearsal script, and each song's music map (beats, phrases, the gaps where a line fits). Songs are found by name with
 Atlas Search (`$search`, fuzzy text on `songs.name`): `--song "andrii waltz"` (even misspelt) loads the stored map and
-its file instead of a path. Run `python server/db.py song "andri walts"` to see the match.
+its file instead of a path. Run `python server/db.py song "andri walts"` to see the match. The glossary is matched with Hybrid
+Search: Atlas Vector Search (the meaning of the described movement) and Atlas Search (a term's name, aliases and
+description, index `term_text`) fused by reciprocal rank fusion in our code (the cluster is MongoDB 8.0, so not
+`$rankFusion`), vetted terms only. `python server/db.py terms waltz "steps forward, side, then closes the feet"` prints
+both rankings and the fused one.
 
 ## Setup
 

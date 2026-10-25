@@ -47,6 +47,15 @@ SONG_NAME_INDEX = SearchIndexModel(
 )
 
 
+TERM_TEXT_INDEX = SearchIndexModel(
+    name="term_text",
+    type="search",
+    definition={"mappings": {"dynamic": False, "fields": {
+        "term": {"type": "string"}, "aliases": {"type": "string"}, "description": {"type": "string"},
+        "style": {"type": "token"}, "status": {"type": "token"}}}},
+)
+
+
 def ensure_collections(database):
     existing = set(database.list_collection_names())
     for name in COLLECTIONS:
@@ -105,6 +114,7 @@ def main():
     try:
         ensure_search_index(database.terms, VECTOR_INDEX)
         ensure_search_index(database.songs, SONG_NAME_INDEX)
+        ensure_search_index(database.terms, TERM_TEXT_INDEX)  # the Atlas Search half of the glossary Hybrid Search
     except OperationFailure as e:
         print(f"\nsearch index step failed: {e}\n"
               "(search indexes need an Atlas cluster; a plain local mongod can't build them.)")

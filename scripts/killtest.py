@@ -1064,7 +1064,7 @@ def phrased(args, song, frames, path, solo, size):
         shots = [] if args.no_frames or features["tracking"] == "poor" else crops(args.clip, path, start, end)
         vocab = []
         if args.style and features["tracking"] != "poor":
-            from db import match_terms, spoken_name
+            from db import match_terms_hybrid, spoken_name
             parts = [f"travels {features['travel']}" if features.get("travel") not in (None, "none") else "stays in place",
                      f"{features['turns']} turn(s)" if features.get("turns") else "no turns",
                      "pauses" if (features.get("stillness") or 0) > 0.3 else "keeps moving",
@@ -1073,7 +1073,7 @@ def phrased(args, song, frames, path, solo, size):
                      f"rotates to the {features['rotation']}" if features.get("rotation") in ("left", "right") else ""]
             movement = "; ".join([p for p in parts if p] + (features.get("events") or []))
             vocab = [f"{name} ({t['description']})" for t in
-                     match_terms(movement, args.style, include_drafts=args.include_drafts)
+                     match_terms_hybrid(movement, args.style, include_drafts=args.include_drafts)
                      if (name := spoken_name(t, args.terms))]
         if vocab:
             print(f"   terms offered: {[v.split(' (')[0] for v in vocab]}")
