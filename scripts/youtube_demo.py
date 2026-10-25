@@ -58,6 +58,28 @@ def seconds(path: Path) -> float:
         return f.getnframes() / f.getframerate()
 
 
+def place(lines: list[dict]) -> None:
+    """No talking over each other. A key moment keeps its place: an ordinary line in its way gives way (dropping the
+    later line every time lost Ponyboy's canon). Anything else that collides waits at most half a second, or is left
+    out, because pushing lines later made them drift late."""
+    placed = []
+    for l in sorted([l for l in lines if l.get("audio")], key=lambda l: l["at"]):
+        while placed and l["at"] < placed[-1]["at"] + placed[-1]["seconds"] + 0.15:
+            prev = placed[-1]
+            if l.get("key_moment") and not prev.get("key_moment"):
+                prev["status"], prev["audio"] = "gave way to a key moment", None
+                placed.pop()
+                continue
+            late = prev["at"] + prev["seconds"] + 0.15 - l["at"]
+            if late <= 0.5:
+                l["at"] = round(l["at"] + late, 2)
+            else:
+                l["status"], l["audio"] = "no room", None
+            break
+        if l.get("audio"):
+            placed.append(l)
+
+
 def build(video: tuple) -> dict:
     key, vid, label, style, start, end = video
     url = f"https://www.youtube.com/watch?v={vid}"
@@ -132,19 +154,7 @@ def build(video: tuple) -> dict:
             if original:
                 original["audio"], original["status"] = original["audio_kept"], "spoken (signature)"
 
-    # No collisions, and no knock-on: a line that can't start within half a second of its moment is left out rather
-    # than pushed later (pushing made every following line drift late).
-    finish = 0.0
-    for l in lines:
-        if not l.get("audio"):
-            continue
-        if l["at"] < finish + 0.15:
-            if finish + 0.15 - l["at"] > 0.5:
-                l["status"] = "no room"
-                l.pop("audio")
-                continue
-            l["at"] = round(finish + 0.15, 2)
-        finish = l["at"] + l["seconds"]
+    place(lines)
 
     spoken = [l for l in lines if l.get("audio")]
     print(f"{key}: {plan['style']['name']}, {len(spoken)}/{len(lines)} lines spoken, speech {share():.0%}")
