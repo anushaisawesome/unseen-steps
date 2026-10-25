@@ -1011,7 +1011,7 @@ and setup, a 2 to 4 minute video on real inputs, a note on models and data sourc
 | Usefulness | Studios' own shows; blind and partially sighted audience; Gerard's blind ballroom dancers; open-sourcing for studios | No blind-user test yet: say it's next, don't imply it happened |
 | Reads the world | Pose checker live; per-line visual check; caption check on every clip; 0.3/0.5 keypoint confidence; checks skipped when unmeasurable; terms only when fully visible; live names only the routine's figures (SPEC 15a) | Show a checker catch on screen in the video |
 | Technical execution | Live camera + real music map + Atlas glossary and shows + 17 real performances | Fine |
-| Responsibility | Live frames not stored unless recording is chosen; narration in each listener's earphones; no other people's clips in the repo; studio edits notes (`scripts/edit_show.py`) | Face blurring of everyone but the followed dancers is built for rendered videos (`killtest.py`, commit 35fb096) |
+| Responsibility | Live frames not stored unless recording is chosen; narration in each listener's earphones; no other people's clips in the repo; studio edits notes (`scripts/edit_show.py`) | Everything outside the dancers being described is blurred in rendered videos (`killtest.py`, commit d20f873; face detection alone missed distant spectators) |
 
 Changes made for it: README rewritten (problem, how it works, honesty and privacy, models and data sources, setup and
 the show-night commands); `scripts/edit_show.py` (studios edit show notes in Atlas); live figure names limited to the
