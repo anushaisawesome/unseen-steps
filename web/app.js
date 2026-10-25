@@ -3,7 +3,7 @@
 
 const $ = (id) => document.getElementById(id);
 const video = $("video"), narration = $("narration");
-const data = await (await fetch("data/ballet.json")).json();
+const data = await (await fetch("data/ballet.json?v=3")).json();
 const spoken = data.lines.filter((l) => l.at !== null);
 
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;

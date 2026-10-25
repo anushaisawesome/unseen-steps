@@ -116,11 +116,11 @@
       <div class="screen">
         <video id="video" src="media/ballet.mp4" poster="media/ballet-poster.jpg" preload="metadata" playsinline
                aria-label="Ballet solo, with music">
-          <track kind="captions" src="media/ballet.vtt" srclang="en" label="Narration" default>
-          <track kind="descriptions" src="media/ballet.vtt" srclang="en" label="Narration">
+          <track kind="captions" src="media/ballet.vtt?v=3" srclang="en" label="Narration" default>
+          <track kind="descriptions" src="media/ballet.vtt?v=3" srclang="en" label="Narration">
         </video>
       </div>
-      <audio id="narration" src="media/ballet-narration.m4a" preload="auto"></audio>
+      <audio id="narration" src="media/ballet-narration.m4a?v=3" preload="auto"></audio>
       <p class="caption" id="caption" aria-hidden="true"></p>
 
       <div class="transport">
@@ -162,7 +162,7 @@
     <h3 id="transcript-title">Transcript</h3>
     <ol class="lines" id="transcript" aria-labelledby="transcript-title"></ol>
     <div class="downloads">
-      <a class="button" href="media/ballet.vtt" download="unseen-steps-ballet.vtt">Download captions (WebVTT)</a>
+      <a class="button" href="media/ballet.vtt?v=3" download="unseen-steps-ballet.vtt">Download captions (WebVTT)</a>
       <a class="button" href="#" id="download-text" download="unseen-steps-ballet.txt">Download transcript (text)</a>
     </div>
   </section>
@@ -200,7 +200,7 @@
     </div>
     <div class="reveal">
       <div style="display:grid;gap:1rem">
-        <video id="reveal-video" src="media/ballet-reveal.mp4" poster="media/ballet-poster.jpg" controls preload="metadata" playsinline
+        <video id="reveal-video" src="media/ballet-reveal.mp4?v=3" poster="media/ballet-poster.jpg" controls preload="metadata" playsinline
                aria-label="The same ballet solo with the tracked skeleton, captions and narration"></video>
         <div class="counter" aria-hidden="true">
           <div><b id="bar">1</b><span>Bar</span></div>
