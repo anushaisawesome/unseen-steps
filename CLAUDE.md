@@ -1039,6 +1039,14 @@ rank fusion in Python (1/(60+rank)); MongoDB 8.0 has no `$rankFusion`. Vetted te
 spin turn, turning lock; "steps forward, side, then closes the feet together" -> closed change first. Atlas features in
 use: Vector Search, Atlas Search, Hybrid Search. The cluster's 3 search-index slots are now all ours.
 
+## Final demo video (25 Oct, ~11:35)
+
+`video/cut4.py` builds it (2:59) from the 15-part script in `video/SCRIPT.md`; the render is in the private clips repo
+`submission/`. Ballroom shots use the stretches of `waltz-annotated.mp4` where the tracked couple stays in frame (13-27 s,
+74-78 s). Captions sit top-left, labels top-right with a clear gap; the venue screen-reader test (10.5-21 s: labelled
+controls, Start listening, the first line) sits above the bottom caption. Submission files: the four PDFs, the architecture
+PNG, the screen-reader test video and its announcements log.
+
 ## Finding a show by part of its name (25 Oct, ~10:00; Andrii's Claude)
 
 A studio's recital is several shows (one per piece, each with its own song), so `live.py --show` and `edit_show.py` now

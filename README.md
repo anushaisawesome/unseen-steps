@@ -135,7 +135,7 @@ Other entry points:
 - `scripts/killtest.py clips/ballet.mp4 --script`: a narrated, annotated video of a local clip with the skeleton drawn.
 - `scripts/regress.py`: the regression list of a dancer's must-haves from `feedback/`.
 - `web/`: the site (static pages plus two Python functions on Vercel).
-- `scripts/dev_server.py` runs the site and its live functions locally; `tests/venue_screenreader_test.py` drives the venue page on a phone viewport with a fake camera, keyboard only, and records what a screen reader would announce (simulated from the accessibility tree).
+- `scripts/dev_server.py` runs the site and its live functions locally; `tests/venue_screenreader_test.py` drives the venue page on a phone viewport with a fake camera, keyboard only, and records what a screen reader would announce (simulated from the accessibility tree). In that test the venue page's lines come from its fast fallback (Gemini 3.5 Flash-Lite with no show notes), so they're plain and repeat ("Steps backward, maintaining the frame"), and the in-browser skeleton trails the dancer slightly. The rich live narration is `scripts/live.py` with a studio's show notes (Gemini Live, about 0.8 s).
 
 ## Layout
 

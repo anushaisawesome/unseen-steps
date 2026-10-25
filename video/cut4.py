@@ -69,7 +69,7 @@ def caption_png(n, text, top=False):
     """The spoken words as a caption (burned in: the video has to work with the sound off too)."""
     png = V / f"cap{n}.png"
     build.shot(f"""<!doctype html><html><head><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@700&display=block">
-<style>html,body{{margin:0;width:1920px;height:1080px;background:transparent}}div{{position:absolute;{'left:48px;top:40px;max-width:1180px;text-align:left' if top else 'left:50%;transform:translateX(-50%);bottom:56px;max-width:1500px'};
+<style>html,body{{margin:0;width:1920px;height:1080px;background:transparent}}div{{position:absolute;{'left:48px;top:40px;max-width:1080px;box-sizing:border-box;text-align:left' if top else 'left:50%;transform:translateX(-50%);bottom:56px;max-width:1500px'};
 background:rgba(20,24,38,.82);color:#f3ede2;font:700 38px/1.35 'Atkinson Hyperlegible Next',sans-serif;padding:14px 26px;border-radius:10px}}{'' if top else 'div{{text-align:center}}'}</style></head>
 <body><div>{escape(text)}</div></body></html>""", png, transparent=True)
     return png
@@ -78,7 +78,7 @@ background:rgba(20,24,38,.82);color:#f3ede2;font:700 38px/1.35 'Atkinson Hyperle
 def label_png(name, text):
     png = V / f"label_{name}.png"
     build.shot(f"""<!doctype html><html><head><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@700&display=block">
-<style>html,body{{margin:0;width:1920px;height:1080px;background:transparent}}div{{position:absolute;right:44px;top:40px;max-width:600px;background:#ff48b0;
+<style>html,body{{margin:0;width:1920px;height:1080px;background:transparent}}div{{position:absolute;right:44px;top:40px;max-width:560px;box-sizing:border-box;background:#ff48b0;
 color:#1e2a44;font:700 28px/1.3 'Atkinson Hyperlegible Next',sans-serif;padding:12px 20px;border-radius:10px;box-shadow:5px 5px 0 #1e2a44}}</style></head>
 <body><div>{escape(text)}</div></body></html>""", png, transparent=True)
     return png
@@ -198,7 +198,7 @@ def main():
     segs.append(segment(3, ["-ss", 44, "-t", dur(v3) + 1.5, "-i", TAKE], "scale=1920:1080", ["-ss", 44, "-t", dur(v3) + 2.5, "-i", TAKE],
                         V / "t3.mp4", music_vol=0.28, top=True))
     # 4: Andrii dancing
-    segs.append(segment(4, ["-ss", 30, "-t", 40, "-i", REPO / "data/killtest/waltz-annotated.mp4"], "scale=1920:1080", song(40, 41), V / "t4.mp4", top=True, label="A crowded ballroom competition: the couple being described is tracked, everyone else blurred"))
+    segs.append(segment(4, ["-ss", 13, "-t", 40, "-i", REPO / "data/killtest/waltz-annotated.mp4"], "scale=1920:1080", song(40, 41), V / "t4.mp4", top=True, label="A crowded ballroom competition: the couple being described is tracked, everyone else blurred"))
     # 5-7: the why, over the studio recital print; 7 ends on the site
     gcard = V / "gerard-card.png"
     photo = (V / "gerard-photo.png").as_uri()
@@ -248,9 +248,9 @@ def main():
         "-map", "[v]", "-map", "[a]", "-t", 15.6, *VID, *A, V / "t12.mp4")
     segs.append(V / "t12.mp4")
     # 13: Andrii; 14: the recital print; 15: both, over the end card building up
-    segs.append(segment(13, ["-ss", 55, "-t", 20, "-i", REPO / "data/killtest/waltz-annotated.mp4"], "scale=1920:1080", song(150, 21), V / "t13.mp4", tail=1.4, top=True, label="Ballroom, where Andrii started"))
-    phone = "scale=-2:1000,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=0xf3ede2"
-    segs.append(segment(14, ["-ss", 30, "-t", 30, "-i", V / "venue-test.mp4"], phone, song(156, 30), V / "t14.mp4", label="The venue page on a phone: each line arrives as the dancer moves"))
+    segs.append(segment(13, ["-ss", 74, "-t", 16, "-i", REPO / "data/killtest/waltz-annotated.mp4"], "scale=1920:1080", song(150, 21), V / "t13.mp4", tail=1.4, top=True, label="Ballroom, where Andrii started"))
+    phone = "scale=-2:840,pad=1920:1080:(ow-iw)/2:28:color=0xf3ede2"
+    segs.append(segment(14, ["-ss", 10.5, "-t", 30, "-i", V / "venue-test.mp4"], phone, song(156, 30), V / "t14.mp4", label="The venue page with a screen reader: every control labelled, each line read aloud"))
     e = build.cards["c_end"]
     e = e.replace('<h1 style', '<h1 data-l="1" style', 1).replace('<p style="font-size:52px', '<p data-l="2" style="font-size:52px', 1)
     e = e.replace('<p class="d" style="font-size:46px', '<p data-l="3" class="d" style="font-size:46px', 1)
