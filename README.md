@@ -3,6 +3,10 @@
 Audio description of dance for small studios' own shows, so blind and partially sighted people in the audience
 experience the dance, not just the music. Built at Encode London (23 to 25 October 2026) by Anusha, Andrii and Nastia.
 
+**Winner: Google DeepMind Special Prize for Open Innovation** at Encode London 2026 ($2,000 in Google Cloud credits):
+*"Real-time audio description of choreography for blind dance audiences, combining Gemini 4 Argon video understanding
+with sub-second Live voice synthesis."*
+
 **Try it:** https://unseen-steps-studio.vercel.app (18 styles described, a narrated ballet solo, the venue listening page)
 
 **Demo video:** https://youtu.be/4aadm47Nk1g

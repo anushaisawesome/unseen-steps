@@ -7,7 +7,11 @@ commit.
 
 **Standing rule for every Claude on this repo:** anything Anusha and Andrii decide or discuss goes into this file in the same session, so the other person's Claude has it after `git pull`.
 
-**Hard deadline:** submissions close **Sunday 25 October, 12:00 London time**. Demo video spec:
+**Result (25 Oct, finale):** not in the top 10 pitches, but **Google DeepMind created a Special Prize for Open
+Innovation for Unseen Steps** ($2,000 in Google Cloud credits). Details at the end of this file. The hackathon is over;
+the deadline notes below are history.
+
+**Hard deadline (passed):** submissions closed **Sunday 25 October, 12:00 London time**. Demo video spec:
 `docs/demo-video.md`.
 
 > **ANDRII: Claude's reference cut of the demo video (25 Oct ~09:15).** `unseen-steps-demo-final.mp4` (2:58) and a
@@ -1071,3 +1075,16 @@ as Atlas Search.
 keep bad body tracking out of the narration (pose confidence, per-phrase coverage, unmeasurable = unchecked, crowded
 footage goes silent, Gemini sees the frames too, people can see the skeleton) are in `docs/tracking-safeguards.md`, with
 a one-line version for the pitch. Covers "how well it reads the world" (Real World) and the verification loop (DeepMind).
+
+## Result: Google DeepMind Special Prize for Open Innovation (25 Oct, finale)
+
+Unseen Steps wasn't among the top 10 finalists who pitched on stage (SceneBar, FlowArc, Second Sig, Axolotl,
+MonsoonWatch, L Plate, deRoute, mosa, Dwelld, Anchorcare), but **Google DeepMind created a Special Prize for Open
+Innovation for it: $2,000 in Google Cloud credits.** Their slide: *"Real-time audio description of choreography for
+blind dance audiences, combining Gemini 4 Argon video understanding with sub-second Live voice synthesis."*
+- The open-source, tool-for-studios framing (rather than a startup pitch) is what the prize recognised; keep it.
+- README and both website footers mention the prize. The website needs a redeploy to show it (see "Website").
+- Credits: who redeems the Google Cloud credits and what they fund (e.g. Argon show-note runs, a cloud GPU for the
+  upload path) is still to be decided by the team.
+- Next step stays the same: test with blind dancers and their audiences (Gerard's dancers first).
+
