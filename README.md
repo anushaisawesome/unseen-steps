@@ -162,7 +162,7 @@ Other entry points:
 ## What's next
 
 Unseen Steps is open source under the MIT licence (`LICENSE`), so any studio can run it for its own shows. Next: a show-notes editor in the browser,
-testing with blind audiences at real recitals (starting with Gerard's dancers), live tracking for whole groups, and a
+testing with blind audiences at real recitals (we hope to start with the dancers Gerard works with), live tracking for whole groups, and a
 training tool for blind dancers.
 
 The Deep Research glossary pipeline is documented in `server/glossary_research.py`.
