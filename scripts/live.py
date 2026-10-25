@@ -314,14 +314,12 @@ class Live:
         self.feedback = ""   # the checker's verdict on the last line, for the next prompt
         self.plan, self.show_notes, self.moments, self.script = None, "", [], []
         if args.show:  # show night: the notes the studio prepared earlier, from MongoDB Atlas
-            from db import db
-            show = db()["shows"].find_one({"name": args.show})
-            if not show:
-                raise SystemExit(f"no show called {args.show!r} in Atlas; prepare it with scripts/prepare_show.py")
+            from db import find_show
+            show = find_show(args.show)  # a partial name is enough; several matches stop with the list
             self.plan, self.show_notes = show["plan"], show["show_notes"]
             self.moments = [tuple(m) for m in show["key_moments"]]
             self.script = show.get("script") or []  # older shows have no rehearsal script
-            print(f"show notes loaded from Atlas: {args.show}")
+            print(f"show notes loaded from Atlas: {show['name']}")
         elif args.rehearsal:  # or prepare them now from the studio's rehearsal video
             from show_notes import prepare
             self.plan, self.moments, self.show_notes, self.script = prepare(args.rehearsal, args.style, self.song_map)
@@ -604,7 +602,7 @@ def main():
     parser.add_argument("--seconds", type=float, help="stop after this many seconds")
     parser.add_argument("--mute", action="store_true", help="keep time without playing sound (for tests)")
     parser.add_argument("--show", help="the name of a show whose notes were prepared earlier and stored in Atlas "
-                        "(scripts/prepare_show.py)")
+                        "(scripts/prepare_show.py); part of the name is enough")
     parser.add_argument("--rehearsal", help="the studio's rehearsal video of this piece: Argon prepares show notes "
                         "from it before the show, and narration goes in the gaps in the song")
     parser.add_argument("--engine", choices=["live", "flash"], default="live",

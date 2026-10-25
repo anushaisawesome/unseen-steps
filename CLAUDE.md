@@ -1039,3 +1039,13 @@ rank fusion in Python (1/(60+rank)); MongoDB 8.0 has no `$rankFusion`. Vetted te
 `killtest.py` offers glossary terms. Test: "rotates to the right as a couple, a natural turn" -> natural turn, natural
 spin turn, turning lock; "steps forward, side, then closes the feet together" -> closed change first. Atlas features in
 use: Vector Search, Atlas Search, Hybrid Search. The cluster's 3 search-index slots are now all ours.
+
+## Finding a show by part of its name (25 Oct, ~10:00; Andrii's Claude)
+
+A studio's recital is several shows (one per piece, each with its own song), so `live.py --show` and `edit_show.py` now
+take part of the name: `db.find_show(query)` returns an exact name (any case) first, else the one show whose name, studio,
+song or style contains every typed word at the start of a word ("andrii waltz", "year 3", "andri"). If several match
+(two pieces to the same song), it stops and lists them rather than guess; none, it says so. Test:
+`python server/db.py show "andrii waltz"`. **A plain MongoDB query, not Atlas Search** (no typo tolerance): the free
+cluster's three search indexes are taken (`vector_index`, `term_text` for Hybrid Search, `song_name`), so don't claim it
+as Atlas Search.

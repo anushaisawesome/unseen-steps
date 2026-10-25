@@ -14,7 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
-from db import db  # noqa: E402
+from db import db, find_show  # noqa: E402
 
 SPLIT = "\n\n# ---- Rehearsal script: one line each, 'seconds | line'. Edit, add or delete lines. ----\n"
 
@@ -23,9 +23,7 @@ def main():
     if len(sys.argv) != 2:
         raise SystemExit(__doc__)
     shows = db()["shows"]
-    show = shows.find_one({"name": sys.argv[1]})
-    if not show:
-        raise SystemExit(f"no show called {sys.argv[1]!r}; prepare it with scripts/prepare_show.py")
+    show = find_show(sys.argv[1])  # a partial name is enough; several matches stop with the list
     script = show.get("script") or []
     text = ("# Show notes for " + show["name"] + ". Edit freely; lines starting with # are ignored.\n\n" + show["show_notes"]
             + SPLIT + "\n".join(f"{line['time']:.1f} | {line['text']}" for line in script) + "\n")

@@ -149,6 +149,30 @@ def match_terms_hybrid(text: str, style: str, k: int = 4, include_drafts: bool =
     return (best, vector, words) if explain else best
 
 
+def find_show(query: str) -> dict:
+    """The show a studio means by a partial name ("andrii waltz" for "Spring showcase: Andrii, waltz"): an exact name
+    first, else the one show whose name, studio, song or style contains every typed word. A plain query, not Atlas
+    Search: the free cluster's three search indexes are taken. Stops and lists the candidates rather than guess when
+    several match."""
+    import re
+    shows = db()["shows"]
+    exact = shows.find_one({"name": {"$regex": f"^{re.escape(query.strip())}$", "$options": "i"}})
+    if exact:
+        return exact
+    fields = ("name", "studio", "song", "style")
+    words = query.split()
+    # Each word must start a word somewhere ("andri" finds Andrii; "3" isn't found inside "mp3")
+    found = list(shows.find({"$and": [{"$or": [{f: {"$regex": f"(^|[^a-z0-9]){re.escape(w)}", "$options": "i"}}
+                                               for f in fields]} for w in words]})) if words else []
+    if len(found) == 1:
+        print(f"show found: {found[0]['name']}")
+        return found[0]
+    if not found:
+        raise SystemExit(f"no show matches {query!r}; prepare it with scripts/prepare_show.py")
+    raise SystemExit(f"{len(found)} shows match {query!r}; use more of the name:\n"
+                     + "\n".join(f"  {s['name']}  ({s.get('studio') or 'no studio'}, {s.get('song')})" for s in found))
+
+
 if __name__ == "__main__" and len(__import__("sys").argv) > 2:
     import sys
     if sys.argv[1] == "song":       # python server/db.py song "andrii waltz"
@@ -159,3 +183,6 @@ if __name__ == "__main__" and len(__import__("sys").argv) > 2:
         print("vector: ", [d["term"] for d in vector[:5]])
         print("text:   ", [d["term"] for d in words[:5]])
         print("hybrid: ", [(d["term"], d["score"]) for d in best])
+    elif sys.argv[1] == "show":     # python server/db.py show "andrii waltz"
+        hit = find_show(sys.argv[2])
+        print({k: hit.get(k) for k in ("name", "studio", "song", "style")})
