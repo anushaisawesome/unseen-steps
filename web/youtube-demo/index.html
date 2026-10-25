@@ -2,94 +2,70 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Unseen Steps: any style</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unseen Steps: 18 styles</title>
+<meta name="description" content="Eighteen choreographed pieces described by Unseen Steps, each in its own vocabulary, played in YouTube's own player.">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&display=swap">
-<style>
-  :root {
-    --bg: #f3ede2; --panel: #ffffff; --ink: #1d1b22; --muted: #5d5866; --line: #e3dfe6;
-    --accent: #1e2a44; --accent-soft: #e3dccd; --caption-bg: #1d1b22; --caption-ink: #ffffff; --cut: #6b6575;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #141318; --panel: #1d1b23; --ink: #eeeaf2; --muted: #a8a2b2; --line: #2e2b36;
-            --accent: #ff8fcf; --accent-soft: #2a2e38; --caption-bg: #000000; --caption-ink: #ffffff; --cut: #948ea4; }
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif; }
-  header { padding: 20px 16px 8px; max-width: 1200px; margin: 0 auto; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  header p { margin: 0; color: var(--muted); font-size: 14px; }
-  main { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; padding: 12px 16px 40px; }
-  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
-  nav h2, section h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
-  nav ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-  nav button { width: 100%; text-align: left; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
-               border-radius: 8px; padding: 8px 10px; font: inherit; cursor: pointer; }
-  nav button small { display: block; color: var(--muted); font-size: 12.5px; }
-  nav button[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); }
-  button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-  .stage { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
-  .section-now { font-size: 14px; color: var(--muted); min-height: 21px; margin: 0 0 8px; }
-  .section-now strong { color: var(--ink); }
-  .video { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; overflow: hidden; }
-  .video > div, .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .caption { min-height: 64px; margin-top: 10px; padding: 12px 16px; border-radius: 8px; background: var(--caption-bg);
-             color: var(--caption-ink); font-size: clamp(18px, 2.4vw, 24px); font-weight: 600; display: flex; align-items: center; }
-  .caption:empty::before { content: "\00a0"; }
-  .controls { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; font-size: 14px; color: var(--muted); }
-  .controls label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
-  .controls input[type="range"] { width: 120px; accent-color: var(--accent); }
-  .note { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
-  .transcript { margin-top: 16px; }
-  .transcript ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
-  .transcript button { width: 100%; text-align: left; display: grid; grid-template-columns: 56px 1fr auto; gap: 10px;
-                       border: 0; background: transparent; color: var(--ink); font: inherit; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
-  .transcript button:hover { background: var(--accent-soft); }
-  .transcript .t { color: var(--muted); font-variant-numeric: tabular-nums; }
-  .transcript .tag { color: var(--muted); font-size: 12.5px; }
-  .transcript li.cut button { color: var(--cut); text-decoration: line-through; }
-  .transcript li.now button { background: var(--accent-soft); }
-  .about { margin-top: 14px; font-size: 14px; color: var(--muted); }
-  .about summary { cursor: pointer; color: var(--ink); font-weight: 600; }
-  .about ul { margin: 6px 0; padding-left: 20px; }
-  .home a { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--ink); text-decoration: none; font-size: 17px; }
-  .home .mark { height: 26px; width: auto; color: var(--accent); }
-  h1 { font-size: 26px; margin-top: 12px; }
-  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&family=Atkinson+Hyperlegible+Next:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../studio.css">
+<link rel="stylesheet" href="demo.css">
 </head>
 <body>
-<header>
-  <p class="home"><a href="../"><svg class="mark" viewBox="0 0 733 875" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="M277,662 L119,710 L130,760 L140,788 L149,806 L168,831 L190,847 L203,852 L219,855 L236,855 L258,850 L273,843 L287,833 L298,820 L305,808 L310,792 L312,777 L310,751 L301,718Z M379,492 L354,547 L343,586 L343,625 L348,642 L354,654 L363,666 L379,680 L395,689 L409,694 L423,697 L448,697 L462,694 L479,687 L493,678 L509,662 L522,643 L538,604 L551,545 L519,535 L517,538 L512,566 L502,602 L496,617 L485,636 L469,652 L454,660 L440,663 L419,661 L403,654 L386,639 L380,627 L377,616 L377,595 L381,576 L393,543 L411,504 L408,501Z M153,189 L128,191 L115,195 L101,202 L82,216 L70,228 L58,244 L43,273 L32,307 L24,348 L21,375 L21,434 L25,462 L33,496 L49,540 L87,620 L109,674 L207,646 L260,629 L262,627 L252,590 L251,552 L259,514 L277,464 L284,424 L284,386 L279,352 L265,303 L246,260 L232,238 L206,211 L180,195Z M527,182 L501,201 L499,205 L513,224 L522,242 L527,257 L532,283 L531,319 L527,337 L516,364 L500,388 L483,406 L508,430 L526,412 L544,386 L560,349 L567,313 L567,280 L559,241 L544,207Z M584,136 L569,146 L556,158 L578,190 L587,208 L597,236 L605,280 L605,312 L600,345 L587,384 L564,424 L538,455 L538,457 L563,479 L575,467 L593,444 L616,405 L631,365 L636,344 L640,314 L639,268 L631,227 L621,198 L611,177Z M641,90 L618,107 L614,113 L632,138 L646,162 L665,208 L671,230 L677,267 L678,316 L671,363 L655,411 L642,437 L627,461 L612,481 L593,502 L593,504 L617,527 L631,513 L653,485 L671,457 L683,434 L702,383 L708,357 L713,318 L713,274 L711,254 L700,202 L687,166 L676,143 L664,122Z M547,24 L522,20 L498,22 L479,28 L460,38 L448,47 L426,70 L406,101 L389,138 L379,169 L371,210 L369,254 L371,276 L376,300 L396,355 L402,385 L402,419 L397,443 L392,457 L424,468 L431,451 L435,434 L438,393 L431,350 L413,301 L405,265 L405,220 L413,177 L425,142 L444,105 L457,87 L470,74 L484,64 L503,56 L528,55 L540,58 L553,64 L571,78 L576,80 L599,58 L594,51 L574,36Z"/></svg>Unseen Steps</a></p>
-  <h1>Unseen Steps: audio description on any style</h1>
-  <p>Each video plays in YouTube's own player. The narration was written in advance by Gemini 4 Argon from the recording, the same way a studio's show notes are prepared from its rehearsal, and is spoken over it in time with the music. It was not narrated live. All choreography belongs to its creators, credited by each title.</p>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../">
+      <svg viewBox="0 0 733 875" aria-hidden="true" focusable="false"><path class="ink-n" fill-rule="evenodd" d="M277,662 L119,710 L130,760 L140,788 L149,806 L168,831 L190,847 L203,852 L219,855 L236,855 L258,850 L273,843 L287,833 L298,820 L305,808 L310,792 L312,777 L310,751 L301,718Z M379,492 L354,547 L343,586 L343,625 L348,642 L354,654 L363,666 L379,680 L395,689 L409,694 L423,697 L448,697 L462,694 L479,687 L493,678 L509,662 L522,643 L538,604 L551,545 L519,535 L517,538 L512,566 L502,602 L496,617 L485,636 L469,652 L454,660 L440,663 L419,661 L403,654 L386,639 L380,627 L377,616 L377,595 L381,576 L393,543 L411,504 L408,501Z M153,189 L128,191 L115,195 L101,202 L82,216 L70,228 L58,244 L43,273 L32,307 L24,348 L21,375 L21,434 L25,462 L33,496 L49,540 L87,620 L109,674 L207,646 L260,629 L262,627 L252,590 L251,552 L259,514 L277,464 L284,424 L284,386 L279,352 L265,303 L246,260 L232,238 L206,211 L180,195Z M527,182 L501,201 L499,205 L513,224 L522,242 L527,257 L532,283 L531,319 L527,337 L516,364 L500,388 L483,406 L508,430 L526,412 L544,386 L560,349 L567,313 L567,280 L559,241 L544,207Z M584,136 L569,146 L556,158 L578,190 L587,208 L597,236 L605,280 L605,312 L600,345 L587,384 L564,424 L538,455 L538,457 L563,479 L575,467 L593,444 L616,405 L631,365 L636,344 L640,314 L639,268 L631,227 L621,198 L611,177Z M641,90 L618,107 L614,113 L632,138 L646,162 L665,208 L671,230 L677,267 L678,316 L671,363 L655,411 L642,437 L627,461 L612,481 L593,502 L593,504 L617,527 L631,513 L653,485 L671,457 L683,434 L702,383 L708,357 L713,318 L713,274 L711,254 L700,202 L687,166 L676,143 L664,122Z M547,24 L522,20 L498,22 L479,28 L460,38 L448,47 L426,70 L406,101 L389,138 L379,169 L371,210 L369,254 L371,276 L376,300 L396,355 L402,385 L402,419 L397,443 L392,457 L424,468 L431,451 L435,434 L438,393 L431,350 L413,301 L405,265 L405,220 L413,177 L425,142 L444,105 L457,87 L470,74 L484,64 L503,56 L528,55 L540,58 L553,64 L571,78 L576,80 L599,58 L594,51 L574,36Z"/><path class="ink-r" fill-rule="evenodd" transform="translate(18 10)" opacity="0.55" d="M277,662 L119,710 L130,760 L140,788 L149,806 L168,831 L190,847 L203,852 L219,855 L236,855 L258,850 L273,843 L287,833 L298,820 L305,808 L310,792 L312,777 L310,751 L301,718Z M379,492 L354,547 L343,586 L343,625 L348,642 L354,654 L363,666 L379,680 L395,689 L409,694 L423,697 L448,697 L462,694 L479,687 L493,678 L509,662 L522,643 L538,604 L551,545 L519,535 L517,538 L512,566 L502,602 L496,617 L485,636 L469,652 L454,660 L440,663 L419,661 L403,654 L386,639 L380,627 L377,616 L377,595 L381,576 L393,543 L411,504 L408,501Z M153,189 L128,191 L115,195 L101,202 L82,216 L70,228 L58,244 L43,273 L32,307 L24,348 L21,375 L21,434 L25,462 L33,496 L49,540 L87,620 L109,674 L207,646 L260,629 L262,627 L252,590 L251,552 L259,514 L277,464 L284,424 L284,386 L279,352 L265,303 L246,260 L232,238 L206,211 L180,195Z M527,182 L501,201 L499,205 L513,224 L522,242 L527,257 L532,283 L531,319 L527,337 L516,364 L500,388 L483,406 L508,430 L526,412 L544,386 L560,349 L567,313 L567,280 L559,241 L544,207Z M584,136 L569,146 L556,158 L578,190 L587,208 L597,236 L605,280 L605,312 L600,345 L587,384 L564,424 L538,455 L538,457 L563,479 L575,467 L593,444 L616,405 L631,365 L636,344 L640,314 L639,268 L631,227 L621,198 L611,177Z M641,90 L618,107 L614,113 L632,138 L646,162 L665,208 L671,230 L677,267 L678,316 L671,363 L655,411 L642,437 L627,461 L612,481 L593,502 L593,504 L617,527 L631,513 L653,485 L671,457 L683,434 L702,383 L708,357 L713,318 L713,274 L711,254 L700,202 L687,166 L676,143 L664,122Z M547,24 L522,20 L498,22 L479,28 L460,38 L448,47 L426,70 L406,101 L389,138 L379,169 L371,210 L369,254 L371,276 L376,300 L396,355 L402,385 L402,419 L397,443 L392,457 L424,468 L431,451 L435,434 L438,393 L431,350 L413,301 L405,265 L405,220 L413,177 L425,142 L444,105 L457,87 L470,74 L484,64 L503,56 L528,55 L540,58 L553,64 L571,78 L576,80 L599,58 L594,51 L574,36Z"/></svg>
+      Unseen Steps
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="../#watch">Listen</a></li>
+        <li><a href="./" aria-current="page">18 styles</a></li>
+        <li><a href="../#how">How it works</a></li>
+        <li><a href="../listen.html">At the venue</a></li>
+      </ul>
+    </nav>
+  </div>
 </header>
-<main>
-  <nav aria-labelledby="pick">
-    <h2 id="pick">Choose a performance</h2>
-    <ul id="list"></ul>
-  </nav>
-  <section aria-labelledby="now">
-    <h2 id="now" class="sr-only">Now playing</h2>
-    <div class="stage">
-      <p class="section-now" id="section"></p>
-      <div class="video"><div id="player"></div></div>
-      <div class="caption" id="caption" aria-live="polite" aria-atomic="true"></div>
-      <div class="controls">
-        <label><input type="checkbox" id="narrate" checked> Narration</label>
-        <label><input type="checkbox" id="duck" checked> Lower the music while a line is spoken</label>
-        <label for="music-vol">Music volume <input type="range" id="music-vol" min="0" max="100" value="100" step="5"></label>
-        <label for="voice-vol">Narration volume <input type="range" id="voice-vol" min="0" max="100" value="100" step="5"></label>
+
+<main id="main">
+  <section class="demos" aria-labelledby="title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h1 id="title">Hear it on <span class="r">18 styles</span></h1>
+        <p>Each video plays in YouTube's own player. The narration was written in advance by Gemini 4 Argon from the recording, the same way a studio's show notes are prepared from its rehearsal, and is spoken over it in time with the music. It was not narrated live. All choreography belongs to its creators, credited by each title.</p>
       </div>
-      <p class="note">Every line was checked against the video at its moment. Pose checking needs the video file, so it isn't used here. Struck-through lines were cut so the music stays the main thing.</p>
-    </div>
-    <details class="about" id="about"><summary>What Argon noticed</summary><div id="about-body"></div></details>
-    <div class="transcript">
-      <h2 id="lines-h">Script</h2>
-      <ol id="lines" aria-labelledby="lines-h"></ol>
+      <div class="demo-grid">
+        <section class="picker" aria-labelledby="pick">
+          <h2 id="pick" class="label">Choose a performance</h2>
+          <ul id="list"></ul>
+        </section>
+        <section class="now-playing" aria-labelledby="now">
+          <h2 id="now" class="sr-only">Now playing</h2>
+          <div class="stage">
+            <p class="section-now" id="section"></p>
+            <div class="video"><div id="player"></div></div>
+            <div class="caption" id="caption" aria-live="polite" aria-atomic="true"></div>
+            <div class="controls">
+              <label class="check"><input type="checkbox" id="narrate" checked> Narration</label>
+              <label class="check"><input type="checkbox" id="duck" checked> Lower the music while a line is spoken</label>
+              <label for="music-vol">Music volume <input type="range" id="music-vol" min="0" max="100" value="100" step="5"></label>
+              <label for="voice-vol">Narration volume <input type="range" id="voice-vol" min="0" max="100" value="100" step="5"></label>
+            </div>
+            <p class="note">Every line was checked against the video at its moment. Pose checking needs the video file, so it isn't used here. Struck-through lines were cut so the music stays the main thing.</p>
+          </div>
+          <details class="about" id="about"><summary>What Argon noticed</summary><div id="about-body"></div></details>
+          <div class="transcript">
+            <h2 id="lines-h" class="label">Script</h2>
+            <ol id="lines" aria-labelledby="lines-h"></ol>
+          </div>
+        </section>
+      </div>
     </div>
   </section>
 </main>

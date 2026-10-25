@@ -1,0 +1,61 @@
+/* The 18 styles page, in the main site's studio-print style (tokens from ../styles.css and ../studio.css). */
+
+.demos { padding-block: clamp(1.5rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem); }
+.demos .sec-head h1 { font-size: clamp(2.3rem, 5.2vw, 3.8rem); font-weight: 800; line-height: 1.02; letter-spacing: -0.03em; }
+.demos .sec-head h1 .r { color: var(--red-text); }
+.demos .sec-head p { max-width: 48rem; }
+.label { font-family: var(--display); font-size: 1.15rem; font-weight: 800; margin: 0 0 0.75rem; letter-spacing: -0.01em; }
+
+.demo-grid { display: grid; grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr); gap: clamp(1.25rem, 3vw, 2.25rem); align-items: start; }
+@media (max-width: 60rem) { .demo-grid { grid-template-columns: 1fr; } }
+.demo-grid > section { display: block; }
+
+/* the list of performances */
+.picker ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.picker button { width: 100%; min-height: 44px; display: grid; gap: 0.2rem; justify-items: start; text-align: left;
+  padding: 0.7rem 0.9rem; border: 2px solid var(--navy); border-radius: 8px; background: var(--surface); color: var(--navy);
+  font: 700 1rem/1.3 var(--sans); cursor: pointer; transition: transform 160ms ease, box-shadow 160ms ease; }
+.picker button small { font-weight: 400; font-size: 0.88rem; color: var(--muted); }
+.picker button:hover { background: var(--surface); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--red); }
+.picker button[aria-current="true"] { background: var(--navy); color: var(--on-navy); box-shadow: 4px 4px 0 var(--red); }
+.picker button[aria-current="true"] small { color: var(--on-navy); opacity: 0.85; }
+
+/* the player card */
+.stage { background: var(--surface); border: 2px solid var(--navy); border-radius: 14px; padding: clamp(0.75rem, 2vw, 1.1rem);
+  box-shadow: 6px 6px 0 var(--red); display: grid; gap: 0.8rem; }
+.section-now { font-size: 0.95rem; color: var(--muted); min-height: 1.5em; margin: 0; }
+.section-now strong { color: var(--navy); font-family: var(--display); }
+.video { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; overflow: hidden; }
+.video > div, .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stage .caption { min-height: 3.4em; display: flex; align-items: center; font-size: clamp(1.1rem, 2.3vw, 1.45rem); line-height: 1.35;
+  padding: 0.75rem 1rem; border-radius: 8px; background: var(--navy); color: var(--on-navy); font-weight: 700; }
+.stage .caption:empty::before { content: "\00a0"; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; align-items: center; font-size: 0.95rem; }
+.controls label { display: inline-flex; gap: 0.5rem; align-items: center; font-weight: 700; cursor: pointer; min-height: 44px; }
+.controls input[type="range"] { width: 8rem; min-height: 0; accent-color: var(--navy); }
+.note { font-size: 0.88rem; color: var(--muted); margin: 0; }
+
+/* what Argon noticed */
+.about { margin-top: 1.25rem; border: 2px solid var(--navy); border-radius: 12px; background: var(--surface); padding: 0.4rem 1rem; }
+.about summary { cursor: pointer; font-family: var(--display); font-weight: 800; font-size: 1.1rem; min-height: 44px; display: flex; align-items: center; }
+.about #about-body { padding-bottom: 0.75rem; color: var(--muted); display: grid; gap: 0.5rem; }
+.about ul { margin: 0; padding-left: 1.2rem; }
+
+/* the script */
+.transcript { margin-top: 1.5rem; }
+.transcript ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+.transcript button { width: 100%; min-height: 44px; display: grid; grid-template-columns: 3.5rem minmax(0, 1fr) auto; gap: 0.75rem;
+  align-items: baseline; text-align: left; padding: 0.55rem 0.8rem; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface); color: var(--navy); font: 400 1rem/1.4 var(--sans); cursor: pointer; }
+.transcript button:hover { border-color: var(--navy); background: var(--surface); }
+.transcript .t { font-family: var(--mono); font-size: 0.88rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.transcript .tag { font-size: 0.82rem; color: var(--muted); }
+.transcript li.now button { border-color: var(--red); box-shadow: inset 4px 0 0 var(--red); }
+.transcript li.cut button { color: var(--muted); }
+.transcript li.cut button span:nth-child(2) { text-decoration: line-through; text-decoration-thickness: 2px; }
+
+@media (max-width: 40rem) {
+  .transcript button { grid-template-columns: 3rem minmax(0, 1fr); }
+  .transcript .tag { grid-column: 2; }
+}
+@media (forced-colors: active) { .stage, .picker button, .about { border: 2px solid CanvasText; } .transcript li.now button { outline: 3px solid Highlight; } }
