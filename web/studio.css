@@ -167,3 +167,16 @@ ol.lines > li[aria-current="true"] { border-color: var(--red); box-shadow: inset
 /* the venue page in the same language */
 .listen h2, main h2 { font-family: var(--display); font-weight: 800; letter-spacing: -0.02em; }
 .eyebrow { color: var(--red-text); font-family: var(--display); font-weight: 700; letter-spacing: 0; text-transform: none; font-size: 1rem; }
+
+/* the venue is the main thing: first in the nav, as a button; sub-pages get a way home (Anusha) */
+nav a.nav-cta { background: var(--navy); color: var(--on-navy); padding: 0.55rem 1rem; border-radius: 8px; border-bottom: 0;
+  box-shadow: 3px 3px 0 var(--red); text-decoration: none; }
+nav a.nav-cta:hover, nav a.nav-cta[aria-current="page"] { color: var(--on-navy); border-bottom: 0; }
+nav a.nav-cta[aria-current="page"] { outline: 2px solid var(--red); outline-offset: 2px; }
+nav ul { align-items: center; }
+.back-home { margin: 1.25rem 0 0; }
+a.back { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0.5rem 1rem; border: 2px solid var(--navy);
+  border-radius: 8px; color: var(--navy); background: var(--surface); font-weight: 700; text-decoration: none; }
+a.back:hover { box-shadow: 3px 3px 0 var(--red); }
+.skip-inline { position: absolute; left: -9999px; }
+.skip-inline:focus { position: static; display: inline-block; padding: 0.5rem 0.9rem; border: 2px solid var(--navy); border-radius: 8px; background: var(--surface); font-weight: 700; }

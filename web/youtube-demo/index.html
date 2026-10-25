@@ -24,16 +24,18 @@
     </a>
     <nav aria-label="Main">
       <ul>
-        <li><a href="../#watch">Listen</a></li>
+        <li><a class="nav-cta" href="../listen.html">Live at the venue</a></li>
         <li><a href="./" aria-current="page">18 styles</a></li>
         <li><a href="../#how">How it works</a></li>
-        <li><a href="../listen.html">At the venue</a></li>
+        <li><a href="../#watch">Ballet solo</a></li>
       </ul>
     </nav>
   </div>
 </header>
 
 <main id="main">
+  <div class="wrap"><p class="back-home"><a class="back" href="../"><span aria-hidden="true">&larr;</span> Back to home</a></p></div>
+
   <section class="demos" aria-labelledby="title">
     <div class="wrap">
       <div class="sec-head">
@@ -43,10 +45,11 @@
       <div class="demo-grid">
         <section class="picker" aria-labelledby="pick">
           <h2 id="pick" class="label">Choose a performance</h2>
+          <p><a class="skip-inline" href="#now">Skip to the player</a></p>
           <ul id="list"></ul>
         </section>
         <section class="now-playing" aria-labelledby="now">
-          <h2 id="now" class="sr-only">Now playing</h2>
+          <h2 id="now" class="sr-only" tabindex="-1">Now playing</h2>
           <div class="stage">
             <p class="section-now" id="section"></p>
             <div class="video"><div id="player"></div></div>
