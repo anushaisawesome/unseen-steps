@@ -832,7 +832,23 @@ def draw_text(frame, caption, note):
     return cv2.cvtColor(np.array(out), cv2.COLOR_RGB2BGR)
 
 
-def render(video, frames, path, results, out_path, focus=None, everyone=False):
+def blur_face(frame, box, xy, conf):
+    """Blur one person's head: from the face keypoints when the pose model sees them, else the top of their box."""
+    pts = [xy[k] for k in range(5) if conf[k] > 0.3]  # nose, eyes, ears
+    x0, y0, x1, y1 = (int(v) for v in box[:4])
+    if pts:
+        cx, cy = np.mean(pts, axis=0)
+        r = max(12, 0.5 * (y1 - y0) * 0.16)
+        x0, y0, x1, y1 = int(cx - 1.4 * r), int(cy - 1.8 * r), int(cx + 1.4 * r), int(cy + 1.4 * r)
+    else:
+        y1 = y0 + int(0.2 * (y1 - y0))
+    hgt, wid = frame.shape[:2]
+    x0, y0, x1, y1 = max(0, x0), max(0, y0), min(wid, x1), min(hgt, y1)
+    if x1 - x0 > 4 and y1 - y0 > 4:
+        frame[y0:y1, x0:x1] = cv2.GaussianBlur(frame[y0:y1, x0:x1], (0, 0), max(4, (x1 - x0) / 5))
+
+
+def render(video, frames, path, results, out_path, focus=None, everyone=False, privacy=True):
     """Demo video: skeletons on the dancers (the followed couple highlighted), each line as a caption
     while it's spoken, any line the checker rejected flagged, and the spoken lines mixed into the music."""
     cap = cv2.VideoCapture(video)
@@ -855,6 +871,10 @@ def render(video, frames, path, results, out_path, focus=None, everyone=False):
             if abs(nearest - t) < 0.1:
                 followed = path[nearest]
         k = int(np.abs(sample_times - t).argmin())
+        if privacy and not everyone:  # faces of everyone but the followed dancers are blurred (spectators, other couples)
+            for p in frames[k][1] + SEATED.get(frames[k][0], []):
+                if not any(p is q for q in followed):
+                    blur_face(frame, p[0], p[1], p[2])
         if abs(sample_times[k] - t) < 0.1:
             ref_h = height(followed[0][0]) if followed else 0.25 * h
             for p in frames[k][1] + (SEATED.get(frames[k][0], []) if everyone else []):

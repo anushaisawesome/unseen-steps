@@ -46,6 +46,8 @@ if a line was wrong, the next one puts it right.
   named only if the routine contains it and it is clearly seen, otherwise the body is described. Style influences are
   named only with several distinct visible cues.
 - **Privacy.** Live, camera frames go to Gemini and are not stored unless the studio chooses to record the session.
+  In rendered videos, the faces of everyone except the dancers being described (spectators, other couples) are
+  blurred.
   Narration goes to each listener's own earphones, never over the room's music. Clips of other people's
   choreography are never put in this repository: the style demos read public YouTube links directly and play them in
   YouTube's own player.
@@ -81,6 +83,9 @@ python3.12 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 cp .env.example .env    # add your own GEMINI_API_KEY, and a MongoDB Atlas connection
 ```
+
+On Windows (PowerShell): `py -3.12 -m venv .venv`, then `.venv\Scripts\pip install -r requirements.txt`, and run the
+scripts with `.venv\Scripts\python`. Install ffmpeg and make sure it's on the PATH.
 
 The YOLO pose model downloads on first run (NVIDIA GPU, Apple GPU or CPU).
 
