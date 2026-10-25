@@ -1,0 +1,34 @@
+   1.9s  axe      axe: 0 WCAG 2.2 AA violations on this page
+   3.4s  focus    link, Skip to content
+   4.1s  focus    link, Unseen Steps
+   4.7s  focus    link, Listen
+   5.4s  focus    link, 18 styles
+   6.0s  focus    link, How it works
+   6.7s  focus    link, At the venue, current page
+   7.4s  focus    radio button, Detailed: every new line, selected
+   8.0s  focus    pop-up button, Speech speed, Normal
+   8.7s  focus    pop-up button, Voice, This device's voice (fastest)
+   9.3s  focus    slider, Narration volume, 100%
+  10.0s  focus    text field, Dance style (optional), For example ballet, waltz or hip hop. It helps Gemini use the style's own words. Leave it empty and Gemini judges from what it sees.
+  10.7s  focus    checkbox, Also send lines to my screen reader, not checked
+  11.3s  focus    Also send lines to my screen reader, checked
+  12.0s  focus    button, Start listening, Uses this device's camera. While it's running, the screen stays awake, and where your browser supports it, your headphones or lock screen can stop it. If the screen does lock, the camera pauses and picks up again when you come back.
+  13.5s  announce Asking for the camera…
+  13.7s  announce Downloading the pose model (12 MB, once)…
+  13.7s  announce Starting the pose model…
+  15.2s  announce Listening. Watching the dancer (pose on the graphics chip); the first description comes in a few seconds.
+  18.8s  announce Holding a still frame for an imaginary partner.
+  26.6s  announce Steps backward, maintaining the frame.
+  29.4s  announce Steps forward, keeping the frame steady.
+  32.0s  announce Steps backward, maintaining the frame.
+  34.9s  announce Steps forward, keeping the frame steady.
+  37.5s  announce Steps backward, maintaining the frame.
+  40.0s  announce Steps forward, keeping the frame steady.
+  42.3s  announce Steps backward, maintaining the frame.
+  44.6s  announce Steps forward, keeping the frame steady.
+  50.5s  announce Steps backward, maintaining the frame.
+  56.0s  announce Steps backward, maintaining the frame.
+  58.9s  announce Steps backward, maintaining the frame.
+  61.5s  announce Steps to the right, keeping the frame.
+  63.2s  focus    button, Stop listening, Uses this device's camera. While it's running, the screen stays awake, and where your browser supports it, your headphones or lock screen can stop it. If the screen does lock, the camera pauses and picks up again when you come back.
+  64.0s  announce Stopped.
