@@ -64,8 +64,8 @@ def caption_png(n, text, top=False):
     """The spoken words as a caption (burned in: the video has to work with the sound off too)."""
     png = V / f"cap{n}.png"
     build.shot(f"""<!doctype html><html><head><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@700&display=block">
-<style>html,body{{margin:0;width:1920px;height:1080px;background:transparent}}div{{position:absolute;left:50%;transform:translateX(-50%);{'top:48px' if top else 'bottom:56px'};max-width:1500px;
-background:rgba(20,24,38,.82);color:#f3ede2;font:700 38px/1.35 'Atkinson Hyperlegible Next',sans-serif;padding:14px 26px;border-radius:10px;text-align:center}}</style></head>
+<style>html,body{{margin:0;width:1920px;height:1080px;background:transparent}}div{{position:absolute;{'left:48px;top:40px;max-width:1180px;text-align:left' if top else 'left:50%;transform:translateX(-50%);bottom:56px;max-width:1500px'};
+background:rgba(20,24,38,.82);color:#f3ede2;font:700 38px/1.35 'Atkinson Hyperlegible Next',sans-serif;padding:14px 26px;border-radius:10px}}{'' if top else 'div{{text-align:center}}'}</style></head>
 <body><div>{escape(text)}</div></body></html>""", png, transparent=True)
     return png
 
@@ -103,6 +103,31 @@ def segment(n, video_args, vf, music_args, out, vo_at=0.4, tail=0.9, length=None
     return out
 
 
+def layered(html, name, starts, total):
+    """A card that builds up: each element marked data-l="k" fades in (and rises slightly) at starts[k-1] seconds.
+    Rendered as one background plus one transparent layer per element, composited by ffmpeg."""
+    n = len(starts)
+    base = html.replace("</style>", "[data-l]{visibility:hidden}</style>", 1)
+    build.shot(base, V / f"{name}_0.png")
+    layers = []
+    for k in range(1, n + 1):
+        h = html.replace("</style>", f"[data-l]{{visibility:hidden}}[data-l='{k}']{{visibility:visible}}"
+                         "html,body{background:transparent!important}</style>", 1)
+        build.shot(h, V / f"{name}_{k}.png", transparent=True)
+        layers.append(V / f"{name}_{k}.png")
+    inputs = ["-loop", "1", "-t", total, "-i", V / f"{name}_0.png"]
+    chain, last = "[0:v]scale=1920:1080,fps=30,format=yuva420p[b0]", "b0"
+    for k, (png, t) in enumerate(zip(layers, starts), 1):
+        inputs += ["-loop", "1", "-t", total, "-i", png]
+        chain += (f";[{k}:v]format=rgba,fade=t=in:st={t:.2f}:d=0.6:alpha=1[l{k}]"
+                  f";[{last}][l{k}]overlay=x=0:y='if(lt(t,{t:.2f}),18,18*max(0,1-(t-{t:.2f})/0.6))'[b{k}]")
+        last = f"b{k}"
+    out = V / f"{name}.mp4"
+    run("ffmpeg", "-loglevel", "error", "-y", *inputs, "-filter_complex", chain + f";[{last}]format=yuv420p[v]", "-map", "[v]",
+        "-t", total, "-an", *VID, out)
+    return out
+
+
 def song(at, length):
     return ["-ss", at, "-t", length + 1, "-i", SONG]
 
@@ -128,7 +153,18 @@ def main():
     zoom = "scale=2400:-1,zoompan=z='min(zoom+0.0005,1.12)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=900:s=1920x1080:fps=30"
     segs.append(segment(5, ["-loop", "1", "-t", 30, "-i", img], zoom, song(60, 30), V / "s5.mp4"))
     # 6. What Argon prepared, from Atlas
-    segs.append(segment(6, ["-loop", "1", "-t", 30, "-i", V / "k_notes.png"], zoom.replace("2400", "2112").replace("1.12", "1.05"), song(90, 30), V / "s6.mp4"))
+    import build2
+    vo6 = voice(6)
+    h = build2.notes_card()
+    h = h.replace('<p class="d pk"', '<p data-l="1" class="d pk"', 1).replace('<h2 style="font-size:72px', '<h2 data-l="1" style="font-size:72px', 1)
+    h = h.replace('<div><p style="font-size:28px;color:#4b5266;margin:0 0 10px">Signature', '<div data-l="2"><p style="font-size:28px;color:#4b5266;margin:0 0 10px">Signature', 1)
+    h = h.replace('<div><p style="font-size:28px;color:#4b5266;margin:0 0 10px">Style', '<div data-l="3"><p style="font-size:28px;color:#4b5266;margin:0 0 10px">Style', 1)
+    h = h.replace('<p style="font-size:28px;color:#4b5266;margin:0 0 12px">The song', '<p data-l="4" style="font-size:28px;color:#4b5266;margin:0 0 12px">The song', 1)
+    h = h.replace('<div style="position:relative;height:110px', '<div data-l="4" style="position:relative;height:110px', 1)
+    h = h.replace('<div style="position:relative;height:64px', '<div data-l="5" style="position:relative;height:64px', 1)
+    L6 = dur(vo6) + 1.3
+    k6 = layered(h, "notes", [0.3, L6 * 0.33, L6 * 0.33 + 1.2, L6 * 0.62, L6 * 0.62 + 1.0], L6 + 0.5)
+    segs.append(segment(6, ["-i", k6], "scale=1920:1080", song(90, 30), V / "s6.mp4"))
     # 7. Live, under the hood: the checker catch at 39.9 s, then the next lines
     panels = V / "s7-raw.mp4"
     vo7 = voice(7)
@@ -161,8 +197,15 @@ def main():
     segs.append(segment(9, ["-i", V / "s9-pic.mp4"], "scale=1920:1080", song(120, 40), V / "s9.mp4"))
     # 10. The close over the site, then the end card with the song
     segs.append(segment(10, ["-loop", "1", "-t", 30, "-i", V / "crop_hero.png"], zoom.replace("1.12", "1.06"), song(150, 30), V / "s10.mp4"))
-    run("ffmpeg", "-loglevel", "error", "-y", "-loop", "1", "-t", 5, "-i", V / "c_end.png", "-ss", 172, "-t", 6, "-i", SONG, "-filter_complex",
-        "[0:v]scale=1920:1080,fps=30,fade=t=in:d=0.4[v];[1:a]volume=0.5,afade=t=out:st=3.5:d=1.5[a]", "-map", "[v]", "-map", "[a]", "-t", 5, *VID, *A, V / "s11.mp4")
+    e = build.cards["c_end"]
+    e = e.replace('<h1 style', '<h1 data-l="1" style', 1).replace('<p style="font-size:52px', '<p data-l="2" style="font-size:52px', 1)
+    e = e.replace('<p class="d" style="font-size:46px', '<p data-l="3" class="d" style="font-size:46px', 1)
+    e = e.replace('<p style="font-size:34px;color:#4b5266;margin:10px 0 0">github', '<p data-l="3" style="font-size:34px;color:#4b5266;margin:10px 0 0">github', 1)
+    e = e.replace('<p style="font-size:28px;color:#5e6476', '<p data-l="4" style="font-size:28px;color:#5e6476', 1)
+    e = e.replace('<div style="width:440px">', '<div data-l="1" style="width:440px">', 1)
+    endv = layered(e, "endcard", [0.2, 0.9, 1.6, 2.3], 6)
+    run("ffmpeg", "-loglevel", "error", "-y", "-i", endv, "-ss", 172, "-t", 7, "-i", SONG, "-filter_complex",
+        "[0:v]fade=t=in:d=0.3[v];[1:a]volume=0.5,afade=t=out:st=4.2:d=1.8[a]", "-map", "[v]", "-map", "[a]", "-t", 6, *VID, *A, V / "s11.mp4")
     segs.append(V / "s11.mp4")
     (V / "list3.txt").write_text("".join(f"file '{s}'\n" for s in segs))
     out = V / "unseen-steps-story.mp4"
