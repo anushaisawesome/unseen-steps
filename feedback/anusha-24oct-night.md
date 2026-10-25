@@ -48,6 +48,7 @@ Argon learns her taste from: what she valued, what she hated, and why.
 - Judas: "it mistakes tutting for miming crowns"; "some of the motion language isn't accurate."
 - Saumya: "said she was waacking rapidly when her arms were almost still."
 - Ballet: "she's holding a tambourine, not a fan."
+- Contemporary (Negrão): "she isn't en pointe, this is contemporary, she's relevé on the balls of her feet."
 - Aquamarine: "where is the wide squat it's referring to? I'm not seeing it."
 - Track 10 labelled "commercial fusion with contemporary and classical Indian dance influences": "Track 10 does not
   have classical influences." (Don't name an influence from one gesture that resembles it.)

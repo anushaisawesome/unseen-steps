@@ -371,8 +371,10 @@ def style_context(plan: dict | None, t: float) -> str:
     sec = next((s for s in plan.get("sections", []) if s["start"] <= t < s["end"]), None)
     named = [f"{x['name']} ({x['evidence']})" for x in (sec or {}).get("techniques", [])]
     named += [f"{m['name']} ({m['description']})" for m in plan.get("motifs", [])]
-    return (f"\n\nThe piece is {plan['style']['name']}. Elements of its styles that the describer's map of the whole "
-            f"piece found{' in this section' if sec else ''}: " + "; ".join(named) + "." if named else "")
+    evidence = "; ".join(plan["style"].get("evidence", []))
+    return (f"\n\nThe piece is {plan['style']['name']}" + (f" (seen across the whole piece: {evidence})" if evidence else "")
+            + "." + (f" Elements of its styles that the describer's map of the whole piece found"
+                     f"{' in this section' if sec else ''}: " + "; ".join(named) + "." if named else ""))
 
 
 def verify_lines(video: str, lines: list[dict], start: float | None = None, end: float | None = None,
@@ -382,7 +384,9 @@ def verify_lines(video: str, lines: list[dict], start: float | None = None, end:
     the pose checker, so it works on any video and style (including YouTube links, which have no pose).
     It sees the piece's style and the elements the map named: checked blind, a few seconds at a time, its corrections
     swapped the style's own vocabulary for plain words (a vogue catwalk became a strut, face framing became arms by
-    the head)."""
+    the head) and overruled the writer on things the whole-piece map had right (soft slippers "corrected" to en
+    pointe); it rewrote 23 of 25 lines. So it judges substance, corrects only what it clearly sees is wrong, and keeps
+    the rest of the line."""
     from concurrent.futures import ThreadPoolExecutor
 
     def check_one(line):
@@ -390,9 +394,12 @@ def verify_lines(video: str, lines: list[dict], start: float | None = None, end:
         b = min(line["time"] + 1.5, end) if end else line["time"] + 1.5
         prompt = (f"An audio describer says this at {line['time']:.1f} s in the video: \"{line['text']}\"\n"
                   f"It should describe what happens between {a:.1f} s and {line['time'] + 1:.1f} s (the clip shown). "
-                  "Is it accurate: the right movement, at this time, the right technique or style term, the right "
-                  "speed and dynamics, and nothing that isn't there? If not, correct what is wrong and keep what is "
-                  "right: the corrected line should be as rich and as fluent in the style's own vocabulary as a "
+                  "Is it accurate: the right movement, at this time, the right technique or style term (used only "
+                  "when every part of its definition is visible), the right speed and dynamics, and nothing that "
+                  "isn't there? Judge the substance, not the wording: a line that is right but could be said "
+                  "differently is accurate. Only call it wrong for something you can clearly see is wrong, and don't "
+                  "contradict what was seen across the whole piece unless this clip clearly shows otherwise. If it is "
+                  "wrong, correct only what is wrong and keep the rest of the line: the corrected line should be as rich and as fluent in the style's own vocabulary as a "
                   "dancer of this style would be, naming its elements where they are visible and letting a newcomer "
                   "picture them (a correction that swaps a correct style term for a plain word loses what a dancer "
                   "sees). One clear image, 5 to 12 words, no times or numbers of seconds, never a list of details; "
@@ -401,7 +408,7 @@ def verify_lines(video: str, lines: list[dict], start: float | None = None, end:
             r = with_retry(lambda: client().models.generate_content(
                 model=MODEL, contents=[video_part(video, a, b, fps=10), prompt],
                 config=types.GenerateContentConfig(response_mime_type="application/json", response_schema=VERIFY,
-                                                   thinking_config=types.ThinkingConfig(thinking_level="low"))))
+                                                   thinking_config=types.ThinkingConfig(thinking_level="medium"))))
             return json.loads(r.text)
         except Exception:
             return {"accurate": True, "issue": "unchecked", "fix": None}
