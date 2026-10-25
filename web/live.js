@@ -19,15 +19,26 @@ let running = false, stream = null, t0 = 0, samples = [], phraseStart = 0, phras
 let frames = [], notes = "", notesBusy = false, lastNotes = 0;  // {t, jpeg base64} at FRAME_RATE; Argon's notes
 const snap = document.createElement("canvas"), snapCtx = snap.getContext("2d");
 let previous = [], playing = null, pending = null, speechToken = 0, waiting = false, speaking = false, smoothed = null, lastT = 0, lastError = "", lastLineAt = null;
+let failures = 0, wakeLock = null;
+const BRIEF_GAP = 8;  // seconds: in brief mode, at most one line this often, so the music has more room
 const SMOOTH = 0.1;  // seconds: keypoint smoothing time constant (steadier turns and travel, still follows jumps)
 
 const saved = (() => { try { return JSON.parse(localStorage.getItem("unseen-steps-live") || "{}"); } catch { return {}; } })();
-for (const k of ["voice", "vol", "style"]) if (saved[k] !== undefined) $(k).value = saved[k];
+for (const k of ["voice", "vol", "style", "rate"]) if (saved[k] !== undefined) $(k).value = saved[k];
 $("announce").checked = !!saved.announce;
+if (saved.amount === "brief") $("amount-brief").checked = true;
+const amount = () => document.querySelector('input[name="amount"]:checked').value;
+const rate = () => +$("rate").value || 1;
 function remember() {
-  try { localStorage.setItem("unseen-steps-live", JSON.stringify({ voice: $("voice").value, vol: $("vol").value, style: $("style").value, announce: $("announce").checked })); } catch {}
+  try {
+    localStorage.setItem("unseen-steps-live", JSON.stringify({ voice: $("voice").value, vol: $("vol").value, style: $("style").value,
+      rate: $("rate").value, amount: amount(), announce: $("announce").checked }));
+  } catch {}
 }
-for (const id of ["voice", "vol", "style", "announce"]) $(id).addEventListener("change", remember);
+for (const id of ["voice", "vol", "style", "announce", "rate", "amount-detailed", "amount-brief"]) $(id).addEventListener("change", remember);
+const volumeText = () => $("vol").setAttribute("aria-valuetext", `${Math.round(+$("vol").value * 100)}%`);
+$("vol").addEventListener("input", volumeText);
+volumeText();
 
 const status = (text) => { $("status").textContent = text; };
 
@@ -46,8 +57,11 @@ $("setup").addEventListener("submit", async (e) => {
     t0 = performance.now() / 1000;
     samples = []; phraseStart = 0; phraseN = 0; previous = []; waiting = false; speaking = false; pending = null;
     frames = []; notes = ""; notesBusy = false; lastNotes = 0; $("notes").textContent = "";
-    $("start").textContent = "Stop";
-    status(`Watching (pose on ${backend === "webgpu" ? "the graphics chip" : "the processor"}). The first description comes in a few seconds.`);
+    failures = 0;
+    $("start").textContent = "Stop listening";
+    status(`Listening. Watching the dancer (pose on ${backend === "webgpu" ? "the graphics chip" : "the processor"}); the first description comes in a few seconds.`);
+    keepAwake();
+    lockScreenControls();
     loop();
   } catch (err) {
     stop(err.name === "NotAllowedError" ? "Camera access was refused. Allow the camera in your browser's site settings, then try again."
@@ -64,8 +78,42 @@ function stop(message) {
   stream?.getTracks().forEach((t) => t.stop());
   stream = null;
   $("stage").hidden = true;
-  $("start").textContent = "Start describing";
+  $("start").textContent = "Start listening";
+  wakeLock?.release?.().catch(() => {});
+  wakeLock = null;
+  if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "none";
   status(message);
+}
+
+// Keep the screen awake while describing (the camera stops when a phone locks). Re-asked when the page comes back.
+async function keepAwake() {
+  try { wakeLock = await navigator.wakeLock?.request("screen"); } catch { wakeLock = null; }
+}
+document.addEventListener("visibilitychange", () => {
+  if (!running) return;
+  if (document.visibilityState === "visible") { keepAwake(); status("Listening again."); }
+  else status("Paused while the screen is off. It picks up again when you come back.");
+});
+
+// Headphone and lock-screen controls, where the browser offers them: pause or stop ends the description.
+function lockScreenControls() {
+  if (!("mediaSession" in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({ title: "Live audio description", artist: "Unseen Steps",
+      album: $("style").value.trim() || "Dance" });
+    navigator.mediaSession.playbackState = "playing";
+    for (const action of ["pause", "stop"]) navigator.mediaSession.setActionHandler(action, () => running && stop("Stopped."));
+  } catch {}
+}
+
+// The narrator is a web request every second or two; if it fails, keep watching and say so once, then say when it's back.
+function reached(ok, why = "") {
+  if (ok) {
+    if (failures) status("Connected to the narrator again.");
+    failures = 0;
+  } else if (++failures === 1) {
+    status(`Lost the connection to the narrator${why ? ` (${why})` : ""}. Still watching, and trying again.`);
+  }
 }
 
 async function loop() {
@@ -172,11 +220,13 @@ async function endPhrase(t) {
                              frames: frames.filter((f) => f.t >= start && f.t <= t) }),
     });
     const out = await res.json();
-    if (!res.ok) { lastError = out.error; entry.say(`(silent: ${out.error})`); return; }
+    if (!res.ok) { lastError = out.error; reached(false, out.error); entry.say(`(silent: ${out.error})`); return; }
+    reached(true);
     entry.say(out.line || "(silent: nothing new to say)", out.attempts);
     if (out.line) offer({ line: out.line, audio: out.audio, end: t, entry });
   } catch (err) {
     lastError = err.message;
+    reached(false);
     entry.say(`(silent: couldn't reach the narrator, ${err.message})`);
   } finally {
     waiting = false;
@@ -188,6 +238,7 @@ async function endPhrase(t) {
 const now = () => performance.now() / 1000 - t0;
 const fresh = (item) => now() - item.end <= STALE;
 function offer(item) {
+  if (amount() === "brief" && lastLineAt !== null && now() - lastLineAt < BRIEF_GAP) return item.entry.mark("Skipped: brief mode, leaving room for the music");
   if (!speaking) return fresh(item) ? speak(item) : item.entry.mark("Skipped: too late");
   pending?.entry.mark("Skipped: a newer line came in");
   pending = item;
@@ -211,15 +262,16 @@ function speak(item) {
   const token = ++speechToken;
   const done = () => { if (token === speechToken && speaking) next(); };
   // Backstop: some browsers never report the end of speech; a line takes about words / 3 seconds at this rate.
-  setTimeout(done, (line.split(/\s+/).length / 3 + 1) * 1000);
+  setTimeout(done, (line.split(/\s+/).length / (3 * rate()) + 1) * 1000);
   if (audio) {
     playing = new Audio(`data:audio/wav;base64,${audio}`);
     playing.volume = volume;
+    playing.playbackRate = rate();
     playing.onended = playing.onerror = done;
     playing.play().catch(done);
   } else {
     const u = new SpeechSynthesisUtterance(line);
-    u.volume = volume; u.lang = "en-GB"; u.rate = 1.25;
+    u.volume = volume; u.lang = "en-GB"; u.rate = Math.min(2, 1.25 * rate());
     u.onend = u.onerror = done;
     speechSynthesis.speak(u);
     playing = { pause: () => speechSynthesis.cancel() };
@@ -234,7 +286,7 @@ function addLog(start, f) {
        f.lowest_level === "floor" ? "goes to the floor" : f.lowest_level === "low" ? "goes low" : null, f.facing !== "unclear" ? f.facing : null,
        f.stillness > 0.5 ? "mostly still" : null].filter(Boolean).join(", ");
   li.innerHTML = `<span class="stamp">${Math.floor(start / 60)}:${String(Math.floor(start % 60)).padStart(2, "0")}</span>
-    <div style="display:grid;gap:0.35rem"><span class="text">Writing…</span><p class="hint"></p></div>`;
+    <div class="entry"><span class="text">Writing…</span><p class="hint"></p></div>`;
   li.querySelector(".hint").textContent = `Measured: ${measured}.`;
   $("log").prepend(li);
   while ($("log").children.length > 40) $("log").lastElementChild.remove();
