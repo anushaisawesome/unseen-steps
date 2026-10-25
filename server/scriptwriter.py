@@ -31,7 +31,8 @@ except ImportError:
 # slow lines drag and pull attention off the music.
 RATE = {"steady": 2.8, "brisk": 3.2, "rapid": 3.8}
 
-BRIEF = """You are an expert audio describer for dance, and a former dancer in this style. Describe this performance
+# What a dancer sees, shared by the script writer and the live narration (scripts/live.py), so tuning one tunes both.
+DANCERS_EYE = """You are an expert audio describer for dance, and a former dancer in this style. Describe this performance
 for a blind listener who loves dance, the way a dancer would see it: as rich and precise as a dancer would be, in few
 words, spoken over the music.
 
@@ -50,7 +51,9 @@ Use the style's own terms where they fit, only when every part of the term's def
 newcomer picture each term the first time. Where the style has its own framework of named elements or parts (the
 elements of a vogue performance, the sections of a ballet variation, the parts of a flamenco palo), describe the piece
 in those terms. Directions as the audience sees them. Only describe what you can see, at
-the moment it happens.
+the moment it happens."""
+
+BRIEF = DANCERS_EYE + """
 
 How to say it: one idea per line, never a list of details; most lines 5 to 12 words. At most one line per musical
 phrase (phrase starts are listed below when there's a beat grid; otherwise listen for them), placed in the gap where

@@ -945,3 +945,25 @@ on every box-step phrase, and flat "stands still / frozen" lines. Cause: the `fo
 - **Live path:** YOLO pose remains the fast frame-by-frame tracker. Gemini Live receives a lower-rate view plus YOLO
   measurements for semantic narration. YOLO alone tracks bodies but cannot infer the dance's meaning or relationship to
   the music.
+
+### Live shares the tuned taste; show notes carry the rehearsal script (25 Oct, ~05:45)
+
+Andrii saw live narration swing between technical terms and crude mechanics ("he waits", "puts his feet together").
+Root cause: live used its own thin brief (a hardcoded waltz step list, stillness example phrases that leaked into the
+output, 3 to 8 words), never read `feedback/`, and was handed raw pose numbers to narrate.
+- `scriptwriter.DANCERS_EYE` is the writer's dancer's-eye brief (the writer's `BRIEF` = it + the pacing rules,
+  byte-identical, so caches hold). `live.live_system()` = `DANCERS_EYE` + `dancer_feedback()` + `LIVE_RULES` (one line
+  per "Now", about 4 to 10 words, may stay silent, name a step only when it clearly is one, never apologise). Tuning the
+  writer or adding feedback now tunes live too. `LIVE_BRIEF` (the `--engine flash` fallback and the website) lost the
+  waltz list and example phrases too.
+- Pose measurements in each prompt are labelled a check only: don't contradict them, don't narrate them.
+- `show_notes.prepare` also writes the rehearsal script with the tuned pipeline (windowed writer + per-line check, not
+  voiced); `prepare_show.py` stores it in the Atlas show as `script`. Each live prompt quotes the rehearsal line(s) near
+  that moment as the quality of language to match, while describing what the dancer actually does tonight. Shows
+  without a script still work.
+- Test on Andrii's clip (70 s, the camera being the rehearsal video itself): before, 12 lines such as "He waits, holding
+  the ballroom frame steady." / "Stepping back, side, and closing." (x2); after, 8 lines such as "Dancer in headphones
+  walks in, rolling his shoulders." / "Stepping back, side, together in a waltz box." / "Pivoting left into a quarter
+  turn to face front." Median first sound 0.80 s -> 1.02 s (the longer system instruction). Some lines repeat the
+  rehearsal wording when the movement is the same, by design.
+- **After `git pull`, re-run `prepare_show.py` for any show prepared before this** (Demo: Andrii, waltz is done).

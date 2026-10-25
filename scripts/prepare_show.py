@@ -1,5 +1,5 @@
-"""A studio prepares a show: Argon writes the show notes from the rehearsal video, and they're stored in MongoDB Atlas
-(collection `shows`) with the song's gaps, ready for the live narration (`scripts/live.py --show "<name>"`).
+"""A studio prepares a show: Argon writes the show notes and the describer's rehearsal script from the rehearsal video,
+and they're stored in MongoDB Atlas (collection `shows`) with the song's gaps, ready for the live narration (`scripts/live.py --show "<name>"`).
 
 Usage:
     python scripts/prepare_show.py --name "Spring showcase: Andrii, waltz" --rehearsal clips/andrii720.mp4 \
@@ -28,15 +28,15 @@ def main():
     parser.add_argument("--beats-per-bar", type=int, default=4)
     args = parser.parse_args()
 
-    plan, moments, notes = prepare(args.rehearsal, args.style)
     song = map_song(load_audio(args.song), beats_per_bar=args.beats_per_bar, bars_per_phrase=2,
                     speech_seconds=2.5, earliest=True)
+    plan, moments, notes, script = prepare(args.rehearsal, args.style, song)
     doc = {"name": args.name, "studio": args.studio, "style": plan["style"]["name"], "song": Path(args.song).name,
            "bpm": song["bpm"], "gaps": [g for g in song["clean_spaces"] if g], "plan": plan,
-           "key_moments": [list(m) for m in moments], "show_notes": notes,
+           "key_moments": [list(m) for m in moments], "show_notes": notes, "script": script,
            "updated": datetime.now(timezone.utc)}
     db()["shows"].update_one({"name": args.name}, {"$set": doc}, upsert=True)
-    print(f"stored in Atlas: {args.name} ({doc['style']}, {len(moments)} key moments, {len(doc['gaps'])} gaps)")
+    print(f"stored in Atlas: {args.name} ({doc['style']}, {len(moments)} key moments, {len(script)} rehearsal lines, {len(doc['gaps'])} gaps)")
 
 
 if __name__ == "__main__":

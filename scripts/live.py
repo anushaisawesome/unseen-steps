@@ -1,4 +1,5 @@
-"""Live audio description: Gemini watches the dancer and describes on its feet. Nothing is scripted or rehearsed.
+"""Live audio description: Gemini watches the dancer and describes on its feet. With show notes (--show), it knows the
+piece from the rehearsal and its describer's script, but always describes what the dancer actually does tonight.
 
 The program plays the song itself (so it always knows where it is in the music) and watches the camera:
 - YOLO-pose follows the dancer every frame; the skeleton and captions are drawn on screen.
@@ -53,19 +54,16 @@ NOTES_EVERY = 20.0   # seconds between the director's updates
 LIVE_BRIEF = """You are an expert audio describer for dance, describing a live performance for blind and partially
 sighted listeners as it happens. You see the last few seconds (frames, oldest first, with their times in the song)
 and the pose measurements for that stretch. Say the one thing a blind listener most wants right now.
-NAME THE STEP. If the dancer is doing a figure with a name -- box step, closed change, natural turn, reverse turn --
-say its name (when the measurements and frames support it); that is the single most useful thing you can tell a blind
-listener, and name it again each time it returns. A purely evocative line without the name ("gliding smoothly",
-"a graceful turn") is fine once in a while for colour, but it should be the exception, not the habit. Once a figure is
-named, on its later bars you may add how it feels -- the rise and fall, the sway, the arms, the mood.
-Grace is in the wording, not instead of the facts. When the dancer is still, give the feeling of the stillness --
-gathering himself, waiting for the right moment, letting the music settle, poised to begin -- never a flat "stands
-still" or "frozen".
+When a movement is clearly a named step of this style, say its name (when the measurements and frames
+support it; the style's vocabulary is in the notes), and when it returns, say what is different about it or how it
+feels. Give what a dancer sees: the quality and intention of the movement, not only the mechanics. When the dancer is
+still, say what the stillness holds (its shape, its tension, what it is waiting for), in your own words.
 You may also say nothing. If this phrase only repeats what you have already described and nothing new has happened,
 return null and let the music breathe.
-Rules: 3 to 8 words (a callout on a hit, 2 to 5 words); present tense; directions as the audience sees them ("to the
-left"); only what the measurements and frames support -- never a step, turn, jump, floor work, dip or direction they
-don't show. Return JSON {"line": "..." or null}."""
+Rules: about 4 to 10 words (a callout on a hit can be shorter); one idea; present tense; directions as the audience
+sees them ("to the left"). The pose measurements are a check, not a script: never say a step, turn, jump, floor work,
+dip or direction they don't support, but don't narrate them as numbers or mechanics. Return JSON {"line": "..." or
+null}."""
 
 NOTES_BRIEF = """You are the director of a live audio description of a dance, watching it as it happens. Frames from
 the last stretch are attached (oldest first, times in the song). Update your running notes for the live describer in
@@ -74,22 +72,24 @@ where it lives in the body, its dynamics); recurring motifs and when they return
 still true from your previous notes. Plain text bullets only."""
 
 
-LIVE_SYSTEM = """You are an expert live audio describer for dance, speaking to blind and partially sighted listeners
-while they hear the music. You watch the camera frames as they arrive. Each time you are prompted with "Now", say ONE
-short line (3 to 8 words; a callout on a hit, 2 to 5) about what the dancer just did.
-NAME THE STEP. If the dancer is doing a figure with a name -- box step, closed change, natural turn, reverse turn --
-SAY ITS NAME; that is the single most useful thing for a blind listener, and you name it again each time it returns.
-A purely evocative line without the name ("gliding smoothly", "a graceful turn") is fine once in a while for colour,
-but it should be the exception, not the habit. Once a figure is named, on its later bars you may add how it feels --
-the rise and fall, the sway, the arms, the mood.
-Grace is in the wording, not instead of the facts. When the dancer is still, give the feeling of the stillness --
-gathering himself, waiting for the right moment, letting the music settle, poised to begin -- not a flat "stands still".
-You may say nothing at all: if the "Now" only repeats what you have already said and nothing new has happened, stay
-silent and let the music breathe.
-Directions as the audience sees them. Use the measurements in the prompt and describe ONLY what they and the frames
-show: never a step, turn, jump, floor work, dip or direction they don't support, and if you're told a line was wrong,
-put it right in the next one by simply describing correctly: never apologise or mention the mistake. Don't use the
-exact same words twice in a row. Speak briskly and warmly, like commentary inside the music. Say only the line."""
+LIVE_RULES = """
+
+You are describing live: camera frames arrive as the dancer moves and the music plays. Each time you are prompted with
+"Now", say ONE line about what the dancer just did, short enough to finish inside the gap in the music: about 4 to 10
+words, one idea (a callout on a hit can be shorter). When a movement is clearly a named step of this style, name it
+(the show notes give the style's vocabulary), and when it returns, say what is different about it or how it feels.
+You may say nothing at all: if nothing new has happened, stay silent and let the music breathe.
+Directions as the audience sees them. The pose measurements in each prompt are a check, not a script: never say
+anything they contradict, and don't narrate them as numbers or mechanics. If you're told a line was wrong, put it
+right in the next one by simply describing correctly: never apologise or mention the mistake. Never repeat a line
+you have already said. Speak briskly and warmly, like commentary inside the music. Say only the line."""
+
+
+def live_system() -> str:
+    """The Gemini Live system instruction: the same dancer's-eye brief the script writer uses, the dancer's feedback
+    (feedback/*.md) and the live rules. Shared on purpose: tuning the writer's taste tunes the live narration too."""
+    from scriptwriter import DANCERS_EYE, dancer_feedback
+    return DANCERS_EYE + LIVE_RULES + dancer_feedback()
 
 
 def spoken_text(words):
@@ -118,7 +118,7 @@ class LiveEngine:
 
     async def main(self):
         self.loop, self.queue = asyncio.get_running_loop(), asyncio.Queue()
-        system = LIVE_SYSTEM + (f"\nThe style is {self.live.args.style}." if self.live.args.style else "")
+        system = live_system() + (f"\nThe style is {self.live.args.style}." if self.live.args.style else "")
         if self.live.show_notes:
             system += ("\n\nShow notes, prepared from the studio's rehearsal video of this piece (the song and times "
                        "are the same tonight). Use them to know the style, the vocabulary, what makes this choreography "
@@ -281,7 +281,7 @@ class Live:
                 print(f"glossary unavailable ({type(e).__name__}); Gemini uses its own vocabulary")
         print(f"glossary: {len(self.glossary)} terms")
         self.feedback = ""   # the checker's verdict on the last line, for the next prompt
-        self.plan, self.show_notes, self.moments = None, "", []
+        self.plan, self.show_notes, self.moments, self.script = None, "", [], []
         if args.show:  # show night: the notes the studio prepared earlier, from MongoDB Atlas
             from db import db
             show = db()["shows"].find_one({"name": args.show})
@@ -289,13 +289,15 @@ class Live:
                 raise SystemExit(f"no show called {args.show!r} in Atlas; prepare it with scripts/prepare_show.py")
             self.plan, self.show_notes = show["plan"], show["show_notes"]
             self.moments = [tuple(m) for m in show["key_moments"]]
+            self.script = show.get("script") or []  # older shows have no rehearsal script
             print(f"show notes loaded from Atlas: {args.show}")
         elif args.rehearsal:  # or prepare them now from the studio's rehearsal video
             from show_notes import prepare
-            self.plan, self.moments, self.show_notes = prepare(args.rehearsal, args.style)
+            self.plan, self.moments, self.show_notes, self.script = prepare(args.rehearsal, args.style, self.song_map)
         if self.plan:
             gaps = [g for g in self.song_map["clean_spaces"] if g]
-            print(f"show notes ready: {self.plan['style']['name']}, {len(self.moments)} key moments, {len(gaps)} gaps in the song")
+            print(f"show notes ready: {self.plan['style']['name']}, {len(self.moments)} key moments, "
+                  f"{len(self.script)} rehearsal lines, {len(gaps)} gaps in the song")
         self.engine = LiveEngine(self) if args.engine == "live" else None
 
     # ---------- per frame ----------
@@ -357,13 +359,20 @@ class Live:
             figure = features.get("footwork")
             if figure:  # the figure's name (box step) so the model can name it, but not its mechanics ("...side, close")
                 measured["footwork"] = "box step" if "box" in figure else figure
-            prompt = f"Now ({start:.0f}-{end:.0f} s in the song). Measured: {json.dumps(measured, default=float)}."
+            prompt = (f"Now ({start:.0f}-{end:.0f} s in the song). Pose measurements, a check only (don't contradict "
+                      f"them; don't narrate them): {json.dumps(measured, default=float)}.")
             if self.plan:
                 expected = [what for mt, what in self.moments if start - 2 <= mt <= end + 2]
                 section = next((sec["label"] for sec in self.plan["sections"] if sec["start"] <= end < sec["end"]), "")
                 prompt += (f" In rehearsal this was the section '{section}'"
                            + (f", with: {'; '.join(expected)}" if expected else "")
                            + ". Describe what the dancer actually does now.")
+            near = sorted((abs(line["time"] - end), line["text"]) for line in self.script
+                          if start - 3 <= line["time"] <= end + 2)[:2]
+            if near:
+                prompt += (" In rehearsal around here the describer said: " + " / ".join(f"'{t}'" for _, t in near)
+                           + ". Describe what the dancer does now, with that quality of language; if it's the same "
+                           "movement you may say it that way.")
             if self.feedback:
                 prompt += " " + self.feedback
             if notes and notes != getattr(self, "notes_sent", ""):
@@ -375,7 +384,8 @@ class Live:
         parts = []
         for ft, f in clip:
             parts += [f"{ft:.1f} s:", types.Part.from_bytes(data=f, mime_type="image/jpeg")]
-        context = (f"Pose measurements for {start:.1f}-{end:.1f} s: {json.dumps(features, default=float)}\n"
+        context = (f"Pose measurements for {start:.1f}-{end:.1f} s (a check only: don't contradict them, don't narrate them): "
+                   f"{json.dumps(features, default=float)}\n"
                    f"Already said: {said or 'nothing yet'}\n"
                    f"Director's notes: {notes or 'none yet'}"
                    + (f"\nThe style is {self.args.style}." if self.args.style else "")
