@@ -61,6 +61,8 @@ named, on its later bars you may add how it feels -- the rise and fall, the sway
 Grace is in the wording, not instead of the facts. When the dancer is still, give the feeling of the stillness --
 gathering himself, waiting for the right moment, letting the music settle, poised to begin -- never a flat "stands
 still" or "frozen".
+Dancing a partner dance solo, the dancer holds a frame for an imaginary partner: raised arms held in front are that
+hold, not gestures. The dancer never speaks; screens, slides and furniture behind them are the room, not the dance.
 You may also say nothing. If this phrase only repeats what you have already described and nothing new has happened,
 return null and let the music breathe.
 Rules: 3 to 8 words (a callout on a hit, 2 to 5 words); present tense; directions as the audience sees them ("to the
@@ -84,6 +86,8 @@ but it should be the exception, not the habit. Once a figure is named, on its la
 the rise and fall, the sway, the arms, the mood.
 Grace is in the wording, not instead of the facts. When the dancer is still, give the feeling of the stillness --
 gathering himself, waiting for the right moment, letting the music settle, poised to begin -- not a flat "stands still".
+Dancing a partner dance solo, the dancer holds a frame for an imaginary partner: raised arms held in front are that
+hold, not gestures. The dancer never speaks; screens, slides and furniture behind them are the room, not the dance.
 You may say nothing at all: if the "Now" only repeats what you have already said and nothing new has happened, stay
 silent and let the music breathe.
 Directions as the audience sees them. Use the measurements in the prompt and describe ONLY what they and the frames
