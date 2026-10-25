@@ -1,0 +1,4419 @@
+[
+ {
+  "key": "arcamarine",
+  "id": "cRil1jtScjI",
+  "label": "Aquamarine, Paris Cavanagh choreography",
+  "style": "commercial contemporary / jazz-funk",
+  "start": 0,
+  "end": 63,
+  "review": "At 109% density, the script talked non-stop over the vocals and overlapped itself; several lines also landed slightly late on key hits like the 10 s attitude flick, 20.8 s bass drop, and 30.2 s floor kick. Dropping surplus callouts around the vocal hooks and tightening the remaining lines gives the music room to breathe while preserving every texture shift, hair whip, tutting angle, and floor pose. Several lines were slightly late against the movement hits (the 20.7s bass drop whips, the 30.2s all-fours kick, the 36.0s front split, and the 55.8s upstage turn), and the script missed the rising kneeling reach and crossed-wrist frame at 28s, the crouching staccato hand slices on the vocal accents at 39s, and the wide-stance arm strikes before the hip pulses at 51s. Tightening phrasing and aligning start times to the exact movement initiations captures the sharp-to-fluid texture shifts and arrival poses on beat.",
+  "signature": [
+   "whipping torso and hair throws into sudden freezes: head, hair, neck, and upper torso",
+   "athletic, sensual floorwork on knee pads: hips, legs, knees, and spine",
+   "sharp, geometric arm and hand framing around the head: arms, forearms, wrists, and hands"
+  ],
+  "sections": [
+   {
+    "start": 0.0,
+    "end": 18.8,
+    "label": "Atmospheric Intro",
+    "group": "unison"
+   },
+   {
+    "start": 18.8,
+    "end": 24.5,
+    "label": "Beat Drop & Standing Whip Phrase",
+    "group": "unison"
+   },
+   {
+    "start": 24.5,
+    "end": 40.5,
+    "label": "Floorwork & Splits Sequence",
+    "group": "unison"
+   },
+   {
+    "start": 40.5,
+    "end": 56.5,
+    "label": "Standing Tutting & Groove Section",
+    "group": "unison"
+   },
+   {
+    "start": 56.5,
+    "end": 62.8,
+    "label": "Final Floor Drop & Leg Extension",
+    "group": "unison"
+   }
+  ],
+  "lines": [
+   {
+    "at": 0.8,
+    "text": "Unison lines hold a sultry freeze, right hand framing the tilted head.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/arcamarine-bc9d35af6c.mp3",
+    "status": "spoken",
+    "seconds": 4.2
+   },
+   {
+    "at": 5.2,
+    "text": "Holding angular head frames, they slowly straighten their legs as hands trace down their torsos.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 5.11
+   },
+   {
+    "at": 10.5,
+    "text": "Attitude back flick, whipping into a flat-back fold!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/arcamarine-e38829d713.mp3",
+    "status": "spoken",
+    "seconds": 2.88
+   },
+   {
+    "at": 14.2,
+    "text": "Dropping into a flat-back fold, they slowly arch upright, arms held low.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.9
+   },
+   {
+    "at": 21.2,
+    "text": "Reaching up, they drop into a crouch, then whip their heads and torsos in wide, explosive arcs.",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/arcamarine-b0eb03eb98.mp3",
+    "status": "spoken",
+    "seconds": 5.1
+   },
+   {
+    "at": 25.0,
+    "text": "Dropping to one knee, crossing wrists overhead on both knees, then into a forearm pike with hip pulses.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": null,
+    "status": "no room",
+    "seconds": 5.6
+   },
+   {
+    "at": 30.8,
+    "text": "High kick on all fours, dropping into a chest-down arch.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/arcamarine-ef990383c6.mp3",
+    "status": "spoken",
+    "seconds": 2.51
+   },
+   {
+    "at": 33.5,
+    "text": "Liquid spine waves and hair tosses on all fours.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/arcamarine-df08cb8136.mp3",
+    "status": "spoken",
+    "seconds": 2.81
+   },
+   {
+    "at": 36.5,
+    "text": "Two slow body rolls on all fours, then sliding to a seated lunge with overhead arm circles.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/arcamarine-bb27c30589.mp3",
+    "status": "spoken",
+    "seconds": 4.37
+   },
+   {
+    "at": 41.02,
+    "text": "Kneeling with sharp arm hits and hair whips, rising to a high-V on relevé, hips swaying.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/arcamarine-60b87df614.mp3",
+    "status": "spoken",
+    "seconds": 4.51
+   },
+   {
+    "at": 45.68,
+    "text": "Arms sweep down to frame their heads, wrists flexing and elbows flaring.",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/arcamarine-8ee6abfc28.mp3",
+    "status": "spoken",
+    "seconds": 3.6
+   },
+   {
+    "at": 49.1,
+    "text": "Heavy ragdoll fold and hair whip!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 1.83
+   },
+   {
+    "at": 51.5,
+    "text": "Deep forward fold and body roll up to open arms, then a wide-stance arm whip and sharp chest strikes.",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/arcamarine-954b701277.mp3",
+    "status": "spoken",
+    "seconds": 6.08
+   },
+   {
+    "at": 56.8,
+    "text": "Sweeping turn into a hip drop and hair whip.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": null,
+    "status": "no room",
+    "seconds": 3.11
+   },
+   {
+    "at": 60.1,
+    "text": "Hair whip, high leg extension, then forearm freeze.",
+    "kind": "callout",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/arcamarine-71004943b4.mp3",
+    "status": "spoken",
+    "seconds": 2.71
+   }
+  ]
+ },
+ {
+  "key": "track10",
+  "id": "HA22LboHCww",
+  "label": "Track 10, Paris Cavanagh choreography",
+  "style": "commercial fusion with contemporary and classical Indian dance influences",
+  "start": 0,
+  "end": 41,
+  "review": "The script was over-dense (114% speech) and several lines were late on the movement—notably the 7.5 s contraction called at 8.5 s, the 27.0 s chest-to-head trace called at 27.7 s, and the outro walks and body roll. I tightened every line to leave breathing room for the plucked intro and R&B vocals, dropped the crowded 6.3 s callout, added the 5.0 s open-arm arch and 17.1 s knee hitch, and aligned all cues with the beat. The script was over-dense (89%) and several lines landed late—calling the 7.5 s contraction at 8.5 s, the 26.8 s chest-to-head trace at 27.7 s, and the 33.0 s crossover walks at 34.5 s. Dropping the two late mid-phrase callouts gives the music room to breathe, while shifting the remaining cues onto the movement onset and specifying the attitude-to-side-extension mechanics sharpens the dance eye.",
+  "signature": [
+   "Classical Indian-inspired sculptural arm frames and hand articulations paired with hip-hop bass pulses: arms, wrists, fingers, and hips",
+   "Suspended one-legged balance extending to the side: legs, hips, and framing arms",
+   "Synchronized floor drop into wide-legged arch: full body, spine, legs"
+  ],
+  "sections": [
+   {
+    "start": 0.0,
+    "end": 12.2,
+    "label": "Introductory standing phrases",
+    "group": "Unison throughout."
+   },
+   {
+    "start": 12.2,
+    "end": 23.6,
+    "label": "Beat drop and sculptural balances",
+    "group": "Unison."
+   },
+   {
+    "start": 23.6,
+    "end": 30.2,
+    "label": "Floorwork sequence",
+    "group": "Unison."
+   },
+   {
+    "start": 30.2,
+    "end": 41.0,
+    "label": "Vocal chorus and outro groove",
+    "group": "Unison until 39s, when they relax and walk forward individually."
+   }
+  ],
+  "lines": [
+   {
+    "at": 1.0,
+    "text": "In profile, unison melt, knees bending.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/track10-de8ac8bd1c.mp3",
+    "status": "spoken",
+    "seconds": 2.16
+   },
+   {
+    "at": 3.31,
+    "text": "Arching back, then sinking with flickering wrist rolls.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/track10-206e0b1027.mp3",
+    "status": "spoken",
+    "seconds": 2.89
+   },
+   {
+    "at": 10.3,
+    "text": "Drop and roll up, crossed arms rising.",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 2.13
+   },
+   {
+    "at": 12.5,
+    "text": "Sculpted arm frames, sinking with sharp hip hits.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/track10-0d5448ed72.mp3",
+    "status": "spoken",
+    "seconds": 3.29
+   },
+   {
+    "at": 16.25,
+    "text": "Wide hit, knee hitch, diagonal reach!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/track10-e251bbcb9d.mp3",
+    "status": "spoken",
+    "seconds": 2.18
+   },
+   {
+    "at": 20.75,
+    "text": "Rising on one leg, lifting the other into attitude, one arm framed overhead.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/track10-2524605947.mp3",
+    "status": "spoken (signature)",
+    "seconds": 4.2
+   },
+   {
+    "at": 25.1,
+    "text": "Side leg extension, dropping to a scorpion floor drop and sliding wide.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/track10-3bab1a2f23.mp3",
+    "status": "spoken",
+    "seconds": 4.31
+   },
+   {
+    "at": 30.5,
+    "text": "Sliding right to the floor, rising, turning, knee lifted.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/track10-778dc66f04.mp3",
+    "status": "spoken",
+    "seconds": 3.1
+   },
+   {
+    "at": 33.2,
+    "text": "Pivoting to the front with a body roll, then stepping forward slowly.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.81
+   },
+   {
+    "at": 37.2,
+    "text": "Wrists cross overhead into a liquid body roll.",
+    "kind": "callout",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/track10-1099582b35.mp3",
+    "status": "spoken",
+    "seconds": 3.28
+   }
+  ]
+ },
+ {
+  "key": "ponyboy",
+  "id": "8qm6Pn9kYas",
+  "label": "Ponyboy, Isaiah Southall choreography",
+  "style": "commercial",
+  "start": 0,
+  "end": 24,
+  "review": "The script was over-dense (104%), causing lines to collide and crowd the heavy electronic beat, and the profile wrist-flick callout at 4.0s landed late. Tightening every line creates breathing room for the music while sharpening the timing on the 3.6s wrist flicks and highlighting the texture shift from the 12.3s flexed-wrist freeze and left-to-right canon into fluid profile body rolls. At 87% density the script crowds the beat and several lines start late on the hits (the opening punch, the 3.6 s profile wrist flicks, and the 12.2 s flexed-wrist freeze). Tightening each line and aligning start times to the musical accents preserves every signature frame, canon, and groove while giving the track room to breathe.",
+  "signature": [
+   "Sharp geometric arm framing and flexed-wrist poses: arms, wrists, and hands",
+   "Deep wide-knee squat with rolling torso and head: legs, hips, torso, and head",
+   "Hands-on-hips sassy groove with syncopated hip hits and hair flips: hips, waist, legs, and head"
+  ],
+  "sections": [
+   {
+    "start": 0.0,
+    "end": 9.6,
+    "label": "Intro & First Phrase",
+    "group": "Unison"
+   },
+   {
+    "start": 9.6,
+    "end": 18.0,
+    "label": "Squat Groove & Canon",
+    "group": "Unison with a left-to-right ripple canon at 12.8s - 14.2s"
+   },
+   {
+    "start": 18.0,
+    "end": 24.0,
+    "label": "Hands-on-Hips Groove",
+    "group": "Unison"
+   }
+  ],
+  "lines": [
+   {
+    "at": 1.8,
+    "text": "Five in black pose, punch wide, whip hair.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ponyboy-3c1dd6a14f.mp3",
+    "status": "spoken",
+    "seconds": 2.19
+   },
+   {
+    "at": 4.0,
+    "text": "Profile—three sharp wrist flicks!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 1.87
+   },
+   {
+    "at": 7.6,
+    "text": "Hands in prayer, turn left, and bounce forward!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ponyboy-b4c21267c0.mp3",
+    "status": "spoken",
+    "seconds": 2.09
+   },
+   {
+    "at": 9.84,
+    "text": "Deep wide squat, grinding hips, circling arms.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ponyboy-b433684064.mp3",
+    "status": "spoken",
+    "seconds": 3.38
+   },
+   {
+    "at": 12.6,
+    "text": "Wide plié with arm circles; flexed-wrist freeze, then left-to-right canon turns to profile.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": null,
+    "status": "no room",
+    "seconds": 4.71
+   },
+   {
+    "at": 16.6,
+    "text": "Arms up, hands to head, knee hitch!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ponyboy-14171b148b.mp3",
+    "status": "spoken",
+    "seconds": 1.81
+   },
+   {
+    "at": 18.6,
+    "text": "Face front, high knee lift, arm pump, hands on hips, shoulder shrugs.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ponyboy-d4b9409712.mp3",
+    "status": "spoken",
+    "seconds": 3.63
+   },
+   {
+    "at": 22.38,
+    "text": "Hands on hips, step, roll head!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ponyboy-b5db160aca.mp3",
+    "status": "spoken",
+    "seconds": 1.92
+   }
+  ]
+ },
+ {
+  "key": "vogue-battle",
+  "id": "Jhhd_tEaJEQ",
+  "label": "Streetstar 2013 vogue femme final: Lasseindra vs Inxi",
+  "style": "Vogue Femme",
+  "start": 84,
+  "end": 264,
+  "review": "Removed severe repetition during the mid-battle freeze (where the same stacked pose was described six times across chunk boundaries) and merged overlapping lines in the encore. Tightened wordy dip callouts so they land sharply on the musical crashes and leave breathing room for the Vogue beat and MC countdowns. Several callouts on the signature spin-and-dip slams and final freezes landed a second or two after the musical hit, and a nine-second floorwork passage after Wonder Woman's front split had no narration. I shifted the dip and freeze callouts onto the anticipatory action so they land squarely on the beat, added Wonder Woman's crawling floorwork challenge, and tightened wordy lines so the house beat breathes.",
+  "signature": [
+   "Synchronized and trading spin-and-dip (shablam) slams on the musical 'boom' and 'uh' crashes: whole body, legs, back, and hair",
+   "Theatrical character play and physical dominance using superhero/anime costumes and props: hands, torso, pelvis, and facial expression",
+   "High-heeled knees-and-heels resilience in Sailor Moon's turns and drops: legs, knees, feet, and high-heeled boots"
+  ],
+  "sections": [
+   {
+    "start": 84.0,
+    "end": 129.0,
+    "label": "Wonder Woman Solo",
+    "group": "soloist against a stationary observer"
+   },
+   {
+    "start": 129.0,
+    "end": 206.0,
+    "label": "Head-to-Head Battle Round 1",
+    "group": "two dancers battling simultaneously in close proximity, trading and mirroring moves"
+   },
+   {
+    "start": 206.0,
+    "end": 215.0,
+    "label": "Hold Pose and Crowd Reaction",
+    "group": "stillness in an intertwined partner pose"
+   },
+   {
+    "start": 215.0,
+    "end": 264.0,
+    "label": "Battle Encore withNunchaku Prop",
+    "group": "simultaneous duet battle with prop interaction, ending in a dominant/submissive stacked freeze"
+   }
+  ],
+  "lines": [
+   {
+    "at": 84.25,
+    "text": "Waacking: Wonder Woman solos on one knee, whipping her hair with rapid arm rolls.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/vogue-battle-b8d8839309.mp3",
+    "status": "spoken",
+    "seconds": 3.85
+   },
+   {
+    "at": 88.25,
+    "text": "High kick—slams into a dip on the boom!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-cee5abfae6.mp3",
+    "status": "spoken",
+    "seconds": 2.5
+   },
+   {
+    "at": 91.5,
+    "text": "She drops into a hard fall, quickly gets up, and rolls her forearms.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.51
+   },
+   {
+    "at": 95.2,
+    "text": "Rapid arm rolls and head circles, then a spinning kick into a heavy dip!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-03e52e044d.mp3",
+    "status": "spoken",
+    "seconds": 4.24
+   },
+   {
+    "at": 101.0,
+    "text": "Standing up, she raises her arms and slides into a split!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-6dc74ec0f0.mp3",
+    "status": "spoken",
+    "seconds": 3.34
+   },
+   {
+    "at": 105.5,
+    "text": "Rolling out of the split, she stays grounded, whipping her hair and arching her back.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-c9ba0a8b9d.mp3",
+    "status": "spoken",
+    "seconds": 4.22
+   },
+   {
+    "at": 111.5,
+    "text": "Kneeling near Sailor Moon, she arches back—",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 2.15
+   },
+   {
+    "at": 113.8,
+    "text": "She props up onto one hand.",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 1.83
+   },
+   {
+    "at": 119.0,
+    "text": "Hunches over, stomping her foot and whipping her head as the MC counts.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/vogue-battle-f55476dafe.mp3",
+    "status": "spoken",
+    "seconds": 4.23
+   },
+   {
+    "at": 124.4,
+    "text": "Cheeky skirt flash into a wide squat freeze, locking her gaze.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-885337790c.mp3",
+    "status": "spoken",
+    "seconds": 3.96
+   },
+   {
+    "at": 130.8,
+    "text": "Sailor Moon struts in on black heels.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 2.18
+   },
+   {
+    "at": 133.0,
+    "text": "A dancer dressed as Sailor Moon walks onto the floor, stops, and gestures.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/vogue-battle-9f99ec6df9.mp3",
+    "status": "spoken",
+    "seconds": 4.67
+   },
+   {
+    "at": 139.2,
+    "text": "She whips her arms and spins in fouetté turns on one heel.",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-991b05820b.mp3",
+    "status": "spoken",
+    "seconds": 3.58
+   },
+   {
+    "at": 143.2,
+    "text": "Slams into a dip and sits up, posing on the floor!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/vogue-battle-90b2cc632e.mp3",
+    "status": "spoken",
+    "seconds": 2.6
+   },
+   {
+    "at": 146.0,
+    "text": "Unison high kicks—double dip on the hit!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-01f0865a1a.mp3",
+    "status": "spoken",
+    "seconds": 2.26
+   },
+   {
+    "at": 150.0,
+    "text": "Sailor Moon dips; Wonder Woman steps past, flashing her skirt.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-06583fbc0a.mp3",
+    "status": "spoken",
+    "seconds": 2.81
+   },
+   {
+    "at": 153.0,
+    "text": "High kicks into a unison dip!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 1.83
+   },
+   {
+    "at": 158.0,
+    "text": "Face-off: fluttering skirt against slicing wrist twirls.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 2.8
+   },
+   {
+    "at": 160.0,
+    "text": "Spins and skirt shakes into staggered crashing dips!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-d713aa3b58.mp3",
+    "status": "spoken",
+    "seconds": 2.87
+   },
+   {
+    "at": 164.8,
+    "text": "They stand, Sailor Moon catwalking, framing her eyes, while Wonder Woman follows.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.62
+   },
+   {
+    "at": 168.5,
+    "text": "Wonder Woman dips; Sailor Moon quarter-turns, checks on one heel, then starts a spin",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/vogue-battle-065e6f4b58.mp3",
+    "status": "spoken",
+    "seconds": 4.8
+   },
+   {
+    "at": 173.5,
+    "text": "Floorwork: Wonder Woman rolls over with a high leg; Sailor Moon drops and fans legs.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 5.4
+   },
+   {
+    "at": 179.5,
+    "text": "Wonder Woman stands with rapid arm rolls; Sailor Moon pulls her leg vertical.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-aee222a70c.mp3",
+    "status": "spoken",
+    "seconds": 4.68
+   },
+   {
+    "at": 185.2,
+    "text": "Sailor Moon kicks on the floor, then rises into a bouncing duckwalk.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/vogue-battle-57198708e2.mp3",
+    "status": "spoken",
+    "seconds": 4.25
+   },
+   {
+    "at": 189.8,
+    "text": "Wonder Woman cartwheels onto her back as Sailor Moon spins past!",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/vogue-battle-b4217ad46b.mp3",
+    "status": "spoken",
+    "seconds": 3.34
+   },
+   {
+    "at": 193.5,
+    "text": "Wonder Woman slams into a dip as Sailor Moon whips her pigtails in circles.",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.78
+   },
+   {
+    "at": 197.0,
+    "text": "Both whip their hair, then Sailor Moon hits a dip as Wonder Woman rolls beside her.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-944ac49872.mp3",
+    "status": "spoken",
+    "seconds": 5.48
+   },
+   {
+    "at": 204.2,
+    "text": "Freeze! Seated between Wonder Woman's legs, Sailor Moon frames an anime gaze over her glove.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-183018dea8.mp3",
+    "status": "spoken",
+    "seconds": 5.62
+   },
+   {
+    "at": 211.5,
+    "text": "Pinned underneath with legs knotted, Wonder Woman lounges back, grinning as the crowd roars.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-968803f9bb.mp3",
+    "status": "spoken",
+    "seconds": 5.75
+   },
+   {
+    "at": 232.5,
+    "text": "Beat drops: pinned in Wonder Woman's legs, Sailor Moon waves her gloved hand.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/vogue-battle-6553d6e44e.mp3",
+    "status": "spoken",
+    "seconds": 3.81
+   },
+   {
+    "at": 236.5,
+    "text": "One sits up to thrash her locks while the kneeling dancer slashes figure-eights.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-3d021328e2.mp3",
+    "status": "spoken",
+    "seconds": 4.67
+   },
+   {
+    "at": 241.8,
+    "text": "Wonder Woman rolls away and stands as Sailor Moon dips back on her knees.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.4
+   },
+   {
+    "at": 246.4,
+    "text": "Nunchucks whip overhead as Wonder Woman tornadoes in hopping turns, skirt flaring!",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/vogue-battle-eb3953e8d4.mp3",
+    "status": "spoken",
+    "seconds": 4.35
+   },
+   {
+    "at": 250.9,
+    "text": "Simultaneous shablam—both crash flat on the beat!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/vogue-battle-26ff3654bd.mp3",
+    "status": "spoken",
+    "seconds": 2.84
+   },
+   {
+    "at": 253.8,
+    "text": "Wonder Woman thrashes on all fours; Sailor Moon stalks in, twirling nunchucks.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.22
+   },
+   {
+    "at": 258.2,
+    "text": "Freeze! Sailor Moon poses beside her prone rival, tassels pulled taut overhead, gaze fierce.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/vogue-battle-48e5a5d1af.mp3",
+    "status": "spoken",
+    "seconds": 5.62
+   }
+  ]
+ },
+ {
+  "key": "inxi-solo",
+  "id": "ksRh4fxTLOs",
+  "label": "Streetstar 2013, Inxi: Sailor Moon vogue solo",
+  "style": "Vogue Femme",
+  "start": 0,
+  "end": 63,
+  "review": "The script was far too dense (73%), stacking lines back-to-back without breathing room and talking over the MC's reactions after the battle round ends at 34 seconds. Tightening the phrasing, merging the entrance spin and duckwalk recovery into single lines, and dropping surplus outro lines brings the narration into meter while capturing the second floorwork kick and letting the music and MC shine. Several lines were slightly late against the movement—notably the hand performance at 10.7 s, the skirt lift into the catwalk at 14.5 s, and the dip callout at 28.4 s (which overlapped the 30.4 s recovery line). Tightened and shifted these cues to land squarely on the hits while capturing the pigtail toss, face-framing pose, shoulder kick, and signature Sailor Moon pose.",
+  "signature": [
+   "Character-driven hair play using long costume pigtails as extensions of the arm and head movements: Head, neck, hands, and long blonde pigtails",
+   "Crisp, high-speed hand performance framing the face during forward runway travel: Wrists, fingers, forearms, and upper torso",
+   "High-impact transition from bouncing duckwalk into a full-body floor dip: Whole body, legs, spine, and hips"
+  ],
+  "sections": [
+   {
+    "start": 4.2,
+    "end": 18.0,
+    "label": "Runway Entrance, Hands, and Catwalk",
+    "group": "Soloist performing alone."
+   },
+   {
+    "start": 18.0,
+    "end": 30.2,
+    "label": "Floorwork, Duckwalk, and Dip",
+    "group": "Soloist performing alone."
+   },
+   {
+    "start": 30.2,
+    "end": 54.0,
+    "label": "Recovery, Attitude Poses, and Exit",
+    "group": "Soloist performing alone, interacting with the MC and judges."
+   }
+  ],
+  "lines": [
+   {
+    "at": 4.4,
+    "text": "Vogue Femme as Sailor Moon: entering with a high-knee strut and grabbing her pigtail!",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/inxi-solo-8b7dcbede7.mp3",
+    "status": "spoken",
+    "seconds": 4.88
+   },
+   {
+    "at": 11.2,
+    "text": "Tosses her pigtails into rapid hand performance, gloved wrists framing her face.",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/inxi-solo-464da0d484.mp3",
+    "status": "spoken",
+    "seconds": 3.64
+   },
+   {
+    "at": 15.2,
+    "text": "Cheeky skirt lift into a cross-step catwalk, hands blurring downstage.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/inxi-solo-359620c5e2.mp3",
+    "status": "spoken",
+    "seconds": 3.72
+   },
+   {
+    "at": 18.0,
+    "text": "Struts forward with rapid, swirling arm waves, hops on one leg, and drops to her knee.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": null,
+    "status": "no room",
+    "seconds": 4.48
+   },
+   {
+    "at": 22.5,
+    "text": "Reclining, she kicks her leg and whips her pigtails in circles, then rolls onto all fours.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/inxi-solo-2a96e77f76.mp3",
+    "status": "spoken",
+    "seconds": 3.91
+   },
+   {
+    "at": 26.6,
+    "text": "Bouncing duckwalk, wrists whirling—",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/inxi-solo-9019c6898a.mp3",
+    "status": "spoken",
+    "seconds": 1.72
+   },
+   {
+    "at": 28.9,
+    "text": "Slams into a dip, leg high!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/inxi-solo-48524e22e3.mp3",
+    "status": "spoken",
+    "seconds": 2.0
+   },
+   {
+    "at": 30.4,
+    "text": "Duckwalks forward with fast arms, then rises and slams into a dip.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": null,
+    "status": "no room",
+    "seconds": 4.33
+   },
+   {
+    "at": 43.5,
+    "text": "Faces front in a signature Sailor Moon pose, hand on hip, pigtail held wide.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/inxi-solo-ebb1de6203.mp3",
+    "status": "spoken",
+    "seconds": 4.2
+   }
+  ]
+ },
+ {
+  "key": "leiomy",
+  "id": "pm9emJoXvH0",
+  "label": "Streetstar 2013, Leiomy: vogue femme solo",
+  "style": "vogue femme",
+  "start": 0,
+  "end": 101,
+  "review": "The script had good vogue femme vocabulary and caught the hair, hand, and dip motifs, but at 81% density several lines collided and key hits—the T-freeze at 25.1 s and the spin-into-dip slams at 37.0 s, 55.5 s, and 66.5 s—were called late after the movement had already happened. I consolidated overlapping spin-and-dip pairs and floorwork lines so every freeze and dip lands on the beat with breathing room for the ballroom MC and house track. The script suffers from 'word salad' (68% density with 12-to-17-word lines that talk over the MC and house beat) and several late timestamps—most notably the 64.2 s traveling spins into the fourth dip being placed at 66.5 s (after she has already hit the floor and colliding with 67.8 s), the 15.0 s arm circles placed at 17.5 s, and the 23.0 s forearm rolls placed at 24.8 s. Tightening each line to one crisp idea and aligning timestamps with the start of each move fixes the timing and gives the music room to breathe.",
+  "signature": [
+   "dramatic, gravity-defying dips in stiletto heels: full body, back, shoulders, and high-kicking legs",
+   "whipping hair tosses integrated into kneeling floorwork and duckwalks: head, neck, and long dark hair",
+   "rapid-fire symmetrical hand performance: wrists, hands, and forearms"
+  ],
+  "sections": [
+   {
+    "start": 11.4,
+    "end": 20.0,
+    "label": "Entrance and Posing",
+    "group": "solo"
+   },
+   {
+    "start": 20.0,
+    "end": 34.8,
+    "label": "Hands and Arms Control",
+    "group": "solo"
+   },
+   {
+    "start": 34.8,
+    "end": 47.0,
+    "label": "First Spin, Dip, and Duckwalk",
+    "group": "solo"
+   },
+   {
+    "start": 47.0,
+    "end": 58.0,
+    "label": "Floor Performance and Third Dip",
+    "group": "solo"
+   },
+   {
+    "start": 58.0,
+    "end": 67.5,
+    "label": "Seductive Catwalk and Fourth Dip",
+    "group": "solo"
+   },
+   {
+    "start": 67.5,
+    "end": 83.0,
+    "label": "Intense Floor Performance",
+    "group": "solo"
+   },
+   {
+    "start": 83.0,
+    "end": 93.5,
+    "label": "Exit Catwalk",
+    "group": "solo"
+   }
+  ],
+  "lines": [
+   {
+    "at": 12.0,
+    "text": "Vogue femme solo: a hip-swaying stiletto catwalk, fluffing her curls.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/leiomy-01d2aee723.mp3",
+    "status": "spoken",
+    "seconds": 4.11
+   },
+   {
+    "at": 17.5,
+    "text": "Whipping arm circles suspend into an arched hold.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/leiomy-a3f7674402.mp3",
+    "status": "spoken",
+    "seconds": 2.38
+   },
+   {
+    "at": 20.03,
+    "text": "Arms sweep overhead as her head tilts back, then fingers trace her collarbones.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/leiomy-cccc016cb8.mp3",
+    "status": "spoken",
+    "seconds": 4.61
+   },
+   {
+    "at": 24.8,
+    "text": "Fast wrist rolls transition into rapid overhead arm rolls, extending wide to the sides!",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/leiomy-33195870cb.mp3",
+    "status": "spoken",
+    "seconds": 3.93
+   },
+   {
+    "at": 28.8,
+    "text": "Sharp arm lines, then she unleashes her hair, pivoting with circular hair whips and arm whacks!",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.85
+   },
+   {
+    "at": 34.8,
+    "text": "Furious arm rolls and hair whips in stilettos, then whirling into fast spins.",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/leiomy-aeab39b435.mp3",
+    "status": "spoken",
+    "seconds": 3.95
+   },
+   {
+    "at": 39.2,
+    "text": "Bouncing duckwalk on her heels, hands flaring.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/leiomy-8012e6f2b3.mp3",
+    "status": "spoken",
+    "seconds": 2.52
+   },
+   {
+    "at": 44.6,
+    "text": "Split leap, suspending a high kick into a dip!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/leiomy-df34e602e6.mp3",
+    "status": "spoken",
+    "seconds": 2.41
+   },
+   {
+    "at": 47.2,
+    "text": "Drops to the floor and onto all fours, whipping her hair.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/leiomy-d2152684e2.mp3",
+    "status": "spoken",
+    "seconds": 3.19
+   },
+   {
+    "at": 52.6,
+    "text": "Whips her hair while rolling onto her back, then kicks her legs up into a backward shoulder-roll.",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/leiomy-c6423af74f.mp3",
+    "status": "spoken",
+    "seconds": 5.15
+   },
+   {
+    "at": 58.5,
+    "text": "Kneels with a body roll, squats, then stands, pulling her dress down.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/leiomy-002baa557c.mp3",
+    "status": "spoken",
+    "seconds": 4.36
+   },
+   {
+    "at": 66.5,
+    "text": "Fast spins—slamming into a dip!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 1.83
+   },
+   {
+    "at": 67.8,
+    "text": "On hands and knees, whipping her hair in fierce circles.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/leiomy-231e8e0812.mp3",
+    "status": "spoken",
+    "seconds": 3.6
+   },
+   {
+    "at": 77.5,
+    "text": "Drops flat on her back, right knee cocked, arm flung wide.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/leiomy-5c4f918869.mp3",
+    "status": "spoken",
+    "seconds": 4.18
+   },
+   {
+    "at": 83.5,
+    "text": "Rising into a light, bouncy catwalk.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/leiomy-891458d178.mp3",
+    "status": "spoken",
+    "seconds": 2.16
+   },
+   {
+    "at": 87.5,
+    "text": "Right arm high in a final diva pose.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/leiomy-ef6bcca3f1.mp3",
+    "status": "spoken",
+    "seconds": 3.12
+   }
+  ]
+ },
+ {
+  "key": "saumya",
+  "id": "4fzJBU7HRno",
+  "label": "Saumya, Red Bull Dance Your Style 2024",
+  "style": "Fusion (Waacking, Vogue, Bharatanatyam, and Hip-Hop/Grooves)",
+  "start": 0,
+  "end": 180,
+  "review": "The script captured the Bharatanatyam-street fusion well, but at 82% density it talked non-stop over the music, had a few late callouts (like the side kick at 152.8s), and misgendered her female opponent at the end. I trimmed surplus lines to let the R&B and house tracks breathe, merged back-to-back fragments into single musical phrases, and aligned the kick and final battle exchange to the beat. The script was overly dense at 68% speech, talking over key vocal phrases and overusing the word 'mudra' almost every line. I trimmed surplus lines to let the R&B and house tracks breathe, varied the technical vocabulary, and tightened the timing on the split drops, classical balance, namaste embrace, and final crunk kick.",
+  "signature": [
+   "Seamless fusion of Bharatanatyam mudras and neck isolations with street/club styles: Hands, fingers, head, neck, and knees (deep turned-out pliés)",
+   "Extreme spinal flexibility and effortless floor-to-standing transitions: Spine, torso, hips, and legs",
+   "Playful prop control and musical theatricality: Head, posture, and arms"
+  ],
+  "sections": [
+   {
+    "start": 0.0,
+    "end": 94.0,
+    "label": "Round 1: Slow R&B Fusion Battle Round",
+    "group": "Soloist performing a battle round while the opponent watches from the side."
+   },
+   {
+    "start": 94.0,
+    "end": 167.8,
+    "label": "Round 2: House / Dance-Pop Fusion Battle Round",
+    "group": "Soloist performing a battle round; at 163.0s both dancers walk to center and embrace."
+   },
+   {
+    "start": 167.8,
+    "end": 180.0,
+    "label": "Round 3: High-Energy Hip-Hop / Crunk Battle Round",
+    "group": "Soloist engaging directly with the stationary opponent at close range."
+   }
+  ],
+  "lines": [
+   {
+    "at": 0.5,
+    "text": "Solo fusion battle; she walks forward onto the stage.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-f98e90a1c1.mp3",
+    "status": "spoken",
+    "seconds": 3.27
+   },
+   {
+    "at": 6.0,
+    "text": "Holds the can high, hips grooving as she steps around.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-6279b29f84.mp3",
+    "status": "spoken",
+    "seconds": 3.18
+   },
+   {
+    "at": 11.5,
+    "text": "Turns with the can on her head, lowering into a wide lunge to set it down.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/saumya-08185dab7e.mp3",
+    "status": "spoken",
+    "seconds": 4.95
+   },
+   {
+    "at": 21.0,
+    "text": "Arm high in a mudra, sharp chest and hip pops.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-bb6fb68d12.mp3",
+    "status": "spoken",
+    "seconds": 3.28
+   },
+   {
+    "at": 27.5,
+    "text": "Slides slowly into a full split on the vocal swell, whipping her arm overhead!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-5c89f5186c.mp3",
+    "status": "spoken",
+    "seconds": 5.04
+   },
+   {
+    "at": 40.2,
+    "text": "Deep hinged backbend on the high note, hand fluttering overhead.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-cb2787fb91.mp3",
+    "status": "spoken",
+    "seconds": 4.12
+   },
+   {
+    "at": 45.2,
+    "text": "Holds a low back-lean with tiny head ticks, then rises into staccato arm ticks.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-c7c742ef25.mp3",
+    "status": "spoken",
+    "seconds": 5.05
+   },
+   {
+    "at": 53.6,
+    "text": "Wide stance with fluid torso rolls, stepping into a sweeping turn!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-146af4ae5c.mp3",
+    "status": "spoken",
+    "seconds": 3.97
+   },
+   {
+    "at": 59.2,
+    "text": "Reaches high on the vocal belt, torso shimmering.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-da2816d6f7.mp3",
+    "status": "spoken",
+    "seconds": 3.2
+   },
+   {
+    "at": 64.5,
+    "text": "Waacking arm rolls melt into a low, leaning crouch.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-51ecbf82f2.mp3",
+    "status": "spoken",
+    "seconds": 3.71
+   },
+   {
+    "at": 75.8,
+    "text": "Holds a diagonal arm line, hitting sharp chest pops and ticks.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/saumya-4938805597.mp3",
+    "status": "spoken",
+    "seconds": 3.51
+   },
+   {
+    "at": 79.5,
+    "text": "One-legged classical pose, stepping around with rapid neck slides!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-561d8f971e.mp3",
+    "status": "spoken",
+    "seconds": 3.35
+   },
+   {
+    "at": 85.2,
+    "text": "Spins to face the can, squats over it, and rapidly twirls her wrists.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/saumya-3ab569ad86.mp3",
+    "status": "spoken",
+    "seconds": 4.14
+   },
+   {
+    "at": 94.8,
+    "text": "Upbeat track; she leans back with one arm raised high, then slowly straightens up.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-41a670972a.mp3",
+    "status": "spoken",
+    "seconds": 4.68
+   },
+   {
+    "at": 107.8,
+    "text": "Wide arched lunge, diagonal arms framing her face!",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-13d82cbc5f.mp3",
+    "status": "spoken",
+    "seconds": 2.89
+   },
+   {
+    "at": 119.8,
+    "text": "Slides into a center split, wrists twirling as her arms lower.",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-038733fe6d.mp3",
+    "status": "spoken",
+    "seconds": 3.96
+   },
+   {
+    "at": 124.5,
+    "text": "Lies flat on her back, arching her hips as her hands twirl upward.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 5.01
+   },
+   {
+    "at": 129.8,
+    "text": "Pivots on her shoulders, rising slowly through a deep backbend.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-0085935400.mp3",
+    "status": "spoken",
+    "seconds": 3.94
+   },
+   {
+    "at": 134.0,
+    "text": "Rises into an overhead frame with a sharp neck slide!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-a3d52cf13f.mp3",
+    "status": "spoken",
+    "seconds": 3.35
+   },
+   {
+    "at": 140.5,
+    "text": "Teases her rival with fluttering wrists and a playful stance.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/saumya-08fc77e7e1.mp3",
+    "status": "spoken",
+    "seconds": 3.51
+   },
+   {
+    "at": 146.0,
+    "text": "Chorus groove: arms high, overhead wraps and hip sways.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/saumya-10407781d8.mp3",
+    "status": "spoken",
+    "seconds": 3.25
+   },
+   {
+    "at": 152.8,
+    "text": "Quick kick and spin, rolling her arms and blowing a kiss.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/saumya-e365f1445c.mp3",
+    "status": "spoken",
+    "seconds": 3.49
+   },
+   {
+    "at": 164.8,
+    "text": "Brings her palms together, then lifts her rival in an embrace.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-e596952bbc.mp3",
+    "status": "spoken",
+    "seconds": 3.01
+   },
+   {
+    "at": 168.0,
+    "text": "New track drops; she steps out, pauses, and turns toward her opponent.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-44d9017ad4.mp3",
+    "status": "spoken",
+    "seconds": 4.31
+   },
+   {
+    "at": 175.7,
+    "text": "Spins and charges in—high front kick, then leans back, gesturing!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/saumya-fe8c752c12.mp3",
+    "status": "spoken",
+    "seconds": 3.22
+   },
+   {
+    "at": 178.5,
+    "text": "Rapid piston punches land!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 1.47
+   }
+  ]
+ },
+ {
+  "key": "ballet",
+  "id": "-yL2X-jkmCk",
+  "label": "Prix de Lausanne 2026, Dayeon Yeom: classical variation",
+  "style": "ballet",
+  "start": 0,
+  "end": 133,
+  "review": "Fixed late and mistimed lines in the opening développés (17–35 s) and the arabesque-to-attitude toe-tap sequence (42–59 s, where the second and third arabesques at 48.7 s and 54.2 s were called several seconds late during the attitude taps). Corrected 'piqué turns' at 58.8 s to pirouettes en dehors from fourth position, removed repetitive phrasing in the playful traveling section (79.5 s) and the duplicate kneeling-pose description at 114.0 s, and tightened pacing so the music can breathe. Fixed a technical error at 58.8 s where repeating piqué en dedans turns were misdescribed as pirouettes from fourth position, and corrected late timings on the opening piqué retiré (19.6 s), first arabesque and attitude toe-tap (42.1 s, 45.5 s), third double pirouette (81.4 s), vertical tambourine kicks (99.6 s), and grand jeté (109.5 s). Tightened phrasing throughout and dropped the 114.0 s applause line so the music and ovation have room to breathe.",
+  "signature": [
+   "Rhythmic tambourine strikes and shakes integrated into classical port de bras—tapping the tambourine with the hand, elbow, hip, and toes: hands, arms, torso, and feet",
+   "Suspended high leg extensions (developpes to the side and arabesques) held effortlessly on pointe during musical pauses: legs, hips, and supporting foot en pointe",
+   "Repeated high releve kicks where the pointed right foot rises to strike the tambourine held high in the right hand: legs, feet, and extended arms",
+   "Multi-revolution pirouettes timed to orchestral drumrolls, finishing with a clean, unhurried open pose: whole body spinning on one pointed foot, arms rounded"
+  ],
+  "sections": [
+   {
+    "start": 0.0,
+    "end": 17.0,
+    "label": "Entrance and Preparation",
+    "group": "solo"
+   },
+   {
+    "start": 17.0,
+    "end": 34.8,
+    "label": "Opening Theme: Tambourine Accents and Developpes",
+    "group": "solo"
+   },
+   {
+    "start": 34.8,
+    "end": 41.5,
+    "label": "First Pirouette Sequence",
+    "group": "solo"
+   },
+   {
+    "start": 41.5,
+    "end": 58.6,
+    "label": "Arabesques and Attitude Balances",
+    "group": "solo"
+   },
+   {
+    "start": 58.6,
+    "end": 66.8,
+    "label": "Second Pirouette Sequence",
+    "group": "solo"
+   },
+   {
+    "start": 66.8,
+    "end": 89.8,
+    "label": "Playful Travelling Footwork and Turns",
+    "group": "solo"
+   },
+   {
+    "start": 89.8,
+    "end": 105.0,
+    "label": "Coda Build: Tambourine Kick Series",
+    "group": "solo"
+   },
+   {
+    "start": 105.0,
+    "end": 114.0,
+    "label": "Finale: Diagonal Turns, Grand Jete, and Final Pose",
+    "group": "solo"
+   },
+   {
+    "start": 114.0,
+    "end": 133.0,
+    "label": "Bows and Exit",
+    "group": "solo"
+   }
+  ],
+  "lines": [
+   {
+    "at": 0.8,
+    "text": "Classical ballet, La Esmeralda: soloist in black-and-red bodice, poised in the wings.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-93c580d355.mp3",
+    "status": "spoken",
+    "seconds": 4.94
+   },
+   {
+    "at": 9.5,
+    "text": "Tambourine in hand, she walks onstage into starting position.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballet-4f4ed4ce3e.mp3",
+    "status": "spoken",
+    "seconds": 3.71
+   },
+   {
+    "at": 15.0,
+    "text": "Walks right, poses in croisé tendu.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballet-bdacb57ac8.mp3",
+    "status": "spoken",
+    "seconds": 2.12
+   },
+   {
+    "at": 17.27,
+    "text": "She poses with a fan raised overhead, then snaps it down, stepping onto pointe.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-2c742519d7.mp3",
+    "status": "spoken",
+    "seconds": 4.6
+   },
+   {
+    "at": 22.02,
+    "text": "Retiré balance, tambourine shimmering, into a high side développé, closing fifth.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-40268a35d4.mp3",
+    "status": "spoken",
+    "seconds": 3.97
+   },
+   {
+    "at": 25.5,
+    "text": "Another held piqué retiré on pointe, shaking the tambourine!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.25
+   },
+   {
+    "at": 32.8,
+    "text": "Third high d'velopp', tapping the tambourine!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballet-18978e4945.mp3",
+    "status": "spoken",
+    "seconds": 2.21
+   },
+   {
+    "at": 35.16,
+    "text": "A high kick to tap the tambourine with her toe, then a piqué en dedans turn.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-b5b5eae357.mp3",
+    "status": "spoken",
+    "seconds": 4.11
+   },
+   {
+    "at": 39.42,
+    "text": "A double pirouette into fourth, then a whipped triple on the drumroll!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballet-eca311db0c.mp3",
+    "status": "spoken",
+    "seconds": 3.6
+   },
+   {
+    "at": 43.2,
+    "text": "Lyrical now, stepping onto pointe into a suspended first arabesque.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-47096e7edd.mp3",
+    "status": "spoken",
+    "seconds": 3.98
+   },
+   {
+    "at": 46.8,
+    "text": "Balancing en pointe, she brings the tambourine to her shoulder and holds an arabesque.",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.79
+   },
+   {
+    "at": 53.8,
+    "text": "Balancing on pointe in passé, she taps the tambourine and steps into a high arabesque.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballet-0b5790cc38.mp3",
+    "status": "spoken",
+    "seconds": 4.8
+   },
+   {
+    "at": 58.8,
+    "text": "She kicks back to tap the tambourine, then tiptoes, shaking it.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-d6fe0efc49.mp3",
+    "status": "spoken",
+    "seconds": 3.95
+   },
+   {
+    "at": 63.6,
+    "text": "Double pirouette, brief pause, then into a fast multiple pirouette on the drumroll!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-efcb91bce5.mp3",
+    "status": "spoken",
+    "seconds": 3.73
+   },
+   {
+    "at": 66.8,
+    "text": "She finishes a fast pirouette on pointe, opening her arms wide.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": null,
+    "status": "no room",
+    "seconds": 3.41
+   },
+   {
+    "at": 70.4,
+    "text": "She pauses on pointe, then executes a crisp double pirouette.",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballet-15c169857f.mp3",
+    "status": "spoken",
+    "seconds": 3.19
+   },
+   {
+    "at": 73.8,
+    "text": "Turns slowly while hitting a tambourine, rises on pointe, then steps into a pose.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 5.05
+   },
+   {
+    "at": 82.2,
+    "text": "Third double pirouette, then crowning her arms in fifth.",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-62d20f2ea6.mp3",
+    "status": "spoken",
+    "seconds": 2.73
+   },
+   {
+    "at": 85.8,
+    "text": "Double pirouette into fifth en pointe, kicks left leg into attitude en pointe.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-c708a0b39b.mp3",
+    "status": "spoken",
+    "seconds": 4.88
+   },
+   {
+    "at": 90.9,
+    "text": "Hand on hip, stepping onto right pointe to kick the tambourine.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-fdb6f52fff.mp3",
+    "status": "spoken",
+    "seconds": 3.51
+   },
+   {
+    "at": 94.6,
+    "text": "Folding through retiré in plié, she fires each kick on the beat.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.14
+   },
+   {
+    "at": 100.2,
+    "text": "Left arm sweeps high, kicking near-vertical to the raised tambourine!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-da653b6488.mp3",
+    "status": "spoken",
+    "seconds": 3.09
+   },
+   {
+    "at": 103.5,
+    "text": "On pointe, floats leg down.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballet-695b16aa9a.mp3",
+    "status": "spoken",
+    "seconds": 1.51
+   },
+   {
+    "at": 105.2,
+    "text": "She taps the tambourine again with a high kick, steps en pointe, and prepares to turn.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-1b04447a2f.mp3",
+    "status": "spoken",
+    "seconds": 4.61
+   },
+   {
+    "at": 110.0,
+    "text": "Soaring grand jeté in full split!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballet-c94a17ab57.mp3",
+    "status": "spoken",
+    "seconds": 1.9
+   },
+   {
+    "at": 112.05,
+    "text": "Sinks to one knee, leg extended wide, tambourine snapped high, beaming.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballet-98401d4b12.mp3",
+    "status": "spoken",
+    "seconds": 4.53
+   },
+   {
+    "at": 120.5,
+    "text": "Walking to center, she opens her arms wide, then crowns them overhead, radiant.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.31
+   },
+   {
+    "at": 125.0,
+    "text": "Opening her arms wide, she sinks into a deep kneeling révérence, tambourine at her shoulder.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballet-dfa4094ed5.mp3",
+    "status": "spoken",
+    "seconds": 5.4
+   }
+  ]
+ },
+ {
+  "key": "contemporary",
+  "id": "rY9PDSfEjUk",
+  "label": "Prix de Lausanne 2023, Ana Luisa Negrão: contemporary",
+  "style": "contemporary ballet",
+  "start": 0,
+  "end": 159,
+  "review": "The script was far too dense (82% speech) for a lyrical piano-and-strings piece, repeated 'Contemporary ballet solo' and 'walks calmly', and had several technical and timing errors: calling the 58 s arabesque and 87 s lateral reach 'side tilts', misidentifying the left-leg tilt at 122 s as the right leg, and narrating the fourth tilt at 125.8 s after she had already dropped to her knee. I trimmed redundant lines so the music can breathe and aligned the extensions, grand jeté, and center split with their exact peaks. The script captures the contemporary ballet vocabulary well, but several lines land 1–2 seconds after the movement has already peaked (the figure-four balance at 56.5 s, the lunge into the past-vertical tilt at 97.8 s, the floor dive into center split at 128.5 s, and the final seated fold and uncurl at 141.2 s), and the 67% density crowds the solo violin and cello phrases—especially during the first standing section and the 118–126 s alternating tilt climax, where a split sentence talks over the entire crescendo. Tightening overlapping lines and shifting late cues onto the movement initiation lets the music breathe while hitting every extension, leap, and texture shift on the beat.",
+  "signature": [
+   "Bookended cross-legged floor meditation with circular head rolls and vertical arm reach: head, neck, spine, and arms while seated cross-legged",
+   "Extreme 180-degree side leg extensions (tilts) melting directly into off-balance torso drops: legs, hips, and cambré torso",
+   "Deep forward spinal fold with arms dangling or sweeping overhead while standing: torso, spine, and arms"
+  ],
+  "sections": [
+   {
+    "start": 0,
+    "end": 26,
+    "label": "Entrance and Opening Pose",
+    "group": "soloist"
+   },
+   {
+    "start": 26,
+    "end": 51,
+    "label": "Seated Torso and Port de Bras Awakening",
+    "group": "soloist"
+   },
+   {
+    "start": 51,
+    "end": 80,
+    "label": "First Standing Phrase and Floor Descent",
+    "group": "soloist"
+   },
+   {
+    "start": 80,
+    "end": 112,
+    "label": "Central Travelling Phrase, Extensions, and Grand Jeté",
+    "group": "soloist"
+   },
+   {
+    "start": 112,
+    "end": 135,
+    "label": "Climactic Extensions and Floor Split Sequence",
+    "group": "soloist"
+   },
+   {
+    "start": 135,
+    "end": 159,
+    "label": "Resolution and Curtain Call",
+    "group": "soloist"
+   }
+  ],
+  "lines": [
+   {
+    "at": 1.0,
+    "text": "Contemporary ballet solo; in a beige tunic, she waits poised in the wing.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-a4d2606c2f.mp3",
+    "status": "spoken",
+    "seconds": 4.9
+   },
+   {
+    "at": 22.5,
+    "text": "At center stage, she sinks cross-legged, spine curved and head bowed low.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-7b213d5c82.mp3",
+    "status": "spoken",
+    "seconds": 3.39
+   },
+   {
+    "at": 26.04,
+    "text": "Seated cross-legged with head bowed, she slowly tilts her head to the side as a piano chord sounds.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-90326011ac.mp3",
+    "status": "spoken",
+    "seconds": 6.34
+   },
+   {
+    "at": 37.0,
+    "text": "She folds forward over her right leg, then her right arm sweeps high into a side arch.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-265b51b00d.mp3",
+    "status": "spoken",
+    "seconds": 5.02
+   },
+   {
+    "at": 47.6,
+    "text": "She folds forward, then uncurls, sweeping her arms overhead and out to the sides.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-ee0beb8c24.mp3",
+    "status": "spoken",
+    "seconds": 5.62
+   },
+   {
+    "at": 57.8,
+    "text": "A front kick folds into a figure-four balance, unfolding into a soaring arabesque.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-f6f9ca06a7.mp3",
+    "status": "spoken",
+    "seconds": 4.51
+   },
+   {
+    "at": 62.5,
+    "text": "From a wide second-position pli\u0019, she rolls her chest and head with undulating arms.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.1
+   },
+   {
+    "at": 66.8,
+    "text": "Angular lunge freeze, wrists flexed and head cocked.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/contemporary-209e8eb8fa.mp3",
+    "status": "spoken",
+    "seconds": 3.27
+   },
+   {
+    "at": 71.8,
+    "text": "Arms open wide, arching back before kicking into a high off-axis side tilt.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/contemporary-9afd7a4429.mp3",
+    "status": "spoken",
+    "seconds": 4.68
+   },
+   {
+    "at": 85.8,
+    "text": "Heavy forward fold, uncurling into a wide second-position plié and lateral reach.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/contemporary-7b391a7f40.mp3",
+    "status": "spoken",
+    "seconds": 4.94
+   },
+   {
+    "at": 92.2,
+    "text": "Spinning bourrées on demi-pointe, wrists drooping softly.",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/contemporary-025b0c3407.mp3",
+    "status": "spoken",
+    "seconds": 2.9
+   },
+   {
+    "at": 99.4,
+    "text": "From a forward fold, she unfolds a high side extension.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-b3644a5d40.mp3",
+    "status": "spoken",
+    "seconds": 2.81
+   },
+   {
+    "at": 102.36,
+    "text": "Soaring grand jeté in full split, head arched back!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-badfa360aa.mp3",
+    "status": "spoken",
+    "seconds": 3.24
+   },
+   {
+    "at": 106.0,
+    "text": "Rapid attitude pirouettes, melting into a back arch.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-38a98df0c0.mp3",
+    "status": "spoken",
+    "seconds": 2.89
+   },
+   {
+    "at": 112.5,
+    "text": "Dropping into a heavy fold, she uncurls with doll-like arm isolations on flat feet.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-f14c608219.mp3",
+    "status": "spoken",
+    "seconds": 5.27
+   },
+   {
+    "at": 118.5,
+    "text": "She arches back, folds forward, and slowly lifts her right leg into a vertical extension.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-9a7c3c00f4.mp3",
+    "status": "spoken",
+    "seconds": 5.41
+   },
+   {
+    "at": 130.0,
+    "text": "Diving from a kneeling arch, she presses into a wide center split.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-d5caab7e3e.mp3",
+    "status": "spoken",
+    "seconds": 3.35
+   },
+   {
+    "at": 133.5,
+    "text": "Shoulder roll, right leg shooting skyward!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 2.09
+   },
+   {
+    "at": 135.5,
+    "text": "Rolling over to sit cross-legged again, her head tilts down in quiet, weightless release.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-e333e8c5f9.mp3",
+    "status": "spoken",
+    "seconds": 5.74
+   },
+   {
+    "at": 143.1,
+    "text": "Folding over her legs, she uncurls to reach both arms high overhead, palms facing forward.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/contemporary-2ec95f7c48.mp3",
+    "status": "spoken",
+    "seconds": 6.17
+   },
+   {
+    "at": 153.5,
+    "text": "She rises to center, lifts a gracious arm, and bows deeply.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.2
+   }
+  ]
+ },
+ {
+  "key": "waacking",
+  "id": "7StkcBL1jp4",
+  "label": "Red Bull Dance Your Style 2025: Hirokoboogie vs Waackxxxy",
+  "style": "street dance battle (waacking vs. hip-hop/popping/breaking)",
+  "start": 0,
+  "end": 180,
+  "review": "The script was overly dense at 86%, talking over the MC countdowns and chorus grooves, and missed a few key technical details: the rapid criss-cross footwork at 54s, the low leg sweep before the tuck jump at 58s, and the correct arm (right arm, not left) extending for the wrist flicks at 154s. I dropped ten surplus lines to let the music breathe and tightened the remaining descriptions to highlight the footwork, floorwork, and sharp waacking lines. The script was too dense at 63%, talking over the music and crowd countdowns, and had several late callouts and limb errors (mistaking the left arm for the right at 154s and missing the right ankle-hold at 110.5s). I trimmed surplus lines to let the funk grooves and Spice Girls chorus breathe, merged split descriptions of single phrases, and aligned callouts precisely with the kicks, ankle-hold hops, and robotic rise.",
+  "signature": [
+   "Whip-fast overhead waacking arm rolls stopping dead in an elongated, statuesque pose on the musical accent: arms, shoulders, wrists, and torso",
+   "Deep, wide-stance grounded grooves with staccato robotic arm and neck isolations: legs in wide plié/squat, chest, neck, and forearms",
+   "Athletic one-legged balance holding the ankle while hopping in a circle and kicking: standing right leg, lifted left leg held by left hand, right arm counterbalancing",
+   "Theatrical, lip-synced character work and fearless full-body drops to the stage floor: whole body, face, and expressive hands"
+  ],
+  "sections": [
+   {
+    "start": 0.0,
+    "end": 72.0,
+    "label": "Round 1: Dancer 1 (Orange Top) - Waacking & Grooves",
+    "group": "Soloist against the watching crowd; trading rounds format."
+   },
+   {
+    "start": 72.0,
+    "end": 127.0,
+    "label": "Round 1: Dancer 2 (Black Outfit) - Hip-Hop, Popping & Floorwork",
+    "group": "Soloist performing her round while opponent watches from the side."
+   },
+   {
+    "start": 127.0,
+    "end": 180.0,
+    "label": "Round 2: Dancer 1 (Orange Top) - High-Speed Waacking to 'Wannabe'",
+    "group": "Soloist engaging directly with her opponent in a face-to-face call-out before returning to center."
+   }
+  ],
+  "lines": [
+   {
+    "at": 1.5,
+    "text": "Soloist in orange claims the floor, bouncing into a loose hip-hop groove.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-8e7147a8e1.mp3",
+    "status": "spoken",
+    "seconds": 4.32
+   },
+   {
+    "at": 7.5,
+    "text": "Facing front, rapid chest-level arm rolls snap into staccato points.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/waacking-f17607536a.mp3",
+    "status": "spoken",
+    "seconds": 3.6
+   },
+   {
+    "at": 14.0,
+    "text": "Slowly raises her right arm high, hip cocked.",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-e4fd69a171.mp3",
+    "status": "spoken",
+    "seconds": 2.89
+   },
+   {
+    "at": 24.0,
+    "text": "Sharp chest pops and side points, freezing to glance over her shoulder.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/waacking-41028ac434.mp3",
+    "status": "spoken",
+    "seconds": 4.1
+   },
+   {
+    "at": 29.2,
+    "text": "Sharp wrist rolls and arm hits over steady footwork.",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 2.73
+   },
+   {
+    "at": 32.2,
+    "text": "Explosive high kick, torso leaning in!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/waacking-06a5da525b.mp3",
+    "status": "spoken",
+    "seconds": 2.13
+   },
+   {
+    "at": 41.6,
+    "text": "She lifts her right knee twice, then pivots to face front with quick, hopping steps.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-40f866decf.mp3",
+    "status": "spoken",
+    "seconds": 4.59
+   },
+   {
+    "at": 47.2,
+    "text": "Sharp side point with the left arm, then she rolls her wrists with a rhythmic bounce.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/waacking-b084e4a74b.mp3",
+    "status": "spoken",
+    "seconds": 4.95
+   },
+   {
+    "at": 57.5,
+    "text": "Fluid torso rolls, dropping into a low crouch!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-e74df4d07f.mp3",
+    "status": "spoken",
+    "seconds": 2.58
+   },
+   {
+    "at": 60.23,
+    "text": "High tuck jump, slamming to her knees!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/waacking-e088882cf7.mp3",
+    "status": "spoken",
+    "seconds": 2.13
+   },
+   {
+    "at": 68.0,
+    "text": "Turns to the front and holds a pose, then steps out with rolling arms.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/waacking-3a134dcbba.mp3",
+    "status": "spoken",
+    "seconds": 4.32
+   },
+   {
+    "at": 72.5,
+    "text": "New soloist in black struts center, pointing out her rival.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-3cf4beae09.mp3",
+    "status": "spoken",
+    "seconds": 3.77
+   },
+   {
+    "at": 81.0,
+    "text": "Wide stance; heavy, robotic arm and neck isolations pop to the beat.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-07c29333d3.mp3",
+    "status": "spoken",
+    "seconds": 4.93
+   },
+   {
+    "at": 93.4,
+    "text": "High kicks, then holds her right leg out to the side, balancing on one foot!",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-ef0b5f499e.mp3",
+    "status": "spoken",
+    "seconds": 4.82
+   },
+   {
+    "at": 100.5,
+    "text": "Hand to her ear, working crisp, rapid heel-toe footwork.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/waacking-060c31f2c8.mp3",
+    "status": "spoken",
+    "seconds": 3.61
+   },
+   {
+    "at": 110.5,
+    "text": "Right leg lift, right arm skyward!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 2.28
+   },
+   {
+    "at": 112.8,
+    "text": "She balances on one leg, lifting the other high to the side before dropping to her knees.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-ae5e1e6ca3.mp3",
+    "status": "spoken",
+    "seconds": 5.8
+   },
+   {
+    "at": 121.0,
+    "text": "Sitting on the floor, she starts a staccato robotic rise!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/waacking-1bd673b213.mp3",
+    "status": "spoken",
+    "seconds": 3.63
+   },
+   {
+    "at": 127.5,
+    "text": "Round two: orange top claims center, arms raised to hype the crowd.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-8660cba1e4.mp3",
+    "status": "spoken",
+    "seconds": 3.81
+   },
+   {
+    "at": 131.5,
+    "text": "Blurring waacking arm rolls slice in front of her chest on the rapid vocals.",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/waacking-69d7bdaec8.mp3",
+    "status": "spoken",
+    "seconds": 4.25
+   },
+   {
+    "at": 143.8,
+    "text": "Sassy hip pulses, left arm pointing clean as her right pumps high.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-f2a2857a65.mp3",
+    "status": "spoken",
+    "seconds": 4.33
+   },
+   {
+    "at": 154.0,
+    "text": "Right hand on hip, left arm extends out with sharp wrist flicks and chest pops.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-053d512f4c.mp3",
+    "status": "spoken",
+    "seconds": 5.28
+   },
+   {
+    "at": 159.5,
+    "text": "Staccato hip hits and sharp angles lock into a robotic freeze.",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.73
+   },
+   {
+    "at": 164.0,
+    "text": "Steps in place with robotic arm pops, then drops to her knees and slides onto her stomach.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-bb7e1daca5.mp3",
+    "status": "spoken",
+    "seconds": 5.66
+   },
+   {
+    "at": 170.0,
+    "text": "Steps toward her opponent, popping her chest and doing robotic arm movements.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/waacking-0497e7043e.mp3",
+    "status": "spoken",
+    "seconds": 4.26
+   },
+   {
+    "at": 175.0,
+    "text": "Stops dancing, gesturing with her hands and lip-syncing.",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/waacking-1c46452a45.mp3",
+    "status": "spoken (signature)",
+    "seconds": 2.43
+   }
+  ]
+ },
+ {
+  "key": "tutting",
+  "id": "oJ6mC4DsOM4",
+  "label": "Sadeck: Murmuration (tutting)",
+  "style": "tutting",
+  "start": 0,
+  "end": 50,
+  "review": "The script was over-packed at 107% density, leaving no room for the music and making the rapid geometric shapes hard to picture with eyes closed. I dropped the crowded line at 26.2s, tightened every line so the bass drops and snare rolls breathe, highlighted the signature contrast of bare forearms against black clothing, and named the leader's conducting illusion and finger-tutting solo. The script was far too dense (90% speech), with long steady lines bleeding into the next musical phrase and overwhelming the listener with nonstop shape names. Tightening lines to a brisk pace and establishing the front leader at the start gives the listener one clear geometric image at a time while leaving breathing room for the beat drops.",
+  "signature": [
+   "High-contrast visual grid of bare forearms against black clothing: forearms, wrists, and hands",
+   "Domino-like column canons travelling horizontally across the चार-row grid: arms and head tilts",
+   "Foreground soloist acting as a visual conductor for the ensemble: full arms, hands, and fingers of the front-center dancer"
+  ],
+  "sections": [
+   {
+    "start": 0.0,
+    "end": 8.0,
+    "label": "Opening ripple and unison box sequence",
+    "group": "Starts in stillness, moves through a left-to-right canon, then locks into full-group unison."
+   },
+   {
+    "start": 8.0,
+    "end": 19.5,
+    "label": "Wave canons and diamond-to-X geometry",
+    "group": "Left-to-right canon into full unison, finishing with a left-to-right canon release."
+   },
+   {
+    "start": 19.5,
+    "end": 30.8,
+    "label": "Conductor solo and rapid unison hits",
+    "group": "Soloist conducting the group (call-and-response/visual manipulation), then full-group fast unison."
+   },
+   {
+    "start": 30.8,
+    "end": 37.2,
+    "label": "Right-to-left canon and central finger-tutting solo",
+    "group": "Right-to-left canon, then soloist against a still, bowed group."
+   },
+   {
+    "start": 37.2,
+    "end": 50.0,
+    "label": "Final geometric build and symmetry return",
+    "group": "Left-to-right canon into slow, synchronized unison, ending with the soloist's slow final extension."
+   }
+  ],
+  "lines": [
+   {
+    "at": 0.0,
+    "text": "Four tiers in black, heads bowed, leader ahead.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/tutting-e6fcaf123b.mp3",
+    "status": "spoken",
+    "seconds": 2.5
+   },
+   {
+    "at": 2.125,
+    "text": "Canon left to right: bare forearms snap into crossed X's.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": null,
+    "status": "no room",
+    "seconds": 3.24
+   },
+   {
+    "at": 5.125,
+    "text": "X-crossed forearms ripple up the pyramid, snapping into unison box frames!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/tutting-0e13e5e38f.mp3",
+    "status": "spoken",
+    "seconds": 3.77
+   },
+   {
+    "at": 8.25,
+    "text": "Left to right, columns snap forearms into sharp right angles.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": null,
+    "status": "no room",
+    "seconds": 3.17
+   },
+   {
+    "at": 11.62,
+    "text": "Unison triangle roofs, snap to X's!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/tutting-d785c28f25.mp3",
+    "status": "spoken",
+    "seconds": 2.36
+   },
+   {
+    "at": 14.75,
+    "text": "Unison X's drop to bowed stillness; canon ripples X's rightward.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/tutting-1896ab36cb.mp3",
+    "status": "spoken",
+    "seconds": 3.59
+   },
+   {
+    "at": 20.2,
+    "text": "A canon lowers arms to knees, then all snap into right angles.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/tutting-c2512ccba2.mp3",
+    "status": "spoken",
+    "seconds": 4.33
+   },
+   {
+    "at": 27.8,
+    "text": "Unison burst: sharp X-cross, strike right, then wrists frame heads!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/tutting-f33bfca1e8.mp3",
+    "status": "spoken",
+    "seconds": 3.88
+   },
+   {
+    "at": 30.9,
+    "text": "Crossed arms ripple right to left, unfolding into sharp right-side extensions.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": null,
+    "status": "no room",
+    "seconds": 3.91
+   },
+   {
+    "at": 35.0,
+    "text": "Arms lower in a wave; leader folds wrists.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/tutting-c3cbdc1617.mp3",
+    "status": "spoken",
+    "seconds": 2.01
+   },
+   {
+    "at": 37.2,
+    "text": "Stacked forearms ripple left to right across the group.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/tutting-a053878e74.mp3",
+    "status": "spoken",
+    "seconds": 3.23
+   },
+   {
+    "at": 42.2,
+    "text": "Forearms cross in X's, then angle into overhead triangles.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/tutting-f297611ac3.mp3",
+    "status": "spoken",
+    "seconds": 3.25
+   },
+   {
+    "at": 46.7,
+    "text": "A canon snaps forearms shut; arms drop and heads bow.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/tutting-0b7c0514c3.mp3",
+    "status": "spoken",
+    "seconds": 3.11
+   }
+  ]
+ },
+ {
+  "key": "bharatanatyam",
+  "id": "TdYWOr12ONU",
+  "label": "IndianRaga: Vahana Alarippu",
+  "style": "Bharatanatyam",
+  "start": 0,
+  "end": 180,
+  "review": "At 91% density, wall-to-wall narration buries the rhythmic vocal percussion (sollukattu) that drives Bharatanatyam, and several lines repeat the same neck slides or squat bounces back-to-back (75–81s, 98–101s) or land late on the movement (127s, 131s). I trimmed redundant callouts to let the vocal rhythms breathe, fixed the late cues in the second half, and named the piece's central Vahana (sacred mount and deity) portrayal at 62s. Replaced ballet terms ('relevés', 'diamond pliés') with accurate Bharatanatyam terminology ('aramandi', 'toe rises'), fixed late timing on key neck-slide, hopping, and spinning-stack moments (18.0s, 98.8s, 109.5s, 121.2s), and tightened wordy lines so the rhythmic vocal percussion (sollukattu) has room to breathe.",
+  "signature": [
+   "Multi-armed deity illusions created by stacking two dancers in a tight vertical line: Arms, hands, and full-body alignment",
+   "Crisp, isolated lateral neck slides (attami) and darting eye movements while the body holds a frozen squat: Head, neck, and eyes",
+   "Extreme level contrast pairing a stationary dancer in a full squat (muzhumandi) with a partner lunging, kicking, or leaping over and around her: Legs, hips, and full-body levels"
+  ],
+  "sections": [
+   {
+    "start": 0,
+    "end": 30,
+    "label": "Invocation and Neck Isolations",
+    "group": "Unison rising, then a two-level static tableau with synchronized neck and eye isolations"
+   },
+   {
+    "start": 30,
+    "end": 61,
+    "label": "First Rhythmic Phrase and Role Swap",
+    "group": "Complementary asymmetrical poses and contrapuntal arm shapes, moving into unison rhythmic stamping"
+   },
+   {
+    "start": 61,
+    "end": 120,
+    "label": "Alternating Vahana (Mount) Tableaux",
+    "group": "Soloist moving against a stationary partner (trading roles at 69s), then joining in a layered multi-armed tableau"
+   },
+   {
+    "start": 120,
+    "end": 159,
+    "label": "High Leg Extensions, Floor Bends, and Leaps",
+    "group": "Active mover framing a stationary or anchored partner, trading levels and roles"
+   },
+   {
+    "start": 159,
+    "end": 180,
+    "label": "Side-by-Side Unison Finale",
+    "group": "Unison and mirrored symmetry"
+   }
+  ],
+  "lines": [
+   {
+    "at": 1.0,
+    "text": "Bharatanatyam duet: kneeling in a staggered pose, front dancer's palms in anjali.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-fc6ee04ee1.mp3",
+    "status": "spoken",
+    "seconds": 4.93
+   },
+   {
+    "at": 8.4,
+    "text": "Remaining in a deep squat, the camera aligns them.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-8d4fc7196d.mp3",
+    "status": "spoken",
+    "seconds": 3.29
+   },
+   {
+    "at": 16.3,
+    "text": "Overhead salutation snaps wide into a two-tiered deity pose.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-cb4d05865e.mp3",
+    "status": "spoken",
+    "seconds": 3.44
+   },
+   {
+    "at": 21.3,
+    "text": "Crisp attami neck slides and darting eyes over rock-still shoulders.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/bharatanatyam-7bc02e7923.mp3",
+    "status": "spoken",
+    "seconds": 3.82
+   },
+   {
+    "at": 30.0,
+    "text": "Neck slides, then their hands come in as they split the line.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-448c11fe47.mp3",
+    "status": "spoken",
+    "seconds": 3.04
+   },
+   {
+    "at": 38.9,
+    "text": "Re-stacked: a wide-armed lunge in front frames a high-knee balance behind.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/bharatanatyam-dc5bfa6039.mp3",
+    "status": "spoken",
+    "seconds": 4.41
+   },
+   {
+    "at": 46.6,
+    "text": "On the diagonal, coy wrist flicks and bright eyes beneath a tall shikhara pose.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.2
+   },
+   {
+    "at": 51.0,
+    "text": "Spinning in place into crisp neck slides, then turning with arms crowned.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-b9cb91965a.mp3",
+    "status": "spoken",
+    "seconds": 4.32
+   },
+   {
+    "at": 59.0,
+    "text": "Looping center, they stamp into an overhead anjali!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 2.44
+   },
+   {
+    "at": 62.1,
+    "text": "Spinning with hands joined overhead, both drop into muzhumandi as the left dancer raises her arms high.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-85c8177eca.mp3",
+    "status": "spoken",
+    "seconds": 6.59
+   },
+   {
+    "at": 69.8,
+    "text": "The front dancer rises to join her partner with palms overhead, then both drop into deep squats.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 5.5
+   },
+   {
+    "at": 75.5,
+    "text": "One squats in muzhumandi while the other arcs overhead, then both spin to stand.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-0261a55191.mp3",
+    "status": "spoken",
+    "seconds": 5.05
+   },
+   {
+    "at": 83.5,
+    "text": "High side leg kick into a crowned, crossed-ankle lean.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-8112c84301.mp3",
+    "status": "spoken",
+    "seconds": 3.25
+   },
+   {
+    "at": 91.2,
+    "text": "Kneeling in front, she sweeps her torso through a deep circular backbend.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-9d475b879f.mp3",
+    "status": "spoken",
+    "seconds": 4.6
+   },
+   {
+    "at": 100.8,
+    "text": "Rhythmic hops in a deep squat, snapping arms wide with sharp glances.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/bharatanatyam-e55bd7281d.mp3",
+    "status": "spoken",
+    "seconds": 4.32
+   },
+   {
+    "at": 110.5,
+    "text": "Linked in profile, front dancer mimes a flute, both dipping, hopping backward.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.83
+   },
+   {
+    "at": 114.0,
+    "text": "One kneels center as her partner spins in place behind her with lifted hops.",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-32b55d9374.mp3",
+    "status": "spoken",
+    "seconds": 4.25
+   },
+   {
+    "at": 123.0,
+    "text": "Spinning to swap places into a stacked deity pose, necks sliding sharp.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-5e1b63c105.mp3",
+    "status": "spoken",
+    "seconds": 4.0
+   },
+   {
+    "at": 127.2,
+    "text": "Tiny heel-toe steps advance with layered, symmetrical arms.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.3
+   },
+   {
+    "at": 136.8,
+    "text": "Stacked with crossed ankles and framed arms, they turn to peel apart into a side-by-side pose.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/bharatanatyam-2ae4725561.mp3",
+    "status": "spoken",
+    "seconds": 6.24
+   },
+   {
+    "at": 146.0,
+    "text": "They spin into deep squats; one raises crossed wrists overhead while the other pulses her hands.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/bharatanatyam-7be3dfd87c.mp3",
+    "status": "spoken",
+    "seconds": 5.58
+   },
+   {
+    "at": 153.0,
+    "text": "One holds a pose and sways in place while her partner steps diagonally away, turning her back.",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-f6c9b37043.mp3",
+    "status": "spoken",
+    "seconds": 5.15
+   },
+   {
+    "at": 159.1,
+    "text": "Side-by-side in unison, fanning alapadma wrists while leaning their torsos left.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-1bbfa1ac58.mp3",
+    "status": "spoken",
+    "seconds": 4.53
+   },
+   {
+    "at": 165.5,
+    "text": "Stepping side to side with arms extended, they turn diagonally upstage with crisp footwork.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 5.03
+   },
+   {
+    "at": 171.0,
+    "text": "Spinning to an upright anjali freeze, they smile directly forward.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-137b176dd2.mp3",
+    "status": "spoken",
+    "seconds": 4.12
+   },
+   {
+    "at": 177.0,
+    "text": "Swapping sides into buoyant one-footed hops, left arms curved high!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/bharatanatyam-27ccb0e364.mp3",
+    "status": "spoken",
+    "seconds": 3.51
+   }
+  ]
+ },
+ {
+  "key": "flamenco",
+  "id": "9JhUBiJPHMM",
+  "label": "Rocío Garrido: soleá",
+  "style": "flamenco",
+  "start": 0,
+  "end": 180,
+  "review": "The script was too dense (79%), talking over the singer's emotional vocal cries and the rhythmic footwork with repetitive lines about 'floreo', 'heavy ruffled train', and 'hunched in profile'. I dropped redundant lines to let the guitar, palmas, and cante breathe, corrected the 31.8 s move (an arm release into an over-the-shoulder glare, not a train kick) and the 172.2 s phrasing ('coiling the train into a high overhead frame'), and tightened late callouts at 121.0 s, 152.0 s, and 171.2 s to land cleanly on the hits. The script captures the flamenco vocabulary well, but at 63% density it talks over the singer's raw vocal entrances (cante) and stacks back-to-back callouts that collide during fast turns and remates. Dropping overlapping setup lines lets the cante and guitar breathe, while tightening and shifting several late lines ensures the train kicks, arm changes, and profile freezes land right on the beat.",
+  "signature": [
+   "heavy, sweeping manipulation of the black ruffled bata de cola train: legs, feet, and lower torso",
+   "statuesque overhead arm frames with intricate finger fanning: arms, wrists, and fingers",
+   "sharp, percussive footwork calls that lock into sudden profile freezes: feet, torso, and head"
+  ],
+  "sections": [
+   {
+    "start": 0.0,
+    "end": 12.2,
+    "label": "Entrance and Settling",
+    "group": "soloist"
+   },
+   {
+    "start": 12.2,
+    "end": 44.2,
+    "label": "Slow Braceo and Marcaje",
+    "group": "soloist"
+   },
+   {
+    "start": 44.2,
+    "end": 74.2,
+    "label": "First Llamada and Train Footwork",
+    "group": "soloist"
+   },
+   {
+    "start": 74.2,
+    "end": 117.2,
+    "label": "Cante Entrance and Sustained Poses",
+    "group": "soloist"
+   },
+   {
+    "start": 117.2,
+    "end": 146.0,
+    "label": "Turning Phrase with Train Sweeps",
+    "group": "soloist"
+   },
+   {
+    "start": 146.0,
+    "end": 180.0,
+    "label": "Second Cante and Escobilla Preparation",
+    "group": "soloist"
+   }
+  ],
+  "lines": [
+   {
+    "at": 3.1,
+    "text": "Bailaora sweeps in, settling facing the musicians with elbows rounded.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-4d06e6a8c9.mp3",
+    "status": "spoken",
+    "seconds": 3.6
+   },
+   {
+    "at": 7.8,
+    "text": "Sharp heel kick fans her bata de cola train!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/flamenco-e9927c30a4.mp3",
+    "status": "spoken",
+    "seconds": 2.92
+   },
+   {
+    "at": 12.4,
+    "text": "With her back to us, she holds a tense, still pose, arms poised slightly out from her sides.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-8c735b9dd8.mp3",
+    "status": "spoken",
+    "seconds": 6.01
+   },
+   {
+    "at": 24.5,
+    "text": "She twists slowly to look over her shoulder, back arched, framing her sorrowful gaze.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/flamenco-ccedf2dcb4.mp3",
+    "status": "spoken",
+    "seconds": 5.51
+   },
+   {
+    "at": 31.8,
+    "text": "With one arm curved overhead, she glares forward, then snaps her arms open wide.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-f055610c24.mp3",
+    "status": "spoken",
+    "seconds": 4.91
+   },
+   {
+    "at": 36.9,
+    "text": "Sudden drop, slicing arms wide as the ruffles flare!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-274104d6c0.mp3",
+    "status": "spoken",
+    "seconds": 3.11
+   },
+   {
+    "at": 44.3,
+    "text": "Holds a fierce splayed-hand pose, then erupts into explosive llamada stamps!",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-f03e91733c.mp3",
+    "status": "spoken",
+    "seconds": 3.95
+   },
+   {
+    "at": 51.8,
+    "text": "Pivoting turn—a heel kick whips her heavy train wide.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-8803722f8a.mp3",
+    "status": "spoken",
+    "seconds": 3.23
+   },
+   {
+    "at": 55.6,
+    "text": "Hunched in profile, she lifts her skirt and stamps crisp zapateado heels.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/flamenco-6a10ca98d6.mp3",
+    "status": "spoken",
+    "seconds": 4.32
+   },
+   {
+    "at": 70.8,
+    "text": "Spinning in place, a whipping turn kicks the heavy train flying!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-687aa46295.mp3",
+    "status": "spoken",
+    "seconds": 3.35
+   },
+   {
+    "at": 74.5,
+    "text": "Arms shoot high, arched taut for the cante!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-327cb8de30.mp3",
+    "status": "spoken",
+    "seconds": 2.86
+   },
+   {
+    "at": 91.8,
+    "text": "Fists unclench; right arm falls suddenly to her hip as her left fans high.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-5babd66afc.mp3",
+    "status": "spoken",
+    "seconds": 5.75
+   },
+   {
+    "at": 101.0,
+    "text": "Rolling wrists frame her face, then reach to the right with an intense expression.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-d8a3e259f1.mp3",
+    "status": "spoken",
+    "seconds": 5.03
+   },
+   {
+    "at": 110.2,
+    "text": "A whipping vuelta kicks the heavy train airborne, arms framing her head!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-60bc4b55a3.mp3",
+    "status": "spoken",
+    "seconds": 4.33
+   },
+   {
+    "at": 117.5,
+    "text": "Holds a deep back arch, then kicks the train and spins right.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-efc7cd214c.mp3",
+    "status": "spoken",
+    "seconds": 3.65
+   },
+   {
+    "at": 125.2,
+    "text": "Steps slowly forward, fingers splayed low as her hips sway.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/flamenco-00195adc0b.mp3",
+    "status": "spoken",
+    "seconds": 4.12
+   },
+   {
+    "at": 138.0,
+    "text": "Hunched heel-flicks build into rapid turns, whipping the train in a wide orbit.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-3dba0083be.mp3",
+    "status": "spoken",
+    "seconds": 4.31
+   },
+   {
+    "at": 142.5,
+    "text": "Spins twice whipping her train—machine-gun footwork, slashing arms down!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-888f12e132.mp3",
+    "status": "spoken",
+    "seconds": 3.37
+   },
+   {
+    "at": 153.2,
+    "text": "Reversing her spin, she kicks the train into a deep quiebro backbend!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/flamenco-2deabf1581.mp3",
+    "status": "spoken",
+    "seconds": 4.32
+   },
+   {
+    "at": 160.0,
+    "text": "From sharp footwork, a high train kick spins into an arched pose!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/flamenco-266710828b.mp3",
+    "status": "spoken",
+    "seconds": 3.95
+   },
+   {
+    "at": 166.0,
+    "text": "Kicks the train aside, standing facing upstage with taut, splayed hands.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/flamenco-d61381b375.mp3",
+    "status": "spoken",
+    "seconds": 4.53
+   },
+   {
+    "at": 172.2,
+    "text": "Whips front, coiling the train beside her.",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/flamenco-8d2bb988c3.mp3",
+    "status": "spoken",
+    "seconds": 2.52
+   },
+   {
+    "at": 175.8,
+    "text": "Left arm high, right arm framing her torso with fluid floreo wrist circles.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.01
+   }
+  ]
+ },
+ {
+  "key": "amapiano",
+  "id": "GQjf74DJjEc",
+  "label": "CPC Stars: amapiano",
+  "style": "South African street dance / Amapiano & Pantsula fusion",
+  "start": 0,
+  "end": 180,
+  "review": "The script was overly dense (86%), talking over key spoken-word hooks ('If you die today...', 'We choose to dance', '5, 6, 7, 8') and leaving no room for the Amapiano groove to breathe. Several lines were also mistimed or technically inaccurate—most notably calling the leader's loose kick-and-step demo at 74s a 'deep, heavy squat', calling the one-legged floor lunge at 152s 'wide side-splits', and narrating the 21.8s shove and 30.8s raised fist several seconds late. At 79% density, the script talked over key spoken-word cues ('We choose to dance', '5, 6, 7, 8, kick and place', 'Sister Bettina!') and crowded the cypher and chorus transitions without letting the Amapiano beat breathe. I trimmed surplus lines, named the Gwara Gwara technique at 52s, and aligned the staccato hits (166s) and squat drops (88.8s, 146s, 160s) to land on the beat.",
+  "signature": [
+   "High-knee bouncing kicks with loose, swinging arms: legs, knees, feet, and arms",
+   "Wide-stance grounded knee drives and hip pulses: hips, knees, and torso",
+   "Theatrical call-and-response and crowd-hyping interactions: full body, arms, and face"
+  ],
+  "sections": [
+   {
+    "start": 0.0,
+    "end": 34.4,
+    "label": "Theatrical Intro",
+    "group": "Soloist acting against a waiting, reactive group."
+   },
+   {
+    "start": 34.4,
+    "end": 65.0,
+    "label": "Opening Ensemble Groove",
+    "group": "Unison, with a brief duet highlight at 47.0s while the rest hold a low crouch."
+   },
+   {
+    "start": 65.0,
+    "end": 102.0,
+    "label": "Call and Response Drill",
+    "group": "Call and response between the front soloist and the unified group behind him."
+   },
+   {
+    "start": 102.0,
+    "end": 126.0,
+    "label": "Cypher Solos",
+    "group": "Soloists trading in the center while the group provides a rhythmic, clapping border."
+   },
+   {
+    "start": 126.0,
+    "end": 162.0,
+    "label": "High-Energy Kwaito/Amapiano Chorus",
+    "group": "Unison, with the front row of three briefly dropping into low floor-skimming squats at 146.8s while the back rows stand."
+   },
+   {
+    "start": 162.0,
+    "end": 180.0,
+    "label": "Staccato Hit Section & Lift",
+    "group": "Unison on the hits, collective group lift in the center, then unison groove."
+   }
+  ],
+  "lines": [
+   {
+    "at": 2.1,
+    "text": "Amapiano theatre: a boy struts in, swinging a briefcase and gesturing dramatically.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-7b6cfc5db1.mp3",
+    "status": "spoken",
+    "seconds": 4.94
+   },
+   {
+    "at": 12.6,
+    "text": "Tapping his case, he stands up and begins writing with a pencil on a white screen.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/amapiano-6fe2c8a001.mp3",
+    "status": "spoken",
+    "seconds": 4.14
+   },
+   {
+    "at": 27.8,
+    "text": "A shove and kick-back challenge; the smaller dancer throws a cap and points!",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-c538d38ef8.mp3",
+    "status": "spoken",
+    "seconds": 4.67
+   },
+   {
+    "at": 34.5,
+    "text": "In matching camo and white tees, the crew strolls into staggered lines with Amapiano swagger.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-5bf3cd1587.mp3",
+    "status": "spoken",
+    "seconds": 5.74
+   },
+   {
+    "at": 42.2,
+    "text": "Dancers walk into formation, shoot arms overhead, then snap them wide!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.96
+   },
+   {
+    "at": 47.6,
+    "text": "The crew crouches low as two girls pop up into bouncy, flexed front kicks.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/amapiano-342ee17268.mp3",
+    "status": "spoken",
+    "seconds": 4.7
+   },
+   {
+    "at": 52.5,
+    "text": "All rise with high knees, then drop into a wide squat, thrusting right arms right.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-dc8755f20a.mp3",
+    "status": "spoken",
+    "seconds": 4.03
+   },
+   {
+    "at": 56.5,
+    "text": "The dancers squat with sweeping arms, then hop in place with high knees.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.83
+   },
+   {
+    "at": 60.8,
+    "text": "Two jumps, wide stance bounces, then one-legged hops with knee lifts!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/amapiano-5b2d4171a4.mp3",
+    "status": "spoken",
+    "seconds": 3.96
+   },
+   {
+    "at": 70.2,
+    "text": "A leader kneels in front while the crew walks backward to form a line.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.62
+   },
+   {
+    "at": 74.0,
+    "text": "The group freezes; he stands to face forward and kicks out.",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-ea6a008a4c.mp3",
+    "status": "spoken",
+    "seconds": 3.34
+   },
+   {
+    "at": 79.2,
+    "text": "Stiff-legged robotic kicks, then they fold flat at the waist!",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/amapiano-0984d90940.mp3",
+    "status": "spoken",
+    "seconds": 3.59
+   },
+   {
+    "at": 89.8,
+    "text": "Nailing the deep squat bounce, they groove with forearms across chests.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/amapiano-3dffaa47a3.mp3",
+    "status": "spoken",
+    "seconds": 3.51
+   },
+   {
+    "at": 93.5,
+    "text": "He reaches down and sweeps his arms up, drawing the crew together.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-fc13564abc.mp3",
+    "status": "spoken",
+    "seconds": 3.91
+   },
+   {
+    "at": 102.0,
+    "text": "The dancers lean and freeze in slow motion, then gather into a circle around a boy.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-0d7809c8de.mp3",
+    "status": "spoken",
+    "seconds": 5.51
+   },
+   {
+    "at": 111.2,
+    "text": "A braided girl steps into the center, kicking her right leg up.",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.48
+   },
+   {
+    "at": 115.8,
+    "text": "One drops into a crouched heel tap; another steps in with fast footwork.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-fc40c8725e.mp3",
+    "status": "spoken",
+    "seconds": 4.5
+   },
+   {
+    "at": 120.5,
+    "text": "A second boy darts in, pumping his arms with rapid, high-knee footwork.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-583035e2ec.mp3",
+    "status": "spoken",
+    "seconds": 4.23
+   },
+   {
+    "at": 126.5,
+    "text": "A soloist finishes centrally as the group breaks the circle, stepping into formation.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-a29c67aa0f.mp3",
+    "status": "spoken",
+    "seconds": 3.65
+   },
+   {
+    "at": 130.2,
+    "text": "Front left shudders his shoulders to the stutter!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 2.42
+   },
+   {
+    "at": 133.6,
+    "text": "They explode into two jumping kicks, raising a knee in between, with sweeping overhead arms.",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/amapiano-6bca337bc3.mp3",
+    "status": "spoken",
+    "seconds": 4.64
+   },
+   {
+    "at": 138.5,
+    "text": "Facing left: reaching high, lifting one knee, dropping into a low lunge!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/amapiano-7f3c9fe089.mp3",
+    "status": "spoken",
+    "seconds": 3.65
+   },
+   {
+    "at": 147.2,
+    "text": "Back rows turned away, a front trio lunges low, steps up, and drops into bouncing squats.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/amapiano-5bf8ca1446.mp3",
+    "status": "spoken",
+    "seconds": 4.82
+   },
+   {
+    "at": 152.2,
+    "text": "All spin to face forward, sliding down to the floor with left legs extended!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-601625717e.mp3",
+    "status": "spoken",
+    "seconds": 3.85
+   },
+   {
+    "at": 156.2,
+    "text": "Up in unison: high-knee hops with loose swinging arms, landing in a wide stance!",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/amapiano-9f77e36271.mp3",
+    "status": "spoken",
+    "seconds": 5.04
+   },
+   {
+    "at": 162.5,
+    "text": "Staccato tension locks: wide stances, arms aiming ahead.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-c74e9744f5.mp3",
+    "status": "spoken",
+    "seconds": 2.9
+   },
+   {
+    "at": 164.625,
+    "text": "Arms shoot to a high V!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 1.78
+   },
+   {
+    "at": 167.125,
+    "text": "Arms shoot up, drop down, then chest pops and sharp arm slices!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/amapiano-60d5b826a6.mp3",
+    "status": "spoken",
+    "seconds": 3.64
+   },
+   {
+    "at": 171.0,
+    "text": "Tension breaks into a celebratory huddle, hoisting a young boy high!",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/amapiano-7289248946.mp3",
+    "status": "spoken",
+    "seconds": 3.97
+   },
+   {
+    "at": 175.25,
+    "text": "Carried horizontally, a dancer lands to bounce, knees wide, waving arms.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.9
+   },
+   {
+    "at": 178.125,
+    "text": "Wobbly-knee bounces, hands high, then lean-back hop-kicks!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/amapiano-b9a66aa24d.mp3",
+    "status": "spoken",
+    "seconds": 2.96
+   }
+  ]
+ },
+ {
+  "key": "afrobeats",
+  "id": "uWqCqv6pmmU",
+  "label": "HomeBros: Afro dance choreography",
+  "style": "Afrobeats / Afro-house",
+  "start": 0,
+  "end": 164,
+  "review": "At 84% speech density, the narration crowds out the Afro-house beat; dropping filler lines lets the music and crowd energy breathe. The script also misidentified dancers after their formation swap at 111s and missed the powerhouse HMBS dancer's signature contrast of frame and weightless speed, as well as the bucket-hat soloist's instrument-strumming animation. At 65% density, the script talked over the music almost continuously; several lines were also late on key transitions (the 41.5s pivot, 135.5s wing-armed shuffles, and 149s bow) and 81.0s invented an instrument-strumming mime instead of naming the wrist rolls and arm waves. Dropping five surplus lines and tightening the rest lets the Afro-house beat breathe while keeping every signature hit and texture change on time.",
+  "signature": [
+   "Nimble, weightless-looking fast footwork and wide-armed hops from the larger dancer in the 'HMBS' shirt, contrasting his powerful frame with effortless speed and bounce: feet, ankles, knees, and wide-spread arms",
+   "Low-crouching, forward-folded groove with hands clasped or dangling between the knees while the feet and knees swivel rapidly: bent torso, clasped hands, knees, and balls of the feet",
+   "Explosive unison level changes—leaping straight up into a tuck jump and dropping into a deep, wide second-position squat with a torso isolation: whole body, legs, hips, and ribcage"
+  ],
+  "sections": [
+   {
+    "start": 0.0,
+    "end": 20.5,
+    "label": "Intro & Setup",
+    "group": "Individual warm-up grooves, then converging into a line."
+   },
+   {
+    "start": 20.5,
+    "end": 34.5,
+    "label": "Opening Trio Groove & Right Dancer Feature",
+    "group": "Brief unison intro (20.5-23.0s) followed by a soloist on the right with the other two watching and hyping."
+   },
+   {
+    "start": 34.5,
+    "end": 65.5,
+    "label": "Main Unison Routine",
+    "group": "Tight unison throughout."
+   },
+   {
+    "start": 65.5,
+    "end": 80.5,
+    "label": "Center Dancer Solo",
+    "group": "Soloist in front with the two flanking dancers shadowing his groove until 01:10, then watching."
+   },
+   {
+    "start": 80.5,
+    "end": 111.0,
+    "label": "Left Dancer (Bucket Hat) Solo",
+    "group": "Soloist against two stationary background hype men."
+   },
+   {
+    "start": 111.0,
+    "end": 147.0,
+    "label": "Right Dancer Climax Solo & Cypher Finale",
+    "group": "Brief trio unison/harmony (111-116s and 127-130s) framing an extended, high-energy solo by the center-right dancer."
+   },
+   {
+    "start": 147.0,
+    "end": 164.0,
+    "label": "Outro & Applause",
+    "group": " Casual, celebratory interaction and bows."
+   }
+  ],
+  "lines": [
+   {
+    "at": 1.5,
+    "text": "Afro-house trio in black: glasses in front, bucket hat behind, bearded right.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-19376a308a.mp3",
+    "status": "spoken",
+    "seconds": 4.64
+   },
+   {
+    "at": 12.0,
+    "text": "Center drops into a deep bounce and body roll; all three lock in.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-f3b915aa7f.mp3",
+    "status": "spoken",
+    "seconds": 3.92
+   },
+   {
+    "at": 20.625,
+    "text": "Two wipe their foreheads as all three lean in, stepping in place.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-d688c5ac6b.mp3",
+    "status": "spoken",
+    "seconds": 3.95
+   },
+   {
+    "at": 25.625,
+    "text": "Right soloist steps out: weightless heel-toe swivels into a rapid chest shimmy.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "gave way to a key moment",
+    "seconds": 3.88
+   },
+   {
+    "at": 29.125,
+    "text": "Steps side-to-side, then lifts a knee and bounces it!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-3744f96728.mp3",
+    "status": "spoken",
+    "seconds": 2.73
+   },
+   {
+    "at": 35.6,
+    "text": "They pause, then start unison high-knee hops with swinging arms.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-74bca7aa5b.mp3",
+    "status": "spoken",
+    "seconds": 3.59
+   },
+   {
+    "at": 39.5,
+    "text": "Drop to a wide stance, rolling heads and shoulders!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-6097ab61cb.mp3",
+    "status": "spoken",
+    "seconds": 2.74
+   },
+   {
+    "at": 43.2,
+    "text": "Torso rolls in wide stance, then pivoting right for hopping taps with piston arms.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 5.05
+   },
+   {
+    "at": 48.5,
+    "text": "Right fingers point skyward, then they bounce on bent knees!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-885278da86.mp3",
+    "status": "spoken",
+    "seconds": 3.03
+   },
+   {
+    "at": 55.0,
+    "text": "Hunched forward, hands dangling between knees while kicking lower legs out.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-2403b9743c.mp3",
+    "status": "spoken",
+    "seconds": 3.96
+   },
+   {
+    "at": 59.2,
+    "text": "Hop into a deep squat, rebounding into a left tilt!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-6c36ae2f5a.mp3",
+    "status": "spoken",
+    "seconds": 3.08
+   },
+   {
+    "at": 65.5,
+    "text": "Center soloist shakes his knees in a wide stance, then stands tall to bounce.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-707a331882.mp3",
+    "status": "spoken",
+    "seconds": 4.5
+   },
+   {
+    "at": 77.8,
+    "text": "Facing his crew, he starts a loose ragdoll shoulder bounce.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/afrobeats-a0c8ce1d3c.mp3",
+    "status": "spoken",
+    "seconds": 3.01
+   },
+   {
+    "at": 81.0,
+    "text": "Bucket-hat soloist mimics a puppet on strings, then hops and reels in a line.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-4f15d049da.mp3",
+    "status": "spoken",
+    "seconds": 5.28
+   },
+   {
+    "at": 89.0,
+    "text": "Standing upright, his hand floats in slow-motion animation.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-74f4913a56.mp3",
+    "status": "spoken",
+    "seconds": 3.29
+   },
+   {
+    "at": 99.6,
+    "text": "Beat drops: deep side lunge, then rebounds into bouncy footwork!",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-f1f808a683.mp3",
+    "status": "spoken",
+    "seconds": 3.6
+   },
+   {
+    "at": 104.3,
+    "text": "Fast knee lifts with arm swings into hopping kicks with overhead lassos!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/afrobeats-2ad00f8486.mp3",
+    "status": "spoken",
+    "seconds": 3.65
+   },
+   {
+    "at": 111.5,
+    "text": "He turns to face the others, who pump their right arms overhead.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-314cdd8281.mp3",
+    "status": "spoken",
+    "seconds": 3.56
+   },
+   {
+    "at": 118.5,
+    "text": "Center soloist takes the floor: wide stance with energetic arm pumps and a leg swing.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/afrobeats-37c1aadaf8.mp3",
+    "status": "spoken",
+    "seconds": 5.22
+   },
+   {
+    "at": 126.0,
+    "text": "Climax: kicking high with wild windmill arms as his crew jumps in!",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-b71557ede9.mp3",
+    "status": "spoken",
+    "seconds": 3.63
+   },
+   {
+    "at": 137.0,
+    "text": "Arms spread wide, gliding on weightless, rapid-fire heel-toe shuffles!",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/afrobeats-446a3b95d1.mp3",
+    "status": "spoken",
+    "seconds": 3.39
+   },
+   {
+    "at": 143.2,
+    "text": "In slow motion, the three men bounce their shoulders and swing their arms.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/afrobeats-5323c95438.mp3",
+    "status": "spoken",
+    "seconds": 5.34
+   },
+   {
+    "at": 151.5,
+    "text": "Deep waist bows to loud applause as the bucket-hat dancer presents his crew.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/afrobeats-3197f163fe.mp3",
+    "status": "spoken",
+    "seconds": 5.11
+   }
+  ]
+ },
+ {
+  "key": "ballroom",
+  "id": "0GHkCRM8DBc",
+  "label": "WDSF World Open Prague: Standard final, waltz",
+  "style": "International Standard Slow Waltz",
+  "start": 0,
+  "end": 141,
+  "review": "The script talks over 92% of the piece, crowding the slow waltz ballad and speaking over the announcer, and it hallucinates leg extensions and a développé at 101.8 s and 112.2 s where the couples actually hold grounded hover lines. I cut redundant lines to let the music breathe, fixed the hallucinated extensions, and pulled the final curtsy line earlier so it finishes before the clip ends. The script missed the developpé leg extension at 61.8 s (misread as 101.8 s from 1:01.8 in the notes), was too dense at 72% speech with back-to-back lines crowding the vocals, and placed the final curtsy line at 140.2 s where it would be cut off by the end of the clip at 141 s. I added the developpé, trimmed three surplus lines to let the waltz ballad breathe, and tightened timings to land on the movement accents.",
+  "signature": [
+   "Extreme arched upper-body shape and head weight in the female partners: Head, neck, upper spine, and ribcage",
+   "Pendulum swing and lofty suspension at the top of the rise: Knees, ankles, feet, and full-body center of mass",
+   "Sharp head snaps between closed and promenade positions: Head and eyes"
+  ],
+  "sections": [
+   {
+    "start": 0.0,
+    "end": 18.0,
+    "label": "Floor preparation and invitation into hold",
+    "group": "Independent pairs preparing at their own timing"
+   },
+   {
+    "start": 18.0,
+    "end": 49.0,
+    "label": "Opening phrases and first line of dance",
+    "group": "Pairs dancing their own routines simultaneously"
+   },
+   {
+    "start": 49.0,
+    "end": 115.0,
+    "label": "Mid-floor progressions and picture lines",
+    "group": "Pairs weaving around each other in shared space"
+   },
+   {
+    "start": 115.0,
+    "end": 133.0,
+    "label": "Final travelling phrases",
+    "group": "Pairs finishing their routines independently"
+   },
+   {
+    "start": 133.0,
+    "end": 141.0,
+    "label": "Release of hold and bows",
+    "group": "Pairs bowing and curtsying"
+   }
+  ],
+  "lines": [
+   {
+    "at": 0.5,
+    "text": "International Standard Slow Waltz; a couple and a solo man take their spots on the parquet.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-fe7a5fb3c6.mp3",
+    "status": "spoken",
+    "seconds": 5.65
+   },
+   {
+    "at": 14.8,
+    "text": "His arms float wide in invitation; she glides toward him.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-d3c944a0c2.mp3",
+    "status": "spoken",
+    "seconds": 3.01
+   },
+   {
+    "at": 18.0,
+    "text": "In pink feathers, she glides across the floor into his open arms.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-621d2901c5.mp3",
+    "status": "spoken",
+    "seconds": 4.81
+   },
+   {
+    "at": 23.0,
+    "text": "Stillness breaks into pendulum swing: deep knee drive, lofty hover on toes.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-c53e962cdf.mp3",
+    "status": "spoken",
+    "seconds": 4.94
+   },
+   {
+    "at": 28.2,
+    "text": "Her head sweeps left from promenade!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballroom-4eb3700594.mp3",
+    "status": "spoken",
+    "seconds": 2.15
+   },
+   {
+    "at": 35.8,
+    "text": "In black, gliding forward steps into a deep, sweeping throwaway oversway.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballroom-273195531d.mp3",
+    "status": "spoken",
+    "seconds": 4.53
+   },
+   {
+    "at": 44.5,
+    "text": "Two couples hit matching dramatic lines, extending their frames with backs arched wide.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-bdc7964b00.mp3",
+    "status": "spoken",
+    "seconds": 5.2
+   },
+   {
+    "at": 53.0,
+    "text": "In the center, the couple with the ombre gown spins rapidly in place, her head arched back.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-55f73158c9.mp3",
+    "status": "spoken",
+    "seconds": 4.96
+   },
+   {
+    "at": 58.5,
+    "text": "In purple, they sweep into a poised right lunge, her torso arching gracefully.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballroom-af37c4a28d.mp3",
+    "status": "spoken",
+    "seconds": 5.21
+   },
+   {
+    "at": 68.8,
+    "text": "Rising from a lunge, they sweep around in a graceful hover corte.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/ballroom-ed2f0fa97e.mp3",
+    "status": "spoken",
+    "seconds": 4.53
+   },
+   {
+    "at": 77.2,
+    "text": "Deep drop oversway in silver, head thrown back, pleated wings fanned!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-2510a63529.mp3",
+    "status": "spoken",
+    "seconds": 3.95
+   },
+   {
+    "at": 82.2,
+    "text": "Rising onto high toes, the silver skirt flares through a continuous standing spin.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-51c0ee07da.mp3",
+    "status": "spoken",
+    "seconds": 4.68
+   },
+   {
+    "at": 95.2,
+    "text": "On the vocal cry, he dips into a deep lunge as her feathered sleeves float.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-7df54e0ba1.mp3",
+    "status": "spoken",
+    "seconds": 5.02
+   },
+   {
+    "at": 101.8,
+    "text": "Spinning into a lunge, the pink pair holds a stationary, extended line.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-989fa9a260.mp3",
+    "status": "spoken",
+    "seconds": 4.91
+   },
+   {
+    "at": 108.2,
+    "text": "Purple feathers turn smoothly into an extended line.",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 2.89
+   },
+   {
+    "at": 115.0,
+    "text": "Pink feathers sweep into a high, suspended hover on the toes.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-a08647ccc0.mp3",
+    "status": "spoken",
+    "seconds": 4.05
+   },
+   {
+    "at": 126.0,
+    "text": "From a tall arch, the purple pair drives low into fast spin turns.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-cca29514ae.mp3",
+    "status": "spoken",
+    "seconds": 4.35
+   },
+   {
+    "at": 130.8,
+    "text": "Deep throwaway oversway lunge on the musical swell!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 2.74
+   },
+   {
+    "at": 133.2,
+    "text": "Pivoting in hold, she dips back dramatically, then rises with poise.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-2961d274b2.mp3",
+    "status": "spoken",
+    "seconds": 4.52
+   },
+   {
+    "at": 140.2,
+    "text": "She curtsies.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/ballroom-02fe4ee4ae.mp3",
+    "status": "spoken",
+    "seconds": 0.84
+   }
+  ]
+ }
+]
