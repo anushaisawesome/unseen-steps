@@ -176,6 +176,8 @@ function tick() {
   lastT = t;
   // pause the narration when the viewer pauses; at the end of the clip, let the last line finish
   if (player.getPlayerState() === YT.PlayerState.PAUSED && !voice.paused) voice.pause();
+  // the description covers demo.start to demo.end: stop the video there (the last line still finishes)
+  if (playing && t >= demo.end) player.pauseVideo();
   if (playing) for (const l of demo.lines) {
     // never cut a line off: while one is speaking the next waits, and plays if it is still within a second of its time
     if (l.audio && !played.has(l) && t >= l.at && t < l.at + 1.0) { if (voice.paused || voice.ended) say(l); break; }
