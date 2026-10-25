@@ -1,0 +1,119 @@
+[
+  {
+    "phrase": 0,
+    "line": "Poised in closed position, holding an imaginary partner.",
+    "at": 5.748639455782313,
+    "seconds": 3.9899999999999993,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-0.wav",
+    "latency": 0.83,
+    "checker": "ok"
+  },
+  {
+    "phrase": 2,
+    "line": "Smooth rise and fall, breathing into the hold.",
+    "at": 14.197800453514738,
+    "seconds": 3.64995464852608,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-2.wav",
+    "latency": 0.8,
+    "checker": "ok"
+  },
+  {
+    "phrase": 4,
+    "line": "Whisk, opening into a side-by-side V-shape.",
+    "at": 22.646961451247165,
+    "seconds": 3.379977324263038,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-4.wav",
+    "latency": 0.81,
+    "checker": "ok"
+  },
+  {
+    "phrase": 5,
+    "line": "Chass\u00e9 from promenade position, feet gliding together.",
+    "at": 26.794263038548753,
+    "seconds": 4.260000000000002,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-5.wav",
+    "latency": 0.7,
+    "checker": "ok"
+  },
+  {
+    "phrase": 7,
+    "line": "Whisk, opening into a side-by-side V-shape.",
+    "at": 35.37222222222222,
+    "seconds": 3.3399546485260814,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-7.wav",
+    "latency": 0.81,
+    "checker": "ok"
+  },
+  {
+    "phrase": 8,
+    "line": "Natural spin turn, rotating rightwards across the floor.",
+    "at": 39.90591836734694,
+    "seconds": 3.2799773242630366,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-8.wav",
+    "latency": 1.09,
+    "checker": "it says right, but the measured travel was left"
+  },
+  {
+    "phrase": 10,
+    "line": "Natural turn, sweeping smoothly through the space.",
+    "at": 48.53539682539682,
+    "seconds": 3.770000000000003,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-10.wav",
+    "latency": 1.24,
+    "checker": "ok"
+  },
+  {
+    "phrase": 12,
+    "line": "Hesitation change, pausing smoothly in the held embrace.",
+    "at": 56.46936507936508,
+    "seconds": 4.059999999999995,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-12.wav",
+    "latency": 0.75,
+    "checker": "ok"
+  },
+  {
+    "phrase": 14,
+    "line": "Closing the box step, finishing in a held embrace.",
+    "at": 64.99580498866213,
+    "seconds": 3.3100226757369597,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-14.wav",
+    "latency": 0.75,
+    "checker": "ok"
+  },
+  {
+    "phrase": 15,
+    "line": "Holding the final pose, grounded and poised.",
+    "at": 69.11734693877551,
+    "seconds": 3.0899773242630317,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-15.wav",
+    "latency": 0.61,
+    "checker": "ok"
+  },
+  {
+    "phrase": 16,
+    "line": "Maintaining the frame, finishing with absolute control.",
+    "at": 73.62528344671202,
+    "seconds": 3.4800226757369614,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-16.wav",
+    "latency": 0.89,
+    "checker": "ok"
+  },
+  {
+    "phrase": 18,
+    "line": "Final whisk, settling back into closed embrace.",
+    "at": 82.04868480725624,
+    "seconds": 3.4499546485260737,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-18.wav",
+    "latency": 0.87,
+    "checker": "ok"
+  },
+  {
+    "phrase": 20,
+    "line": "Releasing the frame, he bows gracefully to the audience.",
+    "at": 90.11145124716553,
+    "seconds": 3.5199773242630386,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-20.wav",
+    "latency": 1.14,
+    "checker": "ok"
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "phrase": 0,
+    "line": "Poised to begin, letting the music settle.",
+    "at": 5.568321995464853,
+    "seconds": 2.83,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-0.wav",
+    "latency": 0.68,
+    "checker": "ok"
+  },
+  {
+    "phrase": 1,
+    "line": "Waiting for the right moment, keeping the frame.",
+    "at": 9.8959410430839,
+    "seconds": 2.6800226757369625,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-1.wav",
+    "latency": 0.71,
+    "checker": "it says right, but the measured travel was no clear direction"
+  },
+  {
+    "phrase": 2,
+    "line": "Rising through a closed change.",
+    "at": 14.223560090702946,
+    "seconds": 2.280000000000001,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-2.wav",
+    "latency": 0.84,
+    "checker": "ok"
+  },
+  {
+    "phrase": 3,
+    "line": "Lowering through another closed change.",
+    "at": 18.31934240362812,
+    "seconds": 2.4999999999999964,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-3.wav",
+    "latency": 0.7,
+    "checker": "ok"
+  },
+  {
+    "phrase": 4,
+    "line": "Whisk to the right.",
+    "at": 22.698480725623583,
+    "seconds": 1.2699999999999996,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-4.wav",
+    "latency": 0.86,
+    "checker": "ok"
+  },
+  {
+    "phrase": 5,
+    "line": "Rising gracefully in the box step.",
+    "at": 26.69122448979592,
+    "seconds": 2.6600453514739186,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-5.wav",
+    "latency": 0.62,
+    "checker": "ok"
+  },
+  {
+    "phrase": 6,
+    "line": "Commencing the natural turn.",
+    "at": 30.96732426303855,
+    "seconds": 1.8900453514739226,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-6.wav",
+    "latency": 0.63,
+    "checker": "ok"
+  },
+  {
+    "phrase": 7,
+    "line": "Back turned, completing the natural turn.",
+    "at": 35.217664399092975,
+    "seconds": 2.7600226757369555,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-7.wav",
+    "latency": 0.65,
+    "checker": "it mentions turning, but no turn was measured"
+  },
+  {
+    "phrase": 8,
+    "line": "Still in frame, facing the back.",
+    "at": 39.828639455782316,
+    "seconds": 2.1599999999999966,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-8.wav",
+    "latency": 0.99,
+    "checker": "ok"
+  },
+  {
+    "phrase": 9,
+    "line": "Stays in place, facing away.",
+    "at": 43.666825396825395,
+    "seconds": 2.010000000000005,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-9.wav",
+    "latency": 0.65,
+    "checker": "ok"
+  },
+  {
+    "phrase": 10,
+    "line": "Natural turn to the right.",
+    "at": 48.09748299319728,
+    "seconds": 1.9599999999999937,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-10.wav",
+    "latency": 0.8,
+    "checker": "it says the turn goes to the right, but the measured rotation was no clear direction"
+  },
+  {
+    "phrase": 11,
+    "line": "Rising into the box step.",
+    "at": 52.37358276643991,
+    "seconds": 2.1000453514739235,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-11.wav",
+    "latency": 0.86,
+    "checker": "ok"
+  },
+  {
+    "phrase": 12,
+    "line": "Closing feet in the box step.",
+    "at": 56.72696145124716,
+    "seconds": 1.8900000000000006,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-12.wav",
+    "latency": 0.99,
+    "checker": "ok"
+  },
+  {
+    "phrase": 13,
+    "line": "Another elegant box step.",
+    "at": 60.90002267573696,
+    "seconds": 2.009999999999998,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-13.wav",
+    "latency": 0.92,
+    "checker": "ok"
+  },
+  {
+    "phrase": 14,
+    "line": "Completing a natural turn.",
+    "at": 65.07308390022676,
+    "seconds": 1.9199999999999875,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-14.wav",
+    "latency": 0.84,
+    "checker": "ok"
+  },
+  {
+    "phrase": 15,
+    "line": "Rising through the box step.",
+    "at": 69.16886621315193,
+    "seconds": 2.0,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-15.wav",
+    "latency": 0.7,
+    "checker": "ok"
+  },
+  {
+    "phrase": 16,
+    "line": "Closing feet into the box step.",
+    "at": 73.52224489795918,
+    "seconds": 2.190022675736955,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-16.wav",
+    "latency": 0.77,
+    "checker": "ok"
+  },
+  {
+    "phrase": 17,
+    "line": "Executing another box step.",
+    "at": 77.82410430839002,
+    "seconds": 2.1300000000000097,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-17.wav",
+    "latency": 0.89,
+    "checker": "ok"
+  },
+  {
+    "phrase": 18,
+    "line": "Repeating the box step.",
+    "at": 82.12596371882086,
+    "seconds": 1.5199773242630386,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-18.wav",
+    "latency": 0.93,
+    "checker": "ok"
+  },
+  {
+    "phrase": 19,
+    "line": "Concluding the box step.",
+    "at": 86.17022675736962,
+    "seconds": 1.789999999999992,
+    "wav": "C:\\Users\\adoro\\AppData\\Local\\Temp\\unseen-live-19.wav",
+    "latency": 0.75,
+    "checker": "ok"
+  }
+]
