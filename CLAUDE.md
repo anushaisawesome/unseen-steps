@@ -29,7 +29,7 @@ commit.
 | Translation (checked English → uk / de / hi) | `server/localise.py` | Works, ~2 s |
 | Kill test + demo video render on a clip | `scripts/killtest.py` | Works: pose, following, features, lines, voice, skeleton/caption video |
 | Who-is-followed contact sheet | `scripts/track_debug.py` | Works |
-| Live demo program | `scripts/live.py` | **Not built yet** (see below) |
+| Live demo program | `scripts/live.py` | Works: Gemini Live, about 0.8 s to first sound (see below) |
 | MongoDB (vocab, songs, show memory) | `server/db.py`, `server/setup_db.py` | Connected; collections and search indexes ready |
 | Dance vocabulary + Deep Research translations | `server/glossary_research.py` | Latest run produced 20 validated Waltz drafts; terminology confirmation belongs to Anusha + Nastia |
 
@@ -838,7 +838,7 @@ Anusha: "don't rehearse it, that's the same as hardcoding. We want to show how G
 
 ## Website: `web/` on Vercel (24 Oct, late; Nastia)
 
-Live at https://unseen-steps.vercel.app (Vercel project `unseen-steps`, account `nxstiaa`). Static pages plus two Python
+Now live at https://unseen-steps-studio.vercel.app (Vercel project `unseen-steps-studio`, Hobby scope `anushaisawesomes-projects`; Nastia's first deploy was `unseen-steps` on `nxstiaa`). Static pages plus two Python
 functions; no build step. WCAG 2.2 AA aimed for (Lighthouse accessibility 100 on both pages); Atkinson Hyperlegible type.
 - **Home (`index.html`, `app.js`):** the ballet solo with Unseen Steps' narration from a recorded `killtest.py --script`
   run (2D); music and narration as separate tracks with their own volumes, resizable captions, transcript, WebVTT
@@ -856,7 +856,6 @@ functions; no build step. WCAG 2.2 AA aimed for (Lighthouse accessibility 100 on
   `live.py`'s briefs into `web/api/_unseen/`. Run it before every deploy; never edit the copies.
 - **Deploy:** `cd web && npx vercel@63.1.2 deploy --prod`. `GEMINI_API_KEY` is a Vercel environment variable; there is no
   access code, so anyone with the link spends on that key: keep the AI Studio spending cap.
-- `web/youtube-demo/` is excluded from deploys (`web/.vercelignore`) until its generated `data.js` and audio are committed.
 
 ### Richness: a dancer's eye, not more rules (24 Oct, ~23:30)
 
@@ -1038,6 +1037,14 @@ rank fusion in Python (1/(60+rank)); MongoDB 8.0 has no `$rankFusion`. Vetted te
 `killtest.py` offers glossary terms. Test: "rotates to the right as a couple, a natural turn" -> natural turn, natural
 spin turn, turning lock; "steps forward, side, then closes the feet together" -> closed change first. Atlas features in
 use: Vector Search, Atlas Search, Hybrid Search. The cluster's 3 search-index slots are now all ours.
+
+## Licensing clean-up (25 Oct, after submission)
+
+The waltz song (`clips_public/with_you_im_born_again_slow_waltz.wav`) and the raw Mixkit ballet clip (`web/media/ballet.mp4`)
+are no longer tracked here: neither is ours to redistribute. **After `git pull` they disappear from your disk**; get them from
+the private clips repo (`music/with_you_im_born_again_slow_waltz.wav`, `ballet.mp4`) and put them back at the same paths
+(both are gitignored now). `video/cut4.py`, `live.py --song <file>` and website deploys still read them from those paths.
+Git history still contains them; rewriting history is the team's call.
 
 ## Final demo video (25 Oct, ~11:35)
 

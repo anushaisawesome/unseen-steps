@@ -3,21 +3,21 @@
 Audio description of dance for small studios' own shows, so blind and partially sighted people in the audience
 experience the dance, not just the music. Built at Encode London (23 to 25 October 2026) by Anusha, Andrii and Nastia.
 
-**Try it:** https://unseen-steps-studio.vercel.app (17 styles described, a narrated ballet solo, the venue listening page)
+**Try it:** https://unseen-steps-studio.vercel.app (18 styles described, a narrated ballet solo, the venue listening page)
 
-**Demo video:** _link to be added_
+**Demo video:** https://youtu.be/4aadm47Nk1g
 
 **A live session, recorded:** [`clips_public/live_session6.mp4`](clips_public/live_session6.mp4) is Andrii dancing
 a waltz with `scripts/live.py` narrating him in real time (skeleton, captions, music and voice). Its log,
 [`live_session6.json`](clips_public/live_session6.json), has every line with its time, latency to first sound and
-the checker's verdict; session 7 is there too, and the music played is
-[`with_you_im_born_again_slow_waltz.wav`](clips_public/with_you_im_born_again_slow_waltz.wav).
+the checker's verdict; session 7 is there too. The music he dances to is a slow-waltz recording of "With You I'm
+Born Again"; the audio file itself isn't in this repo (it isn't ours to share), so the team keeps it in the private clips repo.
 
 ## The problem
 
 Dance is a visual art form, so for the more than two million people in the UK living with sight loss (RNIB), a dance
 show is mostly music. Professional audio description of dance exists, but it is expensive and goes to large venues.
-The shows put on by small studios, schools and competitions, where most dancers actually perform, never get it. The
+The shows put on by small studios, schools and competitions, where most dancers actually perform, rarely get it. The
 project started with Anusha's robotics tutor, Gerard Canal (KCL), who dances ballroom with blind dancers.
 
 ## How it works
@@ -74,7 +74,8 @@ if a line was wrong, the next one puts it right.
 | YOLO11 pose (Ultralytics) | Body tracking and measurements; librosa for the music map |
 
 Data: rehearsal and live recordings of Andrii (our own); public YouTube performances read by Gemini directly (credited
-on the demo page; not downloaded); a Mixkit stock ballet clip (free licence) with Kevin MacLeod's "Dance of the Sugar
+on the demo page; not downloaded); a Mixkit stock ballet clip (Mixkit free licence; the raw clip is served by the site but not
+kept in this repo, since the licence doesn't allow redistributing it as stock) with Kevin MacLeod's "Dance of the Sugar
 Plum Fairy" (CC BY 4.0); a waltz glossary from Deep Research with its cited sources, vetted by dancers; sight-loss
 figures from RNIB.
 

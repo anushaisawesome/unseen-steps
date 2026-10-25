@@ -14,3 +14,8 @@ data/experiments/
 scripts/live_preview.py
 scripts/live_preview2.py
 video/work/
+
+# Not ours to redistribute: kept in the private clips repo (music/, ballet.mp4), still on disk for builds and deploys
+clips_public/*.wav
+web/media/ballet.mp4
+web/youtube-demo/parts/
