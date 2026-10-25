@@ -59,6 +59,9 @@ Argon learns her taste from: what she valued, what she hated, and why.
 - "You still cut really good descriptive lines, especially for the groove at the end"; "the lines you kept compared
   to the ones cut are awful"; "it cut the first line, which is important context."
 - Listening with eyes closed: "it feels different and not right, like it's not on beat."
+- Tutting (Sadeck, "Murmuration"), listening with eyes closed: "I couldn't mentally follow tutting with my eyes
+  closed." (A stream of hand-shape details with no overall picture to hang them on; a listener needs to know what
+  they're picturing first, then one clear image at a time, at a pace they can follow.)
 - "It keeps saying the director's notes, so it doesn't stop talking"; "sometimes the voice doesn't say what the
   captions are saying."
 
