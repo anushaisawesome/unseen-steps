@@ -218,23 +218,27 @@ def zoom(video: str, plan: dict, start: float | None, end: float | None) -> dict
     return plan
 
 
-STYLE_CHECK = """Here is the style label someone gave this dance, with their evidence. Be sceptical: for each style or
-influence it names, is it unmistakably there, with several distinct visible cues (not one gesture that resembles
-it)? Remove any influence that isn't; keep the rest in the same words. Return JSON {"name": "...", "evidence": [...],
-"removed": ["influences you removed, with why"]}."""
+STYLE_CHECK = """Here is the style label someone gave this dance, with their evidence. Watch it yourself and give the
+correct label: every style or influence it really draws on, each with several distinct visible cues (not one gesture
+that resembles it). Remove influences that aren't there; add ones that are, especially where a dancer's feedback below
+says so. Return JSON {"name": "...", "evidence": [...], "removed": ["influences you removed or added, with why"]}."""
 STYLE_SCHEMA = {"type": "object", "properties": {"name": {"type": "string"},
                 "evidence": {"type": "array", "items": {"type": "string"}},
                 "removed": {"type": "array", "items": {"type": "string"}}}, "required": ["name", "evidence", "removed"]}
 
 
-def check_style(video: str, plan: dict, start: float | None = None, end: float | None = None) -> dict:
+def check_style(video: str, plan: dict, start: float | None = None, end: float | None = None,
+                force: bool = False) -> dict:
     """Argon double-checks its own style label: every named influence needs several unmistakable cues (it kept
     calling Track 10 'classical Indian' or 'Dai dance' from ornate wrist work)."""
-    if plan.get("style_checked"):
+    if plan.get("style_checked") and not force:
         return plan
+    from scriptwriter import dancer_feedback  # a dancer's eye outranks the sceptic where she has commented
     label = f"Label: {plan['style']['name']}\nEvidence: {'; '.join(plan['style'].get('evidence', []))}"
     r = with_retry(lambda: client().models.generate_content(
-        model=MODEL, contents=[video_part(video, start, end), STYLE_CHECK + "\n\n" + label + clip_note(start, end)],
+        model=MODEL, contents=[video_part(video, start, end), STYLE_CHECK + "\n\n" + label + clip_note(start, end)
+                               + dancer_feedback() + "\nWhere this dancer has said what is (or isn't) in a piece, "
+                               "trust her eye over yours."],
         config=types.GenerateContentConfig(response_mime_type="application/json", response_schema=STYLE_SCHEMA,
                                            thinking_config=types.ThinkingConfig(thinking_level="high"))))
     checked = json.loads(r.text)

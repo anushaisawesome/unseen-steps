@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
 sys.path.insert(0, str(ROOT / "scripts"))
-from director import performance_map  # noqa: E402
+from director import check_style, performance_map  # noqa: E402
 from youtube_demo import OUT, VIDEOS  # noqa: E402
 
 videos = {v[0]: v for v in VIDEOS}
@@ -18,7 +18,10 @@ for name in ("data.json", "data-keymoments.json"):
     for entry in data:
         v = videos.get(entry["key"])
         if v:
-            plan = performance_map(f"https://www.youtube.com/watch?v={v[1]}", style_hint=v[3], start=v[4], end=v[5])
+            url = f"https://www.youtube.com/watch?v={v[1]}"
+            plan = performance_map(url, style_hint=v[3], start=v[4], end=v[5])
+            if entry["key"] in sys.argv[1:]:  # re-check these with the dancer's feedback
+                plan = check_style(url, plan, v[4], v[5], force=True)
             entry["style"] = plan["style"]["name"]
             print(f"{entry['key']}: {entry['style']}")
     path.write_text(json.dumps(data, indent=1, ensure_ascii=False))
