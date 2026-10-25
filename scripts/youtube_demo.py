@@ -49,6 +49,7 @@ VIDEOS = [
     ("afrobeats", "uWqCqv6pmmU", "HomeBros: Afro dance choreography", "afrobeats", 0, 164),
     ("salsa", "9KBF0BJlCSk", "Javi & Alice: 1st place salsa cabaret couples, ULDC 2017", "salsa", 0, 155),
     ("tap", "5xxTkB5bGy4", "Tap Dance World Championship 2012: adult male solo", "tap", 0, 135),
+    ("judas", "EY25JsOzqpQ", "1MILLION: Round 1 Front Row, IDL 2026 Seoul Series", "commercial hip-hop crew choreography", 0, 168),
     ("recital", "R9snlDcU9bA", "Ascendance Studio Company: \"Trolls\" (studio recital, 2022)", "studio recital, jazz or commercial", 0, 141),
     ("ballroom", "0GHkCRM8DBc", "WDSF World Open Prague: Standard final, waltz", "ballroom waltz", 0, 141),
 ]

@@ -4429,6 +4429,402 @@
   ]
  },
  {
+  "key": "judas",
+  "id": "EY25JsOzqpQ",
+  "label": "1MILLION: Round 1 Front Row, IDL 2026 Seoul Series",
+  "style": "commercial hip-hop megacrew choreography with tutting, street jazz, and contemporary floorwork influences",
+  "start": 0,
+  "end": 168,
+  "review": "At 100% speech density, several lines collided (especially at 34.6/36.5 s, 61.1/62.5 s, 123.4/125.2 s, and the 153–158 s outro climax) and left no room for the music or vocal hooks. I dropped surplus transition lines, merged overlapping pairs into single on-beat descriptions, corrected stage-versus-camera directions on the lunges and side kicks, and sharpened the rapid-fire outro callouts. The script captures the piece's altar tableaux, canons, tutting, floorwork, and partner lifts well, but at 82% speech density it crowds the music and collides during fast transitions (especially 73–76 s and the 153–162 s outro climax). I dropped two surplus lines to let the vocals breathe, tightened phrasing across the board so callouts land cleanly on the beat, and adjusted several timestamps to match the exact visual hits.",
+  "signature": [
+   "Religious/altar-like group tableaux with a central elevated or framed figure surrounded by kneeling worshippers: full body, with the central dancer's arms spread wide and the surrounding dancers kneeling with arms raised or heads bowed",
+   "Whip-like hair tosses and head snaps integrated into the beat: head, neck, and long loose hair",
+   "Synchronized multi-pair acrobatic lifts and horizontal leg tilts across the stage: legs extended straight up or horizontally in wide splits while supported by a partner's torso and arms",
+   "Wide-stanced, low-grounded hip-hop power grooves in oversized baggy pants: legs in deep wide second-position pliés, torso pumping, and arms slicing overhead"
+  ],
+  "sections": [
+   {
+    "start": 2.4,
+    "end": 25.0,
+    "label": "Intro: Altar Tableau and Rising",
+    "group": "Soloist elevated in the center against synchronized flanking subgroups and ripple canons."
+   },
+   {
+    "start": 25.0,
+    "end": 47.6,
+    "label": "Verse 1: Judas Chant and Staggered Grooves",
+    "group": "Unison in the standing front group contrasting with low floor shapes behind, then full-group unison."
+   },
+   {
+    "start": 47.6,
+    "end": 75.8,
+    "label": "Verse 2: Kick Line and Floor Soloist",
+    "group": "Front-line unison, then a lone soloist against a supine group lying on their backs kicking legs up, followed by two subgroups trading low traveling steps."
+   },
+   {
+    "start": 75.8,
+    "end": 106.0,
+    "label": "Chorus 1 & Breakdown: High-Energy Unison and Subgroup Trade",
+    "group": "Full-group unison for the chorus, shifting to a featured subgroup of three to five dancers in front of a static or bowing background line."
+   },
+   {
+    "start": 106.0,
+    "end": 125.0,
+    "label": "Bridge: Floor Wave, Duet Walk, and Partner Lifts",
+    "group": "Unison floorwork in the main group, a featured pair walking together, then seven synchronized pairs performing lifts."
+   },
+   {
+    "start": 125.0,
+    "end": 168.0,
+    "label": "Final Chorus and Outro Tableau",
+    "group": "Pairs transitioning into full-group unison, a brief ripple canon, and a final soloist-framed tableau."
+   }
+  ],
+  "lines": [
+   {
+    "at": 2.5,
+    "text": "Altar tableau: soloist lifted high, arms spread; kneeling lines reach toward her.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-99b3fe1f33.mp3",
+    "status": "spoken",
+    "seconds": 4.62
+   },
+   {
+    "at": 7.3,
+    "text": "Reaching toward the lifted center, then whipping hair back on the drum!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.09
+   },
+   {
+    "at": 10.6,
+    "text": "Rising into sharp crossed-wrist tutting and hair whips.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-23459e9a2a.mp3",
+    "status": "spoken",
+    "seconds": 2.89
+   },
+   {
+    "at": 15.0,
+    "text": "Levels swap: front row drops to bow flat, back row reaching high.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-10a4686681.mp3",
+    "status": "spoken",
+    "seconds": 4.32
+   },
+   {
+    "at": 22.2,
+    "text": "Floor dancers press into shoulder-stand splits as the center lift rises.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-834097c4d0.mp3",
+    "status": "spoken",
+    "seconds": 3.34
+   },
+   {
+    "at": 25.69,
+    "text": "Center lift drops into wide lunges, arms sweeping out over folded kneelers.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-8d5f8cc3ec.mp3",
+    "status": "spoken",
+    "seconds": 4.15
+   },
+   {
+    "at": 29.5,
+    "text": "Wide-stance arm swings and torso rolls over kneeling dancers, hitting overhead angles!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.12
+   },
+   {
+    "at": 34.6,
+    "text": "Sharp overhead forearm crosses, then a canon of side-lunge reaches.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-d7d0584585.mp3",
+    "status": "spoken",
+    "seconds": 3.59
+   },
+   {
+    "at": 45.4,
+    "text": "Converging tight, arms spire overhead before back legs shoot skyward!",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-ba196dbf9d.mp3",
+    "status": "spoken",
+    "seconds": 3.69
+   },
+   {
+    "at": 51.8,
+    "text": "Wide stance, forearms cross in an X, sharp tutting frames heads!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.37
+   },
+   {
+    "at": 55.0,
+    "text": "Front line steps in, firing two waist-high side kicks!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-1422e0c6c6.mp3",
+    "status": "spoken",
+    "seconds": 3.25
+   },
+   {
+    "at": 61.1,
+    "text": "Crew drops flat; soloist arches into a deep contortion backbend.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-f2e48ccb40.mp3",
+    "status": "spoken",
+    "seconds": 4.1
+   },
+   {
+    "at": 67.2,
+    "text": "She whips a one-handed cartwheel as the crew scrambles low.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-9568bb7681.mp3",
+    "status": "spoken",
+    "seconds": 3.61
+   },
+   {
+    "at": 73.5,
+    "text": "Deep fold snaps to overhead crown tuts, framing a center aisle!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.19
+   },
+   {
+    "at": 76.0,
+    "text": "Heads snap back, exploding into chorus unison with slicing forearms!",
+    "kind": "description",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-ff668db3cf.mp3",
+    "status": "spoken",
+    "seconds": 3.73
+   },
+   {
+    "at": 80.5,
+    "text": "Left side whips hair round, snapping up into overhead diamond frames!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/judas-b50f0ad083.mp3",
+    "status": "spoken",
+    "seconds": 3.34
+   },
+   {
+    "at": 87.8,
+    "text": "All drop flat to forearms, rising to kneel with overhead forearm crosses.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.82
+   },
+   {
+    "at": 91.8,
+    "text": "Line freezes behind as a trio charges out, whipping arms overhead.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-b0802e691d.mp3",
+    "status": "spoken",
+    "seconds": 3.96
+   },
+   {
+    "at": 96.8,
+    "text": "Levels split: left group whips arms into wide-stance freezes, right pairs kneel.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-2bf74f242d.mp3",
+    "status": "spoken",
+    "seconds": 4.33
+   },
+   {
+    "at": 106.6,
+    "text": "Dropping into floorwork, a kneeling line sweeps right legs and arms.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-0901a0b8a4.mp3",
+    "status": "spoken",
+    "seconds": 3.22
+   },
+   {
+    "at": 110.0,
+    "text": "Sitting up with high overhead reaches, left-group kick into seated pike folds.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.33
+   },
+   {
+    "at": 117.2,
+    "text": "Rising to knees and folding low as a side pair clasps hands.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/judas-0689066edf.mp3",
+    "status": "spoken",
+    "seconds": 4.64
+   },
+   {
+    "at": 123.4,
+    "text": "Unison partner lifts, flyers arching back in vertical splits!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-4cfb7cbb7f.mp3",
+    "status": "spoken",
+    "seconds": 3.24
+   },
+   {
+    "at": 132.6,
+    "text": "Partners brace leaning torsos for wide horizontal side-leg extensions!",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/judas-71bfed7f5a.mp3",
+    "status": "spoken",
+    "seconds": 3.52
+   },
+   {
+    "at": 139.0,
+    "text": "Pulling kneeling partners up, whipping hair into grounded wide-stance grooves.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/judas-541c32331a.mp3",
+    "status": "spoken (signature)",
+    "seconds": 4.59
+   },
+   {
+    "at": 144.0,
+    "text": "Sharp freeze, right hands snapped to a salute!",
+    "kind": "callout",
+    "pace": "brisk",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-30e4e1aac5.mp3",
+    "status": "spoken",
+    "seconds": 2.58
+   },
+   {
+    "at": 147.8,
+    "text": "Wide-stance arm windmills, then spinning into crossed overhead forearm X-frames.",
+    "kind": "description",
+    "pace": "brisk",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 4.11
+   },
+   {
+    "at": 153.0,
+    "text": "Sharp double torso folds, then marching forward with a hair whip!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": true,
+    "priority": null,
+    "audio": "audio/judas-552bb43671.mp3",
+    "status": "spoken",
+    "seconds": 2.8
+   },
+   {
+    "at": 156.0,
+    "text": "Crew parts as stacked dancers ripple arms around center!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.24
+   },
+   {
+    "at": 158.2,
+    "text": "Overhead forearm X, elbows pull down into high diagonal reach!",
+    "kind": "callout",
+    "pace": "rapid",
+    "key_moment": false,
+    "priority": null,
+    "audio": null,
+    "status": "left for the music",
+    "seconds": 3.37
+   },
+   {
+    "at": 161.4,
+    "text": "Final freeze: the crew kneels in worship around the standing leader, arms flung wide.",
+    "kind": "description",
+    "pace": "steady",
+    "key_moment": false,
+    "priority": null,
+    "audio": "audio/judas-1c128515cc.mp3",
+    "status": "spoken",
+    "seconds": 4.94
+   }
+  ]
+ },
+ {
   "key": "recital",
   "id": "R9snlDcU9bA",
   "label": "Ascendance Studio Company: \"Trolls\" (studio recital, 2022)",
