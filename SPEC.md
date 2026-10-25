@@ -283,7 +283,73 @@ plays from the speaker. One fixed venue camera.
 Spatial audio, haptics, ask mode, detail dial, groups of 3 or more, dancer feedback. Next after
 the weekend: a training tool for blind dancers, with Gerard's haptic-suit idea.
 
-## 15. Sources
+## 15. Room for improvement
+
+### 15a. Live narration names figures that weren't danced (25 Oct, Andrii)
+
+**Observed.** With the shared dancer's-eye brief (`scriptwriter.DANCERS_EYE` + `LIVE_RULES` in
+`scripts/live.py`), live lines got far more personality and better movement description than the earlier
+live brief, but they overreach on names. In Andrii's solo waltz (live session 7, about 90 s) it named seven
+different figures: whisk three times (one word-for-word repeat despite "never repeat a line"), chassé from
+promenade position, natural spin turn, natural turn, hesitation change and box step. "Chassé from promenade
+position" came out of nowhere. Several of these can't be seen in a solo at all: promenade position and the
+whisk's "side-by-side V-shape" are defined by where the partner is.
+
+**Why.**
+1. The live session's system instruction carries the style's whole vetted glossary (18 waltz terms), and the
+   brief says to name a step when it clearly is one. The list reads like a menu of what to expect, so the
+   model picks the fanciest near match.
+2. Nothing verifies a figure name. `server/checker.py` only tests turns, jumps, floor work, stillness and
+   directions, so "chassé from promenade position" passes as "ok"; only the direction in "natural spin turn,
+   rotating rightwards" was flagged.
+3. The earlier hardcoded waltz list was rightly removed (its example phrases leaked into the output), but
+   nothing replaced it to say which figures this routine actually contains.
+
+**Ideas for a middle ground.** Keep the dancer's-eye brief, where the personality comes from, and limit only
+which names may be spoken:
+1. **Names come from the routine, not the whole syllabus.** With show notes (`--show`), allow the figure names
+   in the rehearsal script, since that's what the dancer actually danced. Without show notes, allow only a
+   small basic set (box step / closed change, natural turn, reverse turn). Everything else is described the
+   dancer's-eye way, without a syllabus name. Most impact, and easy to check: you can list exactly which
+   names are allowed.
+2. **Solo partner dancing:** a figure defined by the partner's position (promenade, outside partner, the
+   whisk's V-shape) can't be seen solo, so describe the body instead of naming it.
+3. **When in doubt, describe, don't name:** a wrong figure name sounds authoritative to a blind listener; a
+   vivid description is never wrong. Overlaps with the brief's "clearly a named step", so optional.
+
+Recommended: 1 and 2 together. Talk to Anusha first, since this changes her shared brief.
+
+### 15b. Box step missed in side profile (25 Oct, Andrii)
+
+**Observed.** In live session 4, box steps danced side-on to the camera were narrated as "gently swaying in
+place"; facing the camera they were named.
+
+**Why (measured on that recording).** `killtest.footwork` classifies each beat as forward/back, side or close
+from 2D foot movement and looks for forward-side-close. In profile, forward/back steps move across the picture,
+so they're classified "side", and the box is never found. The facing measurement also reads the profile as
+"facing the audience": the waltz frame keeps the shoulders wide. One ear disappearing (confidence < 0.3 vs > 0.7
+for the other) identifies profile reliably. Even facing the camera, the per-beat classifier found a box in only
+3 of about 17 box-step phrases.
+
+**Idea (tested on session 4, not built).** A facing-independent signature: the feet move on almost every beat
+but the dancer ends close to where he started (net travel < half the largest excursion, excursion > 0.15 body
+heights). It flagged every box-step phrase in profile, facing front and facing away, and no stillness, travel
+or turn phrases. Thresholds come from one recording; any step-step-close in place (a closed change, say) would
+also pass. Suggested home: `live.py` only, sent to the model as `footwork: "box step"`.
+
+### 15c. Smaller live issues
+
+- **Repeated stillness lines.** The live model describes a held pose again on every phrase. A tested fix
+  (skip the prompt when this phrase and the previous one both measure stillness ≥ 0.85; dancing measures
+  0.35–0.55) gave real silence but was taken out for now; if it returns, reset only after two moving phrases,
+  since one small movement restarted the lines.
+- **Checker false flags.** "Waiting for the right moment" is flagged as a direction claim, and "natural turn,
+  rotating to the right" is flagged when rotation can't be measured, though a natural turn always turns right.
+- **Live frame rate.** Gemini Live gets 2 frames a second, about one frame per beat at 86 bpm. The docs don't
+  say whether Live uses more frames if sent; a 5 fps test kept latency at ~0.9 s, but its effect on step
+  recognition wasn't isolated.
+
+## 16. Sources
 
 - Encode London dashboard — challenges, judging criteria, submission requirements (sign-in needed)
 - Encode London on Luma — schedule
