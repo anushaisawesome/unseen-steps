@@ -154,3 +154,16 @@ ol.lines > li[aria-current="true"] { border-color: var(--red); box-shadow: inset
 .track-cap .say { font-family: var(--sans); font-weight: 400; font-style: italic; font-size: clamp(1.1rem, 1.9vw, 1.35rem); }
 .wave .duck { opacity: 0.85; }
 .hero h1 .hl::before { background: color-mix(in srgb, var(--red) 38%, transparent); opacity: 1; mix-blend-mode: normal; }
+
+/* the reveal and trust sections, in the same card language (Andrii's review) */
+:root { --ok-shadow: #2f9e5b; --no-shadow: #d1352b; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ok-shadow: #5fd08a; --no-shadow: #ff7a6e; } }
+.reveal video { border: 2px solid var(--navy); border-radius: 12px; box-shadow: 6px 6px 0 var(--red); }
+#log > li { border: 2px solid var(--navy); border-radius: 10px; }
+#log > li:has(.verdict.ok) { box-shadow: 5px 5px 0 var(--ok-shadow); }
+#log > li:has(> div > .verdict.no) { box-shadow: 5px 5px 0 var(--no-shadow); }
+#log .draft { border-left: 4px solid var(--no-shadow); padding-left: 0.7rem; }
+.facts > div { box-shadow: 6px 6px 0 var(--red); }
+/* the venue page in the same language */
+.listen h2, main h2 { font-family: var(--display); font-weight: 800; letter-spacing: -0.02em; }
+.eyebrow { color: var(--red-text); font-family: var(--display); font-weight: 700; letter-spacing: 0; text-transform: none; font-size: 1rem; }
