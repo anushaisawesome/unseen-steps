@@ -1,0 +1,145 @@
+/* Unseen Steps, home page: "studio print".
+   The world of a small dance studio, printed on a risograph in two inks on warm paper: navy (all text and
+   controls) and vermilion (accent, large display and decoration only). Display type: Bricolage Grotesque.
+   Reading type: Atkinson Hyperlegible (designed for low-vision readers). Loaded after styles.css, which still
+   styles the player and the reveal; this file sets the tokens they use. */
+
+:root {
+  --paper: #f3ede2; --paper-2: #e9e1d2; --navy: #1e2a44; --red: #e0522f; --red-text: #a63a1c;
+  --muted: #4b5266; --line: #d3c8b4; --on-navy: #f7f2e8;
+  --bg: var(--paper); --surface: #fbf8f2; --ink: var(--navy); --accent: var(--navy); --accent-ink: var(--on-navy);
+  --accent-soft: #e3dccd; --focus: #1f5fbf;
+  --display: "Bricolage Grotesque", "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .12 0 0 0 0 .16 0 0 0 0 .27 0 0 0 .08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15171d; --paper-2: #1c1f27; --navy: #f1ebdf; --red: #ff7652; --red-text: #ff9475;
+    --muted: #b8bcc7; --line: #343845; --on-navy: #15171d; --surface: #1c1f27; --accent-soft: #2a2e38; --focus: #8fb8ff;
+  }
+}
+
+body { background: var(--paper) var(--grain); color: var(--navy); }
+html, body { overflow-x: clip; }
+h1, h2, h3, h4 { font-family: var(--display); letter-spacing: -0.02em; }
+a { color: var(--navy); text-decoration-color: var(--red); text-decoration-thickness: 2px; }
+:focus-visible { outline-color: var(--focus); }
+.wrap { max-width: 76rem; }
+main { display: block; padding: 0; gap: 0; }
+main > section { padding-block: clamp(3.5rem, 8vw, 6rem); }
+.band-2 { background: var(--paper-2) var(--grain); border-block: 2px solid var(--navy); }
+
+/* masthead */
+.site-head { border-bottom: 0; background: transparent; }
+.site-head .wrap { padding-block: 1.15rem; }
+.brand { font-family: var(--display); font-weight: 800; font-size: 1.4rem; letter-spacing: -0.02em; }
+.brand svg { height: 2.1rem; width: auto; }
+.brand .ink-n { fill: var(--navy); } .brand .ink-r { fill: var(--red); mix-blend-mode: multiply; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .brand .ink-r { mix-blend-mode: screen; } }
+nav a { font-weight: 700; }
+nav a:hover { border-bottom-color: var(--red); }
+
+/* buttons: ink on paper, with a printed offset shadow in the second ink */
+.btn, .button.primary, button.primary { font-family: var(--display); font-weight: 800; font-size: 1.08rem; color: var(--on-navy); background: var(--navy);
+  border: 2px solid var(--navy); border-radius: 8px; padding: 0.8rem 1.35rem; min-height: 48px; display: inline-flex; align-items: center; gap: 0.5rem;
+  text-decoration: none; box-shadow: 4px 4px 0 var(--red); transition: transform 160ms ease, box-shadow 160ms ease; }
+.btn:hover, .button.primary:hover, button.primary:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--red); filter: none; background: var(--navy); }
+.btn:active, button.primary:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--red); }
+button, .button { border-radius: 8px; }
+.link { font-weight: 700; color: var(--navy); text-decoration: underline; text-decoration-color: var(--red); text-decoration-thickness: 3px; text-underline-offset: 0.25em; padding-block: 0.6rem; }
+
+/* hero */
+.hero { padding-block: clamp(1rem, 3vw, 2.5rem) clamp(3rem, 6vw, 5rem); }
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+@media (max-width: 58rem) { .hero .wrap { grid-template-columns: 1fr; } }
+.copy { display: grid; gap: 1.4rem; justify-items: start; }
+.kicker { font-family: var(--display); font-weight: 700; font-size: 1rem; color: var(--navy); border: 2px solid var(--navy); border-radius: 999px;
+  padding: 0.3rem 0.9rem; box-shadow: 3px 3px 0 var(--red); background: var(--surface); }
+.hero h1 { font-size: clamp(2.9rem, 6.4vw, 5.3rem); font-weight: 800; line-height: 1.0; letter-spacing: -0.035em; color: var(--navy); }
+.hero h1 .hl { position: relative; white-space: nowrap; z-index: 0; }
+.hero h1 .hl::before { content: ""; position: absolute; left: -0.06em; right: -0.06em; bottom: 0.07em; height: 0.38em; background: var(--red);
+  opacity: 0.9; mix-blend-mode: multiply; transform: rotate(-1deg); border-radius: 0.15em 0.4em 0.25em 0.5em; z-index: -1; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hero h1 .hl::before { mix-blend-mode: normal; opacity: 0.45; } }
+.hero .lede { font-size: clamp(1.08rem, 1.6vw, 1.22rem); color: var(--muted); max-width: 34rem; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; }
+.print { margin: 0; }
+.frame { position: relative; }
+.frame::before { content: ""; position: absolute; inset: 0; transform: translate(12px, 12px) rotate(1deg); background: var(--red); border-radius: 12px; opacity: 0.9; }
+.frame img { position: relative; border-radius: 12px; border: 2px solid var(--navy); transform: rotate(-0.8deg); aspect-ratio: 1400 / 939; width: 100%; height: auto; background: var(--paper-2); }
+.print figcaption { margin-top: 1.4rem; text-align: right; font-size: 0.88rem; color: var(--muted); }
+
+/* section heads */
+.sec-head { display: grid; gap: 0.8rem; max-width: 48rem; margin-bottom: 2.25rem; }
+.sec-head h2 { font-size: clamp(2.1rem, 4.6vw, 3.3rem); font-weight: 800; line-height: 1.02; }
+.sec-head h2 .r { color: var(--red-text); }
+.sec-head p { color: var(--muted); font-size: 1.1rem; }
+
+/* the signature graphic: where the words go */
+.track { background: var(--surface); border: 2px solid var(--navy); border-radius: 14px; padding: clamp(1rem, 2.5vw, 1.75rem); box-shadow: 6px 6px 0 var(--red); }
+.track-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; align-items: baseline; }
+.track-title { font-family: var(--display); font-weight: 800; font-size: 1.15rem; }
+.legend { display: flex; gap: 1.25rem; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; list-style: none; margin: 0; padding: 0; }
+.legend li { display: inline-flex; align-items: center; gap: 0.45rem; }
+.legend i { width: 1.4rem; height: 0.55rem; border-radius: 3px; display: inline-block; }
+.legend .lm { background: var(--navy); opacity: 0.55; } .legend .lv { background: var(--red); }
+.stage { position: relative; margin-top: 1.25rem; }
+.wave { display: block; width: 100%; height: clamp(110px, 13vw, 180px); }
+.wave .mus { fill: var(--navy); opacity: 0.5; }
+.wave .duck { fill: var(--red); opacity: 0.9; }
+.segs { position: absolute; inset: 0; }
+.seg { position: absolute; top: 0; bottom: 0; padding: 0; margin: 0; border: 0; background: transparent; cursor: pointer; min-width: 24px; min-height: 0; border-radius: 6px; }
+.seg:hover { background: transparent; }
+.seg span { position: absolute; left: 0; right: 0; bottom: -0.9rem; height: 6px; border-radius: 3px; background: var(--red); transition: transform 160ms ease; }
+.seg:hover span, .seg[aria-pressed="true"] span { transform: scaleY(1.7); }
+.seg[aria-pressed="true"]::before { content: ""; position: absolute; inset: 0; border-radius: 6px; background: color-mix(in srgb, var(--red) 14%, transparent); }
+.playhead { position: absolute; top: -0.4rem; bottom: -1.2rem; width: 2px; background: var(--navy); left: 0; pointer-events: none; }
+.sections { list-style: none; margin: 1.9rem 0 0; padding: 0; position: relative; height: 2.6rem; border-top: 2px solid var(--navy); }
+.sections li { position: absolute; top: 0; padding: 0.4rem 0.5rem 0; border-left: 1px solid var(--navy); color: var(--muted); font-size: 0.8rem; line-height: 1.25; }
+.sections span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.track-cap { margin-top: 1rem; display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; align-items: baseline; min-height: 4.6rem; border-top: 2px dashed var(--line); padding-top: 1rem; }
+.track-cap .t { font-family: var(--mono); color: var(--red-text); font-size: 0.9rem; }
+.track-cap .say { font-family: var(--display); font-weight: 700; font-size: clamp(1.15rem, 2.2vw, 1.55rem); line-height: 1.3; letter-spacing: -0.01em; }
+.track-note { color: var(--muted); font-size: 0.86rem; margin-top: 0.9rem; }
+@media (max-width: 40rem) { .sections { display: none; } .track-cap { grid-template-columns: 1fr; } }
+
+/* what a listener hears: one line per row, like a departures board */
+.board { list-style: none; margin: 0; padding: 0; border-top: 3px solid var(--navy); }
+.board li { display: grid; grid-template-columns: minmax(11rem, 3fr) minmax(0, 9fr); gap: 1.5rem; padding: 1.6rem 0; border-bottom: 3px solid var(--navy); align-items: start; }
+.board .style { display: inline-block; justify-self: start; background: var(--navy); color: var(--on-navy); font: 800 0.95rem var(--display);
+  letter-spacing: 0.06em; text-transform: uppercase; padding: 0.4rem 0.7rem; border-radius: 4px; box-shadow: 3px 3px 0 var(--red); }
+.board .meta { display: grid; gap: 0.6rem; align-content: start; }
+.board .src { font-size: 0.92rem; color: var(--muted); }
+.board blockquote { margin: 0; font: 800 clamp(1.45rem, 3vw, 2.35rem)/1.14 var(--display); letter-spacing: -0.02em; }
+.board blockquote p::before { content: "\201C"; color: var(--red-text); } .board blockquote p::after { content: "\201D"; color: var(--red-text); }
+@media (max-width: 44rem) { .board li { grid-template-columns: 1fr; gap: 0.75rem; } }
+.after { margin-top: 2.25rem; display: flex; flex-wrap: wrap; gap: 1rem 1.6rem; align-items: center; }
+.note { color: var(--muted); font-size: 0.92rem; max-width: 40rem; }
+
+/* before and during, like the running order on a recital flyer */
+.order { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: clamp(1.5rem, 4vw, 3rem); }
+.half h3 { font-size: 1.85rem; font-weight: 800; display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.4rem; }
+.half h3 .dot { width: 1.05rem; height: 1.05rem; border-radius: 50%; background: var(--red); box-shadow: 4px 2px 0 var(--navy); flex: none; }
+.half:nth-child(2) h3 .dot { background: var(--navy); box-shadow: 4px 2px 0 var(--red); }
+.order .steps { list-style: none; margin: 0; padding: 0; display: block; counter-reset: s; }
+.order .steps li { counter-increment: s; display: grid; grid-template-columns: 2.6rem 1fr; gap: 0.2rem 0.9rem; padding: 1rem 0; border: 0; border-bottom: 2px dashed var(--line); }
+.order .steps li::before { content: counter(s); grid-row: 1 / span 2; width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--display); font-weight: 800; font-size: 1rem; color: var(--on-navy); background: var(--navy); box-shadow: 3px 3px 0 var(--red); }
+.order .steps h4 { margin: 0; font-size: 1.15rem; font-weight: 700; }
+.order .steps p { color: var(--muted); }
+
+/* the player and the reveal, on paper */
+.player { background: var(--surface); border: 2px solid var(--navy); border-radius: 14px; box-shadow: 6px 6px 0 var(--red); }
+.caption { background: var(--navy); color: var(--on-navy); border-radius: 8px; }
+ol.lines > li { background: var(--surface); border-color: var(--line); border-radius: 8px; }
+ol.lines > li[aria-current="true"] { border-color: var(--red); box-shadow: inset 4px 0 0 var(--red); }
+.beats i.on { background: var(--red); border-color: var(--red); }
+#transcript-title, .facts h3 { font-family: var(--display); }
+.facts { gap: 1.5rem; }
+.facts > div { background: var(--surface); border: 2px solid var(--navy); border-radius: 12px; padding: 1.25rem; }
+
+.site-foot { background: transparent; color: var(--muted); border-top: 0; }
+.site-foot .wrap { border-top: 2px solid var(--navy); padding-top: 1.25rem; }
+.site-foot a { color: var(--navy); }
+
+@media (prefers-reduced-motion: reduce) { .frame img, .frame::before { transform: none !important; } .playhead { display: none; } }
+@media (forced-colors: active) { .btn, .board .style, .track, .player { border: 2px solid ButtonText; } .hero h1 .hl::before { display: none; } .seg span { background: Highlight; } }
