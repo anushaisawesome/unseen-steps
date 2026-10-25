@@ -71,7 +71,8 @@ def check(line: str, features: dict, max_words: int = MAX_WORDS) -> Verdict:
             measured = features.get("rotation") or "no clear direction"
             return Verdict(False, f"it says the turn goes to the {side}, but the measured rotation was {measured}")
         # Facing, pointing or profile isn't travel either.
-        facing = (rf"\b(fac\w*|point\w*|look\w*)\s+(to\s+(the\s+)?)?{side}\b|\bprofile\s+(to\s+the\s+)?{side}\b"
+        facing = (rf"\bon\s+(his|her|their)\s+{side}\b|"  # "steps forward on his left" = his left foot
+                  rf"\b(fac\w*|point\w*|look\w*)\s+(to\s+(the\s+)?)?{side}\b|\bprofile\s+(to\s+the\s+)?{side}\b"
                   rf"|\b{side}\s+profile\b|\bside-on[^.,;]*\b{side}\b")
         rest = re.sub(facing, " ", re.sub(rotating, " ", text))
         moving = rf"\b{side}(ward)?s?\b(?!\s+(arm|hand|leg|foot|shoulder|hip|knee|elbow|side))"

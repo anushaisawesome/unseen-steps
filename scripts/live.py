@@ -72,7 +72,8 @@ short line (3 to 8 words; a callout on a hit, 2 to 5) about what the dancer just
 most: the step by its name (only if every part of its definition is visible), the shape the body makes, the texture or
 dynamics (sharp or sustained, light or heavy), or a change in energy. Directions as the audience sees them. Use the
 measurements in the prompt: never claim a turn, jump, floor work or direction they don't support, and if you're told
-a line was wrong, put it right in the next one. Never repeat yourself: don't name the same step twice in a row, and
+a line was wrong, put it right in the next one by simply describing correctly: never apologise or mention the
+mistake. Never repeat yourself: don't name the same step twice in a row, and
 don't start lines the same way ("He performs", "He executes"); if the movement repeats, say something new about it
 (its texture, the arms, the shape, the feeling) or just a few words. Speak briskly and warmly, like commentary inside
 the music. Say only the line."""
@@ -99,6 +100,11 @@ class LiveEngine:
     async def main(self):
         self.loop, self.queue = asyncio.get_running_loop(), asyncio.Queue()
         system = LIVE_SYSTEM + (f"\nThe style is {self.live.args.style}." if self.live.args.style else "")
+        if self.live.show_notes:
+            system += ("\n\nShow notes, prepared from the studio's rehearsal video of this piece (the song and times "
+                       "are the same tonight). Use them to know the style, the vocabulary, what makes this choreography "
+                       "distinctive and what is coming, but describe what the dancer actually does now: if tonight "
+                       "differs from rehearsal, say what you see.\n" + self.live.show_notes)
         if self.live.glossary:
             system += "\nVocabulary vetted by dancers (use a term only if what you see matches it):\n" + "\n".join(self.live.glossary)
         config = {"response_modalities": ["AUDIO"], "output_audio_transcription": {},
@@ -254,6 +260,21 @@ class Live:
                 print(f"glossary unavailable ({type(e).__name__}); Gemini uses its own vocabulary")
         print(f"glossary: {len(self.glossary)} terms")
         self.feedback = ""   # the checker's verdict on the last line, for the next prompt
+        self.plan, self.show_notes, self.moments = None, "", []
+        if args.show:  # show night: the notes the studio prepared earlier, from MongoDB Atlas
+            from db import db
+            show = db()["shows"].find_one({"name": args.show})
+            if not show:
+                raise SystemExit(f"no show called {args.show!r} in Atlas; prepare it with scripts/prepare_show.py")
+            self.plan, self.show_notes = show["plan"], show["show_notes"]
+            self.moments = [tuple(m) for m in show["key_moments"]]
+            print(f"show notes loaded from Atlas: {args.show}")
+        elif args.rehearsal:  # or prepare them now from the studio's rehearsal video
+            from show_notes import prepare
+            self.plan, self.moments, self.show_notes = prepare(args.rehearsal, args.style)
+        if self.plan:
+            gaps = [g for g in self.song_map["clean_spaces"] if g]
+            print(f"show notes ready: {self.plan['style']['name']}, {len(self.moments)} key moments, {len(gaps)} gaps in the song")
         self.engine = LiveEngine(self) if args.engine == "live" else None
 
     # ---------- per frame ----------
@@ -277,7 +298,18 @@ class Live:
             self.path = {pt: p for pt, p in self.path.items() if pt > t - 30}
 
     def schedule(self, t):
-        """At each phrase end, think about that phrase (in the background so the video never stalls)."""
+        """At each phrase end (or, with show notes, at each gap in the song the notes identified), think about the
+        last few seconds in the background so the video never stalls."""
+        if self.show_notes:
+            for n, gap in enumerate(self.song_map["clean_spaces"]):
+                if gap and gap[0] <= t < gap[0] + 1.5 and n not in self.done_phrases:
+                    self.done_phrases.add(n)
+                    threading.Thread(target=self.describe, args=(n, max(0.0, gap[0] - CLIP_SECONDS), gap[0]),
+                                     daemon=True).start()
+            if t - self.last_notes >= NOTES_EVERY and t > NOTES_EVERY / 2:
+                self.last_notes = t
+                threading.Thread(target=self.direct, args=(t,), daemon=True).start()
+            return
         for n, (start, end) in enumerate(self.song_map["phrases"]):
             lead = 0.0 if self.engine else 0.5  # the fallback starts thinking just before the phrase ends
             if end - lead <= t and n not in self.done_phrases and end > t - 2:
@@ -302,6 +334,12 @@ class Live:
             measured = {k: features.get(k) for k in ("travel", "turns", "rotation", "facing", "max_rise", "lowest_level",
                                                     "stillness", "footwork") if features.get(k) not in (None, "")}
             prompt = f"Now ({start:.0f}-{end:.0f} s in the song). Measured: {json.dumps(measured, default=float)}."
+            if self.plan:
+                expected = [what for mt, what in self.moments if start - 2 <= mt <= end + 2]
+                section = next((sec["label"] for sec in self.plan["sections"] if sec["start"] <= end < sec["end"]), "")
+                prompt += (f" In rehearsal this was the section '{section}'"
+                           + (f", with: {'; '.join(expected)}" if expected else "")
+                           + ". Describe what the dancer actually does now.")
             if self.feedback:
                 prompt += " " + self.feedback
             if notes and notes != getattr(self, "notes_sent", ""):
@@ -486,6 +524,10 @@ def main():
     parser.add_argument("--headless", action="store_true", help="no window (for testing)")
     parser.add_argument("--seconds", type=float, help="stop after this many seconds")
     parser.add_argument("--mute", action="store_true", help="keep time without playing sound (for tests)")
+    parser.add_argument("--show", help="the name of a show whose notes were prepared earlier and stored in Atlas "
+                        "(scripts/prepare_show.py)")
+    parser.add_argument("--rehearsal", help="the studio's rehearsal video of this piece: Argon prepares show notes "
+                        "from it before the show, and narration goes in the gaps in the song")
     parser.add_argument("--engine", choices=["live", "flash"], default="live",
                         help="live: Gemini Live watches and speaks (~0.7 s); flash: write then TTS (~5 s)")
     Live(parser.parse_args()).run()

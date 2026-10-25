@@ -893,3 +893,22 @@ per-line visual check and caption check stay. Reference videos: Track 10, Aquama
 Pitch and submission plan for the team: https://claude.ai/artifact/WUVqqiV2qvKaZtZgQwgEep (timeline, judging criteria
 mapped to evidence, 3-minute video shot list, stage pitch with the eyes-closed hook, submission field updates, owners,
 backups). Judging: innovation, technical execution, impact, usability; top 10 pitch at 15:00 and the audience votes.
+
+## Framing and show notes (25 Oct, ~02:40)
+
+**Framing (Anusha):** the technology is for small studios to use for their own shows, which don't usually have access
+to rich audio description that captures the meaning of the dance; the users are the blind and partially sighted people
+in their audience. Studios upload the rehearsal video; show notes are written from its audio and video so timing,
+narration and richness are right, down to the style of dance, and can be tweaked. Live, YOLO pose runs on a live camera,
+Gemini has the show notes and the context of the song and performance, and narrates in real time, taking into account
+the dancer's live variation from rehearsal, in the gaps in the song it already identified.
+- `server/show_notes.prepare` (map + key moments + notes text). `scripts/prepare_show.py --name ... --rehearsal ...
+  --song ...` stores a show in MongoDB Atlas (`shows`: name, studio, style, song, bpm, gaps, plan, key_moments,
+  show_notes). `scripts/live.py --show "<name>"` loads it from Atlas (or `--rehearsal <video>` prepares it on the spot):
+  the Live session starts with the notes, prompts happen in the song's gaps (clean spaces), and each prompt says what
+  rehearsal had around then and asks for what the dancer actually does now. Test: median 0.80 s to first sound.
+- Live corrections no longer apologise ("My apologies, he performs a pivot to the left" before). Checker: "on his left"
+  is a foot, not a direction.
+- Scrutiny of the framing (answers in the pitch doc): groups (live tracking is solo today), "isn't it playback?" (Andrii
+  deliberately varies from rehearsal in the demo), trust (checked when notes are made; live corrections come after),
+  no notes editor yet (next), no blind user test yet (Gerard's dancers next), who pays (families at studio shows).
