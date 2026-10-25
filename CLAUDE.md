@@ -1016,3 +1016,31 @@ and setup, a 2 to 4 minute video on real inputs, a note on models and data sourc
 Changes made for it: README rewritten (problem, how it works, honesty and privacy, models and data sources, setup and
 the show-night commands); `scripts/edit_show.py` (studios edit show notes in Atlas); live figure names limited to the
 routine's own (SPEC 15a); checker false flags from SPEC 15c fixed.
+
+## Real World track ("AI that understands the world around us"): where we stand (25 Oct, morning; Andrii's Claude)
+
+Judging: real-world usefulness, how well it reads the world (accuracy, messy inputs), technical execution, responsibility
+(privacy, honesty about uncertainty). Needs: working demo, repo with README + setup, 2–4 min video on real inputs, a short
+note on models and data sources.
+
+| Criterion | Where we are | Rough score |
+| --- | --- | --- |
+| Real-world usefulness | Small studios can't afford audio description; blind and partially sighted audience members miss the dance. Same gap as DeepMind: no named user, no blind-user test yet. | Medium–strong |
+| Reading the world / messy input | Follows a marked couple in crowded handheld footage and goes silent rather than describe the wrong people; a hidden partner counts as "together"; unmeasured claims aren't checked; low-confidence keypoints aren't drawn (no wrong legs in backlight); lines checked against pose and re-watched against their moment; fixed phrases when there's no music. | Strong |
+| Technical execution | End to end on real data: Andrii's own footage, live camera, real songs, Atlas, Vercel site. | Strong |
+| Responsibility | Uncertainty handled well: style glossary only at >= 0.90 confidence, silence when the dancer is lost, checker vetoes instead of guessing, YouTube demos marked unchecked. **Privacy is weak:** face blurring for non-followed people and deleting uploads are planned only (the blur in `killtest.py` is for tracking). Other couples' clips are kept in the private clips repo. | Medium |
+
+| Requirement | Status |
+| --- | --- |
+| Working demo | Done: `live.py` and unseen-steps.vercel.app |
+| README with setup | Done, but Mac paths only (`.venv/bin/pip`); add Windows |
+| 2–4 min video on real inputs | The same 3:00 video covers both tracks |
+| Models and data note | Partly in the README layout; add a short "Models and data" section (Gemini models, YOLO11 pose, librosa, Mixkit + Sugar Plum Fairy CC BY credit, Andrii's footage, Deep Research sources) |
+
+**Quick wins:**
+1. **Blur faces of everyone but the followed dancer(s)** in rendered videos (pose boxes already exist in `killtest.py`); show it in
+   one demo shot.
+2. **One sentence on uncertainty in the video:** below 90% style confidence it uses plain words; if it loses the dancer it goes
+   quiet rather than guess.
+3. **One messy-input shot:** the crowded handheld waltz with the followed couple in pink.
+4. **README:** "Models and data" section and Windows setup.
