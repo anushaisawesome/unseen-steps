@@ -18,6 +18,7 @@ Press q to stop.
 import argparse
 import asyncio
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -51,13 +52,20 @@ NOTES_EVERY = 20.0   # seconds between the director's updates
 
 LIVE_BRIEF = """You are an expert audio describer for dance, describing a live performance for blind and partially
 sighted listeners as it happens. You see the last few seconds (frames, oldest first, with their times in the song)
-and the pose measurements for that stretch. Say the one thing a blind listener most needs right now, the way a
-sighted viewer would experience it: the step by its name if it has one (only if every part of the term's definition
-is visible), the shape the body makes, the texture or dynamics (sharp or sustained, light or heavy), a change in
-energy, or a striking accent. Never repeat what has already been said; if nothing new or important happened, return
-null and let the music play.
+and the pose measurements for that stretch. Say the one thing a blind listener most wants right now.
+NAME THE STEP. If the dancer is doing a figure with a name -- box step, closed change, natural turn, reverse turn --
+say its name (when the measurements and frames support it); that is the single most useful thing you can tell a blind
+listener, and name it again each time it returns. A purely evocative line without the name ("gliding smoothly",
+"a graceful turn") is fine once in a while for colour, but it should be the exception, not the habit. Once a figure is
+named, on its later bars you may add how it feels -- the rise and fall, the sway, the arms, the mood.
+Grace is in the wording, not instead of the facts. When the dancer is still, give the feeling of the stillness --
+gathering himself, waiting for the right moment, letting the music settle, poised to begin -- never a flat "stands
+still" or "frozen".
+You may also say nothing. If this phrase only repeats what you have already described and nothing new has happened,
+return null and let the music breathe.
 Rules: 3 to 8 words (a callout on a hit, 2 to 5 words); present tense; directions as the audience sees them ("to the
-left"); only what you can see. Return JSON {"line": "..." or null}."""
+left"); only what the measurements and frames support -- never a step, turn, jump, floor work, dip or direction they
+don't show. Return JSON {"line": "..." or null}."""
 
 NOTES_BRIEF = """You are the director of a live audio description of a dance, watching it as it happens. Frames from
 the last stretch are attached (oldest first, times in the song). Update your running notes for the live describer in
@@ -68,15 +76,26 @@ still true from your previous notes. Plain text bullets only."""
 
 LIVE_SYSTEM = """You are an expert live audio describer for dance, speaking to blind and partially sighted listeners
 while they hear the music. You watch the camera frames as they arrive. Each time you are prompted with "Now", say ONE
-short line (3 to 8 words; a callout on a hit, 2 to 5) about what the dancer just did that a sighted viewer would notice
-most: the step by its name (only if every part of its definition is visible), the shape the body makes, the texture or
-dynamics (sharp or sustained, light or heavy), or a change in energy. Directions as the audience sees them. Use the
-measurements in the prompt: never claim a turn, jump, floor work or direction they don't support, and if you're told
-a line was wrong, put it right in the next one by simply describing correctly: never apologise or mention the
-mistake. Never repeat yourself: don't name the same step twice in a row, and
-don't start lines the same way ("He performs", "He executes"); if the movement repeats, say something new about it
-(its texture, the arms, the shape, the feeling) or just a few words. Speak briskly and warmly, like commentary inside
-the music. Say only the line."""
+short line (3 to 8 words; a callout on a hit, 2 to 5) about what the dancer just did.
+NAME THE STEP. If the dancer is doing a figure with a name -- box step, closed change, natural turn, reverse turn --
+SAY ITS NAME; that is the single most useful thing for a blind listener, and you name it again each time it returns.
+A purely evocative line without the name ("gliding smoothly", "a graceful turn") is fine once in a while for colour,
+but it should be the exception, not the habit. Once a figure is named, on its later bars you may add how it feels --
+the rise and fall, the sway, the arms, the mood.
+Grace is in the wording, not instead of the facts. When the dancer is still, give the feeling of the stillness --
+gathering himself, waiting for the right moment, letting the music settle, poised to begin -- not a flat "stands still".
+You may say nothing at all: if the "Now" only repeats what you have already said and nothing new has happened, stay
+silent and let the music breathe.
+Directions as the audience sees them. Use the measurements in the prompt and describe ONLY what they and the frames
+show: never a step, turn, jump, floor work, dip or direction they don't support, and if you're told a line was wrong,
+put it right in the next one by simply describing correctly: never apologise or mention the mistake. Don't use the
+exact same words twice in a row. Speak briskly and warmly, like commentary inside the music. Say only the line."""
+
+
+def spoken_text(words):
+    """Strip the Live transcription's non-speech labels (<no speech>, {pause}, (music)...). What's left is the actual
+    spoken line; if it's empty, the model stayed silent and there's nothing to caption, check or log."""
+    return re.sub(r"<[^>]*>|\{[^}]*\}|\([^)]*\)", "", words or "").strip()
 
 
 class LiveEngine:
@@ -147,7 +166,9 @@ class LiveEngine:
                     turn["pcm"] += m.data
                 if content and content.output_transcription and content.output_transcription.text:
                     turn["words"] += content.output_transcription.text
-                    self.live.caption = (turn["words"].strip(), turn["at"] or 0, (turn["end"] or 0) + 0.4)
+                    shown = spoken_text(turn["words"])
+                    if shown:  # don't caption a silent turn's "<no speech>"/"{pause}" label
+                        self.live.caption = (shown, turn["at"] or 0, (turn["end"] or 0) + 0.4)
                 if content and content.turn_complete:
                     self.busy = False
                     self.live.spoken(turn)
@@ -332,7 +353,10 @@ class Live:
         features = phrase_features(path, float(np.median(sizes)), True, start, end, n, beats=self.song_map["beats"])
         if self.engine:  # Gemini Live speaks straight away; the checker reviews the line as it's said
             measured = {k: features.get(k) for k in ("travel", "turns", "rotation", "facing", "max_rise", "lowest_level",
-                                                    "stillness", "footwork") if features.get(k) not in (None, "")}
+                                                    "stillness") if features.get(k) not in (None, "")}
+            figure = features.get("footwork")
+            if figure:  # the figure's name (box step) so the model can name it, but not its mechanics ("...side, close")
+                measured["footwork"] = "box step" if "box" in figure else figure
             prompt = f"Now ({start:.0f}-{end:.0f} s in the song). Measured: {json.dumps(measured, default=float)}."
             if self.plan:
                 expected = [what for mt, what in self.moments if start - 2 <= mt <= end + 2]
@@ -398,8 +422,8 @@ class Live:
     def spoken(self, turn):
         """A Live line has been said: check it against the measurements; a wrong claim is flagged on screen and fed
         back so the next line puts it right."""
-        line = turn["words"].strip()
-        if not line or turn["at"] is None:
+        line = spoken_text(turn["words"])
+        if not line or turn["at"] is None:  # a silent turn (only "<no speech>"/"{pause}"): nothing to check or log
             return
         verdict = check(line, turn["features"], max_words=12)
         if not verdict.passed:
@@ -447,6 +471,9 @@ class Live:
             self.engine.start()
             print("connected to Gemini Live")
         self.mixer.start()
+        if not args.headless:  # a resizable window that fits the screen; the raw frame can be far bigger
+            cv2.namedWindow("Unseen Steps live", cv2.WINDOW_NORMAL)
+            cv2.resizeWindow("Unseen Steps live", 1280, 720)
         print(f"music: {self.song_map['bpm']} bpm, {len(self.song_map['phrases'])} phrases. Press q to stop.")
         try:
             while True:

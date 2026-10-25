@@ -913,6 +913,20 @@ the dancer's live variation from rehearsal, in the gaps in the song it already i
   deliberately varies from rehearsal in the demo), trust (checked when notes are made; live corrections come after),
   no notes editor yet (next), no blind user test yet (Gerard's dancers next), who pays (families at studio shows).
 
+### Live wording: name the step, with grace (25 Oct, ~04:00; Andrii + Anusha)
+
+Andrii's live test on Windows (`clips/live_session*.json`, local) said "closing the feet" / "bringing the feet together"
+on every box-step phrase, and flat "stands still / frozen" lines. Cause: the `footwork` measurement sent to Live read
+"half a box step (forward or back, side, close)", so the model echoed "close" each bar.
+- **Decided:** live lines name the figure (box step, closed change, natural turn, reverse turn) every time it is danced
+  and again when it returns; grace is in the wording ("waiting for the right moment", "letting the music settle"
+  instead of "stands still"). A purely evocative line without the name is allowed only occasionally, not banned.
+- Live gets `footwork` as just the figure name ("box step"), every phrase. A first attempt that sent it only once per
+  section made the model drop the names entirely ("gliding smoothly", "elegant waltz rhythm"), so don't de-dup it.
+- The Live model may stay silent when nothing new happened. Its transcription then reads `<no speech>{pause}`;
+  `live.spoken_text` strips such labels so a silent turn isn't captioned, checked or logged.
+- Also: the live window opens resizable at 1280x720 (it opened at full camera resolution on Windows).
+
 ### Video sources, rehearsal analysis and live tracking (25 Oct, ~01:00)
 
 - **Keep the full video with its soundtrack as the canonical input.** An MP3 is enough for beat/phrase mapping but not
