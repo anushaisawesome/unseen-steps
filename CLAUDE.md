@@ -854,7 +854,7 @@ functions; no build step. WCAG 2.2 AA aimed for (Lighthouse accessibility 100 on
   default; the Gemini voice uses `speech._synthesise` only (`speak()` needs ffmpeg, which Vercel doesn't have).
 - **The functions can't import `server/` or `scripts/`:** `python scripts/web_sync_server.py` copies the server modules and
   `live.py`'s briefs into `web/api/_unseen/`. Run it before every deploy; never edit the copies.
-- **Deploy:** `cd web && npx vercel@63.1.2 deploy --prod`. `GEMINI_API_KEY` is a Vercel environment variable; there is no
+- **Deploy (from main now, not the site-final worktree):** copy the `.vercel` link into `web/` once (gitignored), run `python scripts/web_sync_server.py`, then `cd web && npx vercel@63.1.2 deploy --prod --yes`. `web/media/ballet.mp4` is gitignored (Mixkit raw stock) but must be on disk for deploys; get it from the clips repo. `GEMINI_API_KEY` is a Vercel environment variable; there is no
   access code, so anyone with the link spends on that key: keep the AI Studio spending cap.
 
 ### Richness: a dancer's eye, not more rules (24 Oct, ~23:30)

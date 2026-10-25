@@ -58,7 +58,7 @@
     <p class="eyebrow">At the venue</p>
     <h1 id="title">Listen to a dancer, live</h1>
     <p class="lede measure">At a studio's show, the venue's own camera faces the stage. The camera feed is processed by Unseen Steps on our servers, where pose tracking and Gemini write the narration, and each blind or partially sighted person in the audience just opens this page on their own phone and listens through their earphones, in the quieter moments of the music. Nothing to install, and no camera needed on the listener's phone.</p>
-    <p class="measure"><b>This demo runs both halves on one device:</b> your phone's camera stands in for the venue camera. Point it at one dancer, whole body in view, and press Start listening.</p>
+    <p class="measure"><b>This demo runs both halves on one device:</b> your phone's camera stands in for the venue camera. Point it at one dancer, whole body in view, and press Start listening. To keep this public demo quick and cheap, its lines come from a lighter Gemini model with no show notes, so they're plainer than a real show's; at a studio's show, Gemini Live narrates with the show notes written from the rehearsal.</p>
     <p class="measure hint">To write each line, two small still frames a second and the body measurements go to Gemini. Nothing is recorded or stored.</p>
 
     <form id="setup" class="settings">
@@ -113,7 +113,7 @@
 
   <section aria-labelledby="notes-title">
     <h2 id="notes-title">Director's notes</h2>
-    <p class="measure hint">Every 20 seconds, Gemini Argon watches the last stretch and updates these notes on the style, the dancer's signature, recurring motifs and what just changed. The live describer uses them, so lines get more specific as the piece goes on. At a studio show, the notes Argon prepared from the rehearsal video are loaded here before the curtain goes up.</p>
+    <p class="measure hint">Every 20 seconds, Gemini 4 Argon watches the last stretch and updates these notes on the style, the dancer's signature, recurring motifs and what just changed. The live describer uses them, so lines get more specific as the piece goes on. At a studio show, the notes Argon prepared from the rehearsal video are loaded here before the curtain goes up.</p>
     <p class="measure" id="notes"></p>
   </section>
 
@@ -138,7 +138,7 @@
 
 <footer class="site-foot">
   <div class="wrap">
-    <p>Unseen Steps, built at Encode London, 23–25 October 2026. Pose tracking: YOLO11n-pose (Ultralytics) running in your browser with ONNX Runtime Web.</p>
+    <p>Unseen Steps, built at Encode London, 23–25 October 2026. In this demo, pose tracking runs in your browser: YOLO11n-pose (Ultralytics) with ONNX Runtime Web. Open source under the MIT licence: <a href="https://github.com/anushaisawesome/unseen-steps">code on GitHub</a>.</p>
   </div>
 </footer>
 
