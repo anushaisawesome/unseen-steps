@@ -893,3 +893,22 @@ per-line visual check and caption check stay. Reference videos: Track 10, Aquama
 Pitch and submission plan for the team: https://claude.ai/artifact/WUVqqiV2qvKaZtZgQwgEep (timeline, judging criteria
 mapped to evidence, 3-minute video shot list, stage pitch with the eyes-closed hook, submission field updates, owners,
 backups). Judging: innovation, technical execution, impact, usability; top 10 pitch at 15:00 and the audience votes.
+
+### Video sources, rehearsal analysis and live tracking (25 Oct, ~01:00)
+
+- **Keep the full video with its soundtrack as the canonical input.** An MP3 is enough for beat/phrase mapping but not
+  for understanding the dance, because Gemini needs movement, staging and the relationship between movement and music.
+  `server/music.py` already accepts an audio or video file and uses ffmpeg to extract the soundtrack internally.
+- **Public YouTube:** Gemini can analyze the public YouTube URL directly, which is what `scripts/youtube_demo.py` does.
+  That path avoids downloading but has no YOLO measurements. When post-tracking, local rendering or pose verification is
+  required, download a permitted/public clip as MP4 with audio (for example with `yt-dlp`) and process that local file.
+  Do not download material the team does not own or have permission to use.
+- **Google Drive or another private source:** download the original MP4 through the Drive API, an authenticated download,
+  or the app's normal upload flow, then upload the resulting file through Gemini's File API. A Drive sharing-page URL is
+  not treated as a reliable direct video URI.
+- **Recorded upload/rehearsal path:** Gemini/Argon analyzes the whole video plus audio for style, structure, meaning and
+  key moments; YOLO pose runs afterwards on the same file for target tracking and measurable verification. Merge both
+  outputs by timestamp.
+- **Live path:** YOLO pose remains the fast frame-by-frame tracker. Gemini Live receives a lower-rate view plus YOLO
+  measurements for semantic narration. YOLO alone tracks bodies but cannot infer the dance's meaning or relationship to
+  the music.
