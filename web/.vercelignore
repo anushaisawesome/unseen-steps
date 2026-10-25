@@ -1,2 +1,5 @@
-# Generated locally by scripts/youtube_demo.py (data.js and audio aren't in git); deploy it once they are.
-youtube-demo/
+# Working files from scripts/youtube_demo.py; the page needs only index.html, data.js and audio/.
+youtube-demo/parts/
+youtube-demo/.merge.lock
+youtube-demo/data-*.js
+youtube-demo/data-*.json
