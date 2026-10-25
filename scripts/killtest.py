@@ -871,10 +871,16 @@ def render(video, frames, path, results, out_path, focus=None, everyone=False, p
             if abs(nearest - t) < 0.1:
                 followed = path[nearest]
         k = int(np.abs(sample_times - t).argmin())
-        if privacy and not everyone:  # faces of everyone but the followed dancers are blurred (spectators, other couples)
-            for p in frames[k][1] + SEATED.get(frames[k][0], []):
-                if not any(p is q for q in followed):
-                    blur_face(frame, p[0], p[1], p[2])
+        if privacy and not everyone:
+            # Privacy: everything outside the dancers being described is blurred (spectators, other couples, judges),
+            # so no bystander is recognisable. With nobody followed at this moment, the whole picture is blurred.
+            soft = cv2.GaussianBlur(frame, (0, 0), max(6, w / 160))
+            keep = np.zeros((h, w), np.uint8)
+            for q in followed:
+                x0, y0, x1, y1 = q[0][:4]
+                mx, my = 0.15 * (x1 - x0), 0.08 * (y1 - y0)
+                keep[max(0, int(y0 - my)):min(h, int(y1 + my)), max(0, int(x0 - mx)):min(w, int(x1 + mx))] = 1
+            frame = np.where(keep[..., None] == 1, frame, soft)
         if abs(sample_times[k] - t) < 0.1:
             ref_h = height(followed[0][0]) if followed else 0.25 * h
             for p in frames[k][1] + (SEATED.get(frames[k][0], []) if everyone else []):
