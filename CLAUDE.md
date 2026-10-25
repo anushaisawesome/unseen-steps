@@ -1051,3 +1051,8 @@ as Atlas Search.
 
 **Website fixes for Anusha (25 Oct, ~10:30, from Andrii):** consistent header/nav names across pages, redesign of the
 "18 styles" page, green/red/pink shadows on the main page. Details in `SPEC.md` 15, "Immediate website fixes". Not implemented yet.
+
+**ANUSHA: please make a slide / video card on tracking safeguards (25 Oct, ~11:00, from Andrii).** The six layers that
+keep bad body tracking out of the narration (pose confidence, per-phrase coverage, unmeasurable = unchecked, crowded
+footage goes silent, Gemini sees the frames too, people can see the skeleton) are in `docs/tracking-safeguards.md`, with
+a one-line version for the pitch. Covers "how well it reads the world" (Real World) and the verification loop (DeepMind).
