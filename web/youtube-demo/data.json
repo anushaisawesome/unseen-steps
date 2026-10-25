@@ -3157,7 +3157,7 @@
   "end": 177,
   "review": "The script was far too dense (78%), with back-to-back lines talking over vocal breaks, duplicate lines in the intro and middle sections, and a hallucinated knee-pulse line at 137s where the dancers are actually upright kicking. Dropping redundant lines and tightening key transitions lets the Amapiano log drum and vocal cues breathe while clarifying the footwork and heist staging. Fixed a hallucinated squat at 119s (they are upright hopping and kicking to the chants, while the wide-stance knee-knock squat actually hits at 137s) and added the center leader standing tall above the final floor freeze at 162s. Tightened callouts, fixed the late huddle timing at 80.5s, and dropped redundant lines at 42.5s and 130.5s so the music can breathe.",
   "signature": [
-   " Bank Heist theatrical framing with masks and props: whole body posture, hands holding signs, masks, and loot bag",
+   " Piano Heist theatrical framing with masks and props: whole body posture, hands holding signs, masks, and loot bag",
    "Synchronized deep squat drops and level changes: legs, hips, and knees dropping sharply toward the floor",
    "Wide-stance bent-knee rapid legwork: knees, hips, and ankles with torso pitched forward"
   ],
@@ -3165,7 +3165,7 @@
    {
     "start": 4.4,
     "end": 51.0,
-    "label": "Theatrical Intro (Bank Heist)",
+    "label": "Theatrical Intro (Piano Heist)",
     "group": "Narrative mime and staged entrances, transitioning into a unified ready stance."
    },
    {
@@ -3207,14 +3207,15 @@
    },
    {
     "at": 12.0,
-    "text": "Walking inward to meet at center, holding signs reading Bank Heist overhead.",
+    "text": "Walking inward to meet at center, holding signs reading Piano Heist overhead.",
     "kind": "description",
     "pace": "steady",
     "key_moment": true,
     "priority": null,
-    "audio": "audio/amapiano-85b16b63c6.mp3",
+    "audio": "audio/amapiano-2a4f532534.mp3",
     "status": "spoken",
-    "seconds": 4.59
+    "seconds": 5.47,
+    "audio_kept": "audio/amapiano-2a4f532534.mp3"
    },
    {
     "at": 16.8,
