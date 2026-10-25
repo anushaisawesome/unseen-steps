@@ -4,6 +4,7 @@ clips/
 *.task
 __pycache__/
 .DS_Store
+Untitled.base
 .obsidian/
 data/killtest/
 data/glossary-research/

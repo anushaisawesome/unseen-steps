@@ -215,6 +215,36 @@ Keys and the Atlas connection string live in each person's `.env`, never in the 
 
 ## 10. Demo (3 minutes, no slides)
 
+==🟣Close your eyes==
+*Plays blurry video with just music for 10 seconds*
+==🟣What about now?==
+*Plays still blurry video, now with voice subtitles for 10 seconds*
+==🟣You noticed the difference, right? First clip is an example of how blind and visually impaired people experience performances and dances. Second - is our solution for such life unfairness - make dance be able to be heard.==
+*Andrii talking, while having clips of the old performances being played* 
+==🔵Back in Ukraine, I did ballroom dancing for five years, and it was a big part of my childhood. So I know all behind the scenes of each dance - steps, timings, grace and all little details that make performance what it is.==
+*Anusha talking, and some clips/slideshow*
+==🟣There is over 2 million people with sight loss. Also, my personal tutor, Gerard, hangs out and works with blind dancers. He told me many stories on how often even though they hear the music, they miss what actually is going on on the stage.==
+==🔵And that's how we came out to such a project idea. I brough the dance experience, while Anusha brought accessibility problem.== 
+==🟣So, we built Unseen Steps.==
+
+*Start the actual live demo: you dancing, skeleton visible, narration playing*
+So, before the performance, Argon watches the rehearsal with the music at around 5 to 8 frames per second, all together. It works out structure, moments and what each movement means - not just where somebody's arms or leg at.
+*Show Argon performance map/editable show notes*
+During the real performance, YOLO11 Pose follows dancers' movements, while Gemini 3.8 Live describe what is happening just in under a second - EVEN if dancers change something from rehearsal.
+*Show rejected or corrected line*
+But, we didn't want AI to just guess, right? If body tracking doesn't support a turn, direction or jump - our checker system flags it, so studio can review and change Argon's notes beforehand.
+*Briefly show the database*
+Dance, as coding, has its own language. We used Deep Research and MongoDB to build reviewed and easily navigated glossary of terms, with both professional and simpler names.
+
+*Some slides summarizing all info, for the idea*
+==🔵For me, dance is connected to five years of my childhood.==
+==🟣For the people Gerard works with, this could mean getting whole performance and not just the music.==
+
+*Said by both*
+==That’s what we want Unseen Steps to do.==
+
+
+
 ### 10a. Opening hook (the cold open, before anything else)
 Lead with the problem felt, not explained:
 1. Play ~15 seconds of the normal dance clip (clear).
