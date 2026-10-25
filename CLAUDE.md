@@ -1016,3 +1016,15 @@ and setup, a 2 to 4 minute video on real inputs, a note on models and data sourc
 Changes made for it: README rewritten (problem, how it works, honesty and privacy, models and data sources, setup and
 the show-night commands); `scripts/edit_show.py` (studios edit show notes in Atlas); live figure names limited to the
 routine's own (SPEC 15a); checker false flags from SPEC 15c fixed.
+
+
+## Atlas Search for songs (25 Oct, ~09:00)
+
+`db.find_song(name)` runs `$search` (index `song_name`, fuzzy, maxEdits 2) on `songs.name`; `db.save_song` stores a
+song's music map whenever `prepare_show.py` or `live.py` maps a file. Both scripts accept `--song "<name>"` as well as a
+file path: a name is looked up in Atlas and its stored map and file are used. Andrii's rehearsal soundtrack is stored as
+"Andrii's waltz (rehearsal soundtrack)". Atlas features in use: Vector Search (glossary) and Atlas Search (songs).
+**Hybrid Search not built:** the free cluster allows 3 search indexes and all 3 are taken (`vector_index`, `song_name`,
+and the sample dataset's `sample_mflix.movies` `default`). Deleting that sample index would free a slot for a text
+index on `terms` and a hybrid glossary search (the cluster is MongoDB 8.0, so `$rankFusion` (8.1+) isn't available;
+fuse the two rankings client-side). Anusha's call, since it deletes something in the cluster.

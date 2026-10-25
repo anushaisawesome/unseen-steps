@@ -267,11 +267,32 @@ def jpeg(frame, width=512) -> bytes:
     return cv2.imencode(".jpg", small, [cv2.IMWRITE_JPEG_QUALITY, 80])[1].tobytes()
 
 
+def song_by_name_or_file(args) -> dict:
+    """The song's music map. --song is a file, or the name of a song already mapped and stored in Atlas ("andrii
+    waltz", even misspelt): Atlas Search finds it, and its stored map and file are used. A new file is mapped and
+    stored, so next time it can be called by name."""
+    if not Path(args.song).exists():
+        from db import find_song
+        hit = find_song(args.song, args.beats_per_bar)
+        if not hit or not hit.get("file") or not Path(hit["file"]).exists():
+            raise SystemExit(f"no song file or stored song called {args.song!r}")
+        print(f"song found in Atlas by name: {hit['name']} ({hit['file']})")
+        args.song = hit["file"]
+        return {k: hit[k] for k in ("bpm", "beats", "phrases", "clean_spaces", "beats_per_bar", "energy", "hits") if k in hit}
+    song = map_song(load_audio(args.song), beats_per_bar=args.beats_per_bar, bars_per_phrase=2,
+                    speech_seconds=2.5, earliest=True)
+    try:
+        from db import save_song
+        save_song(Path(args.song).stem, {**song, "beats_per_bar": args.beats_per_bar}, args.style, args.song)
+    except Exception as e:
+        print(f"song map not stored in Atlas ({type(e).__name__})")
+    return song
+
+
 class Live:
     def __init__(self, args):
         self.args = args
-        self.song_map = map_song(load_audio(args.song), beats_per_bar=args.beats_per_bar, bars_per_phrase=2,
-                                 speech_seconds=2.5, earliest=True)
+        self.song_map = song_by_name_or_file(args)
         self.mixer = Mixer(decode(args.song), mute=args.mute)
         self.pose = load_pose(args.model)
         director.client(), speech.client()  # create the clients before the worker threads

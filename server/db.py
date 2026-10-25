@@ -33,7 +33,7 @@ def db():
     return _db
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and len(__import__("sys").argv) == 1:
     database = db()
     database.client.admin.command("ping")
     print(f"connected to '{database.name}'")
@@ -89,3 +89,33 @@ def spoken_name(term: dict, level: str = "beginner") -> str | None:
     if level == "professional":
         return term["term"]
     return (term.get("display_names") or {}).get("beginner")
+
+
+def save_song(name: str, song: dict, style: str | None = None, file: str | None = None) -> None:
+    """Store a song's music map (beats, phrases, the gaps where a line fits) under its name, so it can be found again
+    by name with Atlas Search (find_song) instead of being re-analysed."""
+    import json
+    plain = json.loads(json.dumps({k: song[k] for k in ("bpm", "beats", "phrases", "clean_spaces", "beats_per_bar",
+                                                         "energy", "hits") if k in song}, default=float))
+    doc = {"name": name, "style": style, "file": file, **plain}
+    db()["songs"].update_one({"name": name}, {"$set": doc}, upsert=True)
+
+
+def find_song(name: str, beats_per_bar: int | None = None) -> dict | None:
+    """The stored song whose name best matches what was typed or announced ("viennese waltz", a misspelling, part of
+    the title): Atlas Search over songs.name with fuzzy matching (index song_name). None if nothing matches."""
+    pipeline = [
+        {"$search": {"index": "song_name", "text": {"query": name, "path": "name", "fuzzy": {"maxEdits": 2}}}},
+        {"$limit": 5},
+        {"$addFields": {"score": {"$meta": "searchScore"}}},
+    ]
+    if beats_per_bar:
+        pipeline.insert(2, {"$match": {"beats_per_bar": beats_per_bar}})
+    return next(db()["songs"].aggregate(pipeline), None)
+
+
+if __name__ == "__main__" and len(__import__("sys").argv) > 2:
+    import sys
+    if sys.argv[1] == "song":       # python server/db.py song "andrii waltz"
+        hit = find_song(sys.argv[2])
+        print({k: hit[k] for k in ("name", "file", "bpm", "beats_per_bar", "score")} if hit else "no match")

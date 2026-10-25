@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "server"))
-from db import db  # noqa: E402
+from db import db, find_song, save_song  # noqa: E402
 from music import load_audio, map_song  # noqa: E402
 from show_notes import prepare  # noqa: E402
 
@@ -28,8 +28,15 @@ def main():
     parser.add_argument("--beats-per-bar", type=int, default=4)
     args = parser.parse_args()
 
+    if not Path(args.song).exists():  # a song already stored in Atlas, found by name with Atlas Search
+        hit = find_song(args.song, args.beats_per_bar)
+        if not hit or not hit.get("file"):
+            raise SystemExit(f"no song file or stored song called {args.song!r}")
+        print(f"song found in Atlas by name: {hit['name']} ({hit['file']})")
+        args.song = hit["file"]
     song = map_song(load_audio(args.song), beats_per_bar=args.beats_per_bar, bars_per_phrase=2,
                     speech_seconds=2.5, earliest=True)
+    save_song(Path(args.song).stem, {**song, "beats_per_bar": args.beats_per_bar}, args.style, args.song)
     plan, moments, notes, script = prepare(args.rehearsal, args.style, song)
     doc = {"name": args.name, "studio": args.studio, "style": plan["style"]["name"], "song": Path(args.song).name,
            "bpm": song["bpm"], "gaps": [g for g in song["clean_spaces"] if g], "plan": plan,

@@ -76,8 +76,10 @@ Plum Fairy" (CC BY 4.0); a waltz glossary from Deep Research with its cited sour
 figures from RNIB.
 
 MongoDB Atlas holds the dance glossary (canonical and beginner names, plain descriptions, translations, sources,
-review status; `$vectorSearch` over 3072-dimension vectors, filtered by style) and each show's notes, map, gaps and
-rehearsal script.
+review status; `$vectorSearch` over 3072-dimension vectors, filtered by style), each show's notes, map, gaps and
+rehearsal script, and each song's music map (beats, phrases, the gaps where a line fits). Songs are found by name with
+Atlas Search (`$search`, fuzzy text on `songs.name`): `--song "andrii waltz"` (even misspelt) loads the stored map and
+its file instead of a path. Run `python server/db.py song "andri walts"` to see the match.
 
 ## Setup
 
