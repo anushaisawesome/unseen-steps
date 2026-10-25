@@ -138,7 +138,7 @@ Other entry points:
 
 ## What's next
 
-We're open-sourcing Unseen Steps so any studio can run it for its own shows. Next: a show-notes editor in the browser,
+Unseen Steps is open source under the MIT licence (`LICENSE`), so any studio can run it for its own shows. Next: a show-notes editor in the browser,
 testing with blind audiences at real recitals (starting with Gerard's dancers), live tracking for whole groups, and a
 training tool for blind dancers.
 
