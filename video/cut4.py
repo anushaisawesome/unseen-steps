@@ -173,7 +173,8 @@ def main():
     director.client(); speech.client()
     segs = []
     blur = "crop=iw:ih*0.84:0:0,scale=1920:1080,gblur=sigma=55:steps=3,eq=brightness=-0.04"
-    zoom = "scale=2400:-1,zoompan=z='min(zoom+0.0005,1.12)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=900:s=1920x1080:fps=30"
+    # still holds: ffmpeg's zoompan rounds to whole pixels each frame, so a slow push-in judders (Anusha)
+    zoom = "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080"
     img = REPO / "web/media/recital.jpg"
     ANDRII = REPO / "clips/andrii720.mp4"
     # 1-2: the hook, blurred: the song alone, then Gemini Live's narration
@@ -187,7 +188,7 @@ def main():
     segs.append(segment(4, ["-ss", 70, "-t", 40, "-i", ANDRII], "scale=1920:1080", ["-ss", 70, "-t", 41, "-i", ANDRII], V / "t4.mp4", music_vol=0.3))
     # 5-7: the why, over the studio recital print; 7 ends on the site
     segs.append(segment(5, ["-loop", "1", "-t", 30, "-i", img], zoom, song(60, 30), V / "t5.mp4"))
-    segs.append(segment(6, ["-loop", "1", "-t", 30, "-i", img], zoom.replace("min(zoom+0.0005,1.12)", "min(1.06+on*0.0004,1.14)"), song(78, 30), V / "t6.mp4"))
+    segs.append(segment(6, ["-loop", "1", "-t", 30, "-i", img], zoom, song(78, 30), V / "t6.mp4"))
     segs.append(segment(7, ["-loop", "1", "-t", 30, "-i", V / "crop_hero.png"], "scale=1920:1080", song(88, 30), V / "t7.mp4"))
     # 8: Argon's show notes, building up with the voice
     import build2
