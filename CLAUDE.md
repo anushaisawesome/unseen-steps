@@ -221,6 +221,13 @@ a motif ("the glissade from the opening returns"), the checker badge, and the ER
 **Next code (Anusha):** lookup functions in `server/db.py` (`match_terms(summary, style)`,
 `find_song(name)`, `save_memory(...)`), then the writer reads real vocabulary from `terms`.
 
+**If time (25 Oct, before the demo video):**
+- [ ] **Atlas Search with `find_song(name)`.** Only Atlas Vector Search is used today (`match_terms`). The `song_name`
+  search index on `songs.name` exists and is READY (`server/setup_db.py`), but no code runs `$search`. Add
+  `find_song(name)` to `server/db.py` (`$search` with fuzzy text on `name`, so "viennese waltz" finds its map), use it
+  where a song map is loaded, and show it in the demo video's MongoDB section. Not used: Hybrid Search, Automated
+  Embedding, Stream Processing, Voyage AI.
+
 ## Demo priorities (decided 24 Oct, 02:50)
 
 1. **Headline: live real-time narration of Andrii dancing** (`scripts/live.py`). This is the "blow their
