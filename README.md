@@ -5,6 +5,11 @@ experience the dance, not just the music. Built at Encode London (23 to 25 Octob
 
 **Try it:** https://unseen-steps-studio.vercel.app (17 styles described, a narrated ballet solo, the venue listening page)
 
+**Demo video:** _link to be added_
+
+**A live session, recorded:** [`clips_public/live_session6.mp4`](clips_public/live_session6.mp4) is Andrii dancing
+a waltz with `scripts/live.py` narrating him in real time (skeleton, captions, music and voice).
+
 ## The problem
 
 Dance is a visual art form, so for the more than two million people in the UK living with sight loss (RNIB), a dance
@@ -84,10 +89,20 @@ python3.12 -m venv .venv
 cp .env.example .env    # add your own GEMINI_API_KEY, and a MongoDB Atlas connection
 ```
 
-On Windows (PowerShell): `py -3.12 -m venv .venv`, then `.venv\Scripts\pip install -r requirements.txt`, and run the
-scripts with `.venv\Scripts\python`. Install ffmpeg and make sure it's on the PATH.
+On Windows (PowerShell): `py -3.12 -m venv .venv`, then `.venv\Scripts\pip install -r requirements.txt`,
+`Copy-Item .env.example .env`, and run the scripts with `.venv\Scripts\python`. Install ffmpeg (for example
+`winget install ffmpeg`) and make sure it's on the PATH.
 
 The YOLO pose model downloads on first run (NVIDIA GPU, Apple GPU or CPU).
+
+MongoDB Atlas, once your connection is in `.env`:
+
+```sh
+.venv/bin/python server/setup_db.py   # once: collections plus the vector and text search indexes (idempotent)
+.venv/bin/python server/db.py         # check: prints "connected to 'unseen_steps'" and the collections
+```
+
+Search indexes need an Atlas cluster (not a plain local MongoDB) and take a minute or two to build.
 
 ## Run it
 

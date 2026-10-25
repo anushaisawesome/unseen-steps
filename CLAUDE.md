@@ -984,7 +984,7 @@ pitch clarity 10%.
 | --- | --- | --- |
 | Working live demo (50%) | Andrii dances live, unscripted; voice ~0.8–1 s after each prompt (`live.py`, 3.8 Live). Real verification loops: pose checker vetoes contradicted lines, per-line visual check, caption check on the voice, live corrections on the next line. Argon builds the performance map and show notes from the rehearsal, plus notes every 20 s live. | Strong |
 | Problem and usefulness (25%) | Small studios without audio description; blind and partially sighted audience members. **Gap: no named user, no blind-user test yet.** | Medium |
-| Needed Argon (15%) | Argon watches the whole rehearsal with its music at 5–8 fps, zooms into sections, writes and checks the script (thinking high). **Weak: live speech is 3.8 Live, not Argon** ("isn't this just Gemini Live?"); no show-notes editor yet for "people stay in control". | Medium–strong |
+| Needed Argon (15%) | Argon watches the whole rehearsal with its music at 5–8 fps, zooms into sections, writes and checks the script (thinking high). **Weak: live speech is 3.8 Live, not Argon** ("isn't this just Gemini Live?"); people stay in control via `scripts/edit_show.py` (studio edits the Atlas show notes). | Medium–strong |
 | Pitch clarity (10%) | Eyes-closed hook, live product, no slides. Depends on rehearsal. | Depends on rehearsal |
 
 **To raise the score, cheapest first:**
@@ -993,11 +993,11 @@ pitch clarity 10%.
 3. **Answer "why Argon?":** "Argon is the choreographer's eye: it watches the whole rehearsal with its music in one context, finds
    sections, motifs and texture changes, and writes the show notes. Live is the voice that delivers them in time." Show the
    map / show notes on screen for a few seconds.
-4. **Human control:** say a describer can edit the Atlas show notes before the show; a minimal edit step would make it true.
+4. **Human control:** say a studio or describer edits the Atlas show notes before the show (`scripts/edit_show.py`, built).
 
 **Don't claim:** Robotics-ER, Lyria, Antigravity (none are in the code; Robotics-ER was one manual test). The only
 `background=True` call is the Deep Research glossary job, not Argon.
-**Main risk:** live failure on stage (camera, audio routing, WiFi). Keep a recorded `live.py --record` session as backup.
+**Main risk:** live failure on stage (camera, audio routing, WiFi). Backup: `clips_public/live_session6.mp4` (recorded live session).
 
 ## The Real World track: where we stand (25 Oct, ~08:00)
 
@@ -1011,36 +1011,8 @@ and setup, a 2 to 4 minute video on real inputs, a note on models and data sourc
 | Usefulness | Studios' own shows; blind and partially sighted audience; Gerard's blind ballroom dancers; open-sourcing for studios | No blind-user test yet: say it's next, don't imply it happened |
 | Reads the world | Pose checker live; per-line visual check; caption check on every clip; 0.3/0.5 keypoint confidence; checks skipped when unmeasurable; terms only when fully visible; live names only the routine's figures (SPEC 15a) | Show a checker catch on screen in the video |
 | Technical execution | Live camera + real music map + Atlas glossary and shows + 17 real performances | Fine |
-| Responsibility | Live frames not stored unless recording is chosen; narration in each listener's earphones; no other people's clips in the repo; studio edits notes (`scripts/edit_show.py`) | Face blurring for uploads is planned, not built: don't claim it |
+| Responsibility | Live frames not stored unless recording is chosen; narration in each listener's earphones; no other people's clips in the repo; studio edits notes (`scripts/edit_show.py`) | Face blurring of everyone but the followed dancers is built for rendered videos (`killtest.py`, commit 35fb096) |
 
 Changes made for it: README rewritten (problem, how it works, honesty and privacy, models and data sources, setup and
 the show-night commands); `scripts/edit_show.py` (studios edit show notes in Atlas); live figure names limited to the
 routine's own (SPEC 15a); checker false flags from SPEC 15c fixed.
-
-## Real World track ("AI that understands the world around us"): where we stand (25 Oct, morning; Andrii's Claude)
-
-Judging: real-world usefulness, how well it reads the world (accuracy, messy inputs), technical execution, responsibility
-(privacy, honesty about uncertainty). Needs: working demo, repo with README + setup, 2–4 min video on real inputs, a short
-note on models and data sources.
-
-| Criterion | Where we are | Rough score |
-| --- | --- | --- |
-| Real-world usefulness | Small studios can't afford audio description; blind and partially sighted audience members miss the dance. Same gap as DeepMind: no named user, no blind-user test yet. | Medium–strong |
-| Reading the world / messy input | Follows a marked couple in crowded handheld footage and goes silent rather than describe the wrong people; a hidden partner counts as "together"; unmeasured claims aren't checked; low-confidence keypoints aren't drawn (no wrong legs in backlight); lines checked against pose and re-watched against their moment; fixed phrases when there's no music. | Strong |
-| Technical execution | End to end on real data: Andrii's own footage, live camera, real songs, Atlas, Vercel site. | Strong |
-| Responsibility | Uncertainty handled well: style glossary only at >= 0.90 confidence, silence when the dancer is lost, checker vetoes instead of guessing, YouTube demos marked unchecked. **Privacy is weak:** face blurring for non-followed people and deleting uploads are planned only (the blur in `killtest.py` is for tracking). Other couples' clips are kept in the private clips repo. | Medium |
-
-| Requirement | Status |
-| --- | --- |
-| Working demo | Done: `live.py` and unseen-steps.vercel.app |
-| README with setup | Done, but Mac paths only (`.venv/bin/pip`); add Windows |
-| 2–4 min video on real inputs | The same 3:00 video covers both tracks |
-| Models and data note | Partly in the README layout; add a short "Models and data" section (Gemini models, YOLO11 pose, librosa, Mixkit + Sugar Plum Fairy CC BY credit, Andrii's footage, Deep Research sources) |
-
-**Quick wins:**
-1. **Blur faces of everyone but the followed dancer(s)** in rendered videos (pose boxes already exist in `killtest.py`); show it in
-   one demo shot.
-2. **One sentence on uncertainty in the video:** below 90% style confidence it uses plain words; if it loses the dancer it goes
-   quiet rather than guess.
-3. **One messy-input shot:** the crowded handheld waltz with the followed couple in pink.
-4. **README:** "Models and data" section and Windows setup.
