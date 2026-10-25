@@ -769,7 +769,19 @@ def crops(video, path, start, end, n=3):
 SKELETON = [(5, 7), (7, 9), (6, 8), (8, 10), (5, 6), (5, 11), (6, 12), (11, 12),
             (11, 13), (13, 15), (12, 14), (14, 16), (0, 5), (0, 6)]
 LEAD_COLOUR, PARTNER_COLOUR, OTHER_COLOUR = (230, 120, 255), (170, 235, 150), (150, 150, 150)  # BGR
-FONT = "/System/Library/Fonts/HelveticaNeue.ttc"
+
+
+def _find_font():
+    """First caption font that exists on this machine (macOS, then Windows, then Linux)."""
+    for path in ("/System/Library/Fonts/HelveticaNeue.ttc",
+                 "C:/Windows/Fonts/segoeui.ttf", "C:/Windows/Fonts/arial.ttf",
+                 "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"):
+        if Path(path).exists():
+            return path
+    return None  # draw_text falls back to PIL's built-in bitmap font
+
+
+FONT = _find_font()
 
 
 DRAW_CONF = 0.5  # points the model is unsure of are hidden rather than drawn in the wrong place
@@ -784,17 +796,28 @@ def draw_skeleton(frame, xy, conf, colour, thickness):
             cv2.circle(frame, tuple(int(v) for v in xy[k]), thickness + 1, colour, -1, cv2.LINE_AA)
 
 
+def _font(size):
+    """A truetype caption font at ``size``, or PIL's built-in bitmap font if none is installed."""
+    from PIL import ImageFont
+    if FONT:
+        return ImageFont.truetype(FONT, size)
+    try:
+        return ImageFont.load_default(size)   # Pillow >= 10.1 accepts a size
+    except TypeError:
+        return ImageFont.load_default()
+
+
 def draw_text(frame, caption, note):
     """Caption bar at the bottom, a small title top left, and an optional checker note top right."""
-    from PIL import Image, ImageDraw, ImageFont
+    from PIL import Image, ImageDraw
     h, w = frame.shape[:2]
     img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)).convert("RGBA")
     layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
-    small = ImageFont.truetype(FONT, max(14, h // 40))
+    small = _font(max(14, h // 40))
     d.text((int(0.02 * w), int(0.02 * h)), "Unseen Steps  ·  live audio description", font=small, fill=(255, 255, 255, 200))
     if caption:
-        big = ImageFont.truetype(FONT, max(18, h // 20))
+        big = _font(max(18, h // 20))
         tw = d.textlength(caption, font=big)
         pad, bh = int(0.02 * h), int(h / 20 * 1.9)
         x0, y0 = int((w - tw) / 2) - 2 * pad, h - bh - int(0.05 * h)
