@@ -75,16 +75,25 @@ background:rgba(20,24,38,.82);color:#f3ede2;font:700 38px/1.35 'Atkinson Hyperle
     return png
 
 
+def label_png(name, text):
+    png = V / f"label_{name}.png"
+    build.shot(f"""<!doctype html><html><head><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@700&display=block">
+<style>html,body{{margin:0;width:1920px;height:1080px;background:transparent}}div{{position:absolute;right:44px;top:40px;max-width:600px;background:#ff48b0;
+color:#1e2a44;font:700 28px/1.3 'Atkinson Hyperlegible Next',sans-serif;padding:12px 20px;border-radius:10px;box-shadow:5px 5px 0 #1e2a44}}</style></head>
+<body><div>{escape(text)}</div></body></html>""", png, transparent=True)
+    return png
+
+
 def sentences(text):
     return [s for s in re.split(r"(?<=[.?!])\s+", text) if s]
 
 
-def segment(n, video_args, vf, music_args, out, vo_at=0.4, tail=0.9, length=None, music_vol=0.32, captions=True, top=False):
+def segment(n, video_args, vf, music_args, out, vo_at=0.4, tail=0.9, length=None, music_vol=0.32, captions=True, top=False, label=None):
     """One part: picture (input 0) + its own audio or the song (input 1) + the voice, captions timed by sentence."""
     vo = voice(n) if n in PARTS else None
     total = length or ((vo_at + dur(vo) + tail) if vo else 6)
     inputs = [*video_args, *music_args]
-    graph, last, k = [f"[0:v]{vf},fps=30,format=yuv420p[v0]"], "v0", 2
+    graph, last, k = [f"[0:v]{vf},fps=30,setsar=1,format=yuv420p[v0]"], "v0", 2
     if vo:
         inputs += ["-i", vo]
         vo_idx, k = 2, 3
@@ -101,6 +110,10 @@ def segment(n, video_args, vf, music_args, out, vo_at=0.4, tail=0.9, length=None
                      f"[m][n]amix=inputs=2:normalize=0:duration=first[a0]")
     else:
         graph.append("[1:a]anull[a0]")
+    if label:
+        inputs += ["-loop", "1", "-t", total, "-i", label_png(out.stem, label)]
+        graph.append(f"[{k}:v]format=rgba,fade=t=in:st=0.4:d=0.5:alpha=1[lab];[{last}][lab]overlay=0:0[v{k}]")
+        last, k = f"v{k}", k + 1
     graph.append(f"[{last}]fade=t=in:d=0.35,fade=t=out:st={total - 0.35:.2f}:d=0.35[v]")
     graph.append(f"[a0]afade=t=in:d=0.3,afade=t=out:st={total - 0.4:.2f}:d=0.4[a]")
     run("ffmpeg", "-loglevel", "error", "-y", *inputs, "-filter_complex", ";".join(graph), "-map", "[v]", "-map", "[a]",
@@ -121,7 +134,7 @@ def layered(html, name, starts, total):
         build.shot(h, V / f"{name}_{k}.png", transparent=True)
         layers.append(V / f"{name}_{k}.png")
     inputs = ["-loop", "1", "-t", total, "-i", V / f"{name}_0.png"]
-    chain, last = "[0:v]scale=1920:1080,fps=30,format=yuva420p[b0]", "b0"
+    chain, last = "[0:v]scale=1920:1080,setsar=1,fps=30,format=yuva420p[b0]", "b0"
     for k, (png, t) in enumerate(zip(layers, starts), 1):
         inputs += ["-loop", "1", "-t", total, "-i", png]
         chain += (f";[{k}:v]format=rgba,fade=t=in:st={t:.2f}:d=0.6:alpha=1[l{k}]"
@@ -142,7 +155,7 @@ def panel_clip(start, length, min_at, out):
     sys.argv = ["cut2.py", str(TAKE), str(REPO / "clips_public/live_session7.json")]
     import cut2
     turns = [t for t in TURNS if min_at <= t["at"] < start + length]
-    inputs, chain, last = ["-ss", start, "-t", length, "-i", TAKE], "[0:v]scale=1300:-2,pad=1920:1080:0:(1080-ih)/2:color=0x1e2a44,fps=30[b0]", "b0"
+    inputs, chain, last = ["-ss", start, "-t", length, "-i", TAKE], "[0:v]scale=1300:-2,setsar=1,pad=1920:1080:0:(1080-ih)/2:color=0x1e2a44,fps=30[b0]", "b0"
     for k, t in enumerate(turns):
         png = V / f"p{out.stem}_{k}.png"
         build.shot(cut2.panel(t), png, transparent=True)
@@ -172,7 +185,7 @@ def main():
     import speech
     director.client(); speech.client()
     segs = []
-    blur = "crop=iw:ih*0.84:0:0,scale=1920:1080,gblur=sigma=55:steps=3,eq=brightness=-0.04"
+    blur = "crop=iw*0.84:ih*0.84:(iw-ow)/2:0,scale=1920:1080,setsar=1,gblur=sigma=55:steps=3,eq=brightness=-0.04"
     # still holds: ffmpeg's zoompan rounds to whole pixels each frame, so a slow push-in judders (Anusha)
     zoom = "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080"
     img = REPO / "web/media/recital.jpg"
@@ -185,11 +198,25 @@ def main():
     segs.append(segment(3, ["-ss", 44, "-t", dur(v3) + 1.5, "-i", TAKE], "scale=1920:1080", ["-ss", 44, "-t", dur(v3) + 2.5, "-i", TAKE],
                         V / "t3.mp4", music_vol=0.28, top=True))
     # 4: Andrii dancing
-    segs.append(segment(4, ["-ss", 70, "-t", 40, "-i", ANDRII], "scale=1920:1080", ["-ss", 70, "-t", 41, "-i", ANDRII], V / "t4.mp4", music_vol=0.3))
+    segs.append(segment(4, ["-ss", 30, "-t", 40, "-i", REPO / "data/killtest/waltz-annotated.mp4"], "scale=1920:1080", song(40, 41), V / "t4.mp4", top=True, label="A crowded ballroom competition: the couple being described is tracked, everyone else blurred"))
     # 5-7: the why, over the studio recital print; 7 ends on the site
-    segs.append(segment(5, ["-loop", "1", "-t", 30, "-i", img], zoom, song(60, 30), V / "t5.mp4"))
-    segs.append(segment(6, ["-loop", "1", "-t", 30, "-i", img], zoom, song(78, 30), V / "t6.mp4"))
-    segs.append(segment(7, ["-loop", "1", "-t", 30, "-i", V / "crop_hero.png"], "scale=1920:1080", song(88, 30), V / "t7.mp4"))
+    gcard = V / "gerard-card.png"
+    photo = (V / "gerard-photo.png").as_uri()
+    build.shot(build.HEAD + f""" style="display:grid;grid-template-columns:340px 1fr;gap:70px;align-items:center;padding:0 180px">
+<img src="{photo}" style="width:340px;height:340px;border-radius:50%;object-fit:cover;border:6px solid #1e2a44;box-shadow:12px 12px 0 #ff48b0">
+<div><p class="d pk" style="font-size:34px;font-weight:800;margin:0 0 10px">Where the idea came from</p>
+<h1 style="font-size:96px;font-weight:800;line-height:1;margin:0 0 18px">Dr Gerard Canal</h1>
+<p style="font-size:40px;font-weight:700;margin:0 0 26px">Senior Lecturer in Autonomous Systems, King's College London</p>
+<p style="font-size:32px;line-height:1.4;color:#4b5266;margin:0 0 30px">Anusha's robotics tutor, who dances ballroom with blind dancers.</p>
+<p style="font-size:24px;color:#5e6476;margin:0">kcl.ac.uk/people/gerard-canal</p></div></body></html>""", gcard)
+    v5 = voice(5)
+    half5 = dur(v5) * 0.42
+    run("ffmpeg", "-loglevel", "error", "-y", "-loop", "1", "-t", half5, "-i", img, "-loop", "1", "-t", dur(v5) + 1.5, "-i", gcard, "-filter_complex",
+        f"[0:v]{zoom},setsar=1,fps=30[a];[1:v]scale=1920:1080,setsar=1,fps=30[b];[a][b]xfade=transition=fade:duration=0.5:offset={half5 - 0.5:.2f}[v]",
+        "-map", "[v]", "-an", *VID, V / "p5.mp4")
+    segs.append(segment(5, ["-i", V / "p5.mp4"], "scale=1920:1080", song(60, 30), V / "t5.mp4"))
+    segs.append(segment(6, ["-ss", 2, "-t", 20, "-i", REPO / "web/media/ballet-reveal.mp4"], "scale=1920:1080", ["-ss", 2, "-t", 21, "-i", REPO / "web/media/ballet.mp4"], V / "t6.mp4", music_vol=0.3, top=True, label="A ballet solo described and checked against the tracked pose"))
+    segs.append(segment(7, ["-ss", 8, "-t", 14, "-stream_loop", "1", "-i", REPO / "web/media/ballet.mp4"], "scale=1920:1080", ["-ss", 8, "-t", 15, "-stream_loop", "1", "-i", REPO / "web/media/ballet.mp4"], V / "t7.mp4", music_vol=0.3, label="The same narration works for any style"))
     # 8: Argon's show notes, building up with the voice
     import build2
     v8 = voice(8)
@@ -213,13 +240,17 @@ def main():
     L11 = dur(v11) + 1.3
     segs.append(segment(11, ["-i", layered(ATLAS, "atlas", [0.3, L11 * 0.3, L11 * 0.55, L11 * 0.8], L11 + 0.5)], "scale=1920:1080", song(130, 30), V / "t11.mp4"))
     # 12: a 20-dancer crew with its own narration, then the 18 styles page
-    run("ffmpeg", "-loglevel", "error", "-y", "-ss", 61.5, "-t", 15.2, "-i", REPO / "data/killtest/judas-script-annotated.mp4", "-filter_complex",
-        "[0:v]scale=1920:1080,fps=30,fade=t=in:d=0.35,fade=t=out:st=14.85:d=0.35[v];[0:a]afade=t=in:d=0.3,afade=t=out:st=14.8:d=0.4[a]",
-        "-map", "[v]", "-map", "[a]", *VID, *A, V / "t12.mp4")
+    jl = label_png("t12", "Not just one dancer: a 20-dancer crew, every dancer tracked, its canon described (1MILLION, IDL Seoul)")
+    run("ffmpeg", "-loglevel", "error", "-y", "-ss", 61.5, "-t", 15.6, "-i", REPO / "data/killtest/judas-script-annotated.mp4", "-loop", "1", "-t", 15.6, "-i", jl,
+        "-filter_complex",
+        "[0:v]scale=1920:1080,setsar=1,fps=30[b];[1:v]format=rgba,fade=t=in:st=0.3:d=0.5:alpha=1[l];[b][l]overlay=0:0,fade=t=in:d=0.35,fade=t=out:st=14.2:d=1.4[v];"
+        "[0:a]afade=t=in:d=0.3,afade=t=out:st=14.2:d=1.4[a]",
+        "-map", "[v]", "-map", "[a]", "-t", 15.6, *VID, *A, V / "t12.mp4")
     segs.append(V / "t12.mp4")
     # 13: Andrii; 14: the recital print; 15: both, over the end card building up
-    segs.append(segment(13, ["-ss", 100, "-t", 20, "-i", ANDRII], "scale=1920:1080", song(150, 20), V / "t13.mp4", tail=1.4))
-    segs.append(segment(14, ["-loop", "1", "-t", 30, "-i", img], zoom, song(156, 30), V / "t14.mp4"))
+    segs.append(segment(13, ["-ss", 55, "-t", 20, "-i", REPO / "data/killtest/waltz-annotated.mp4"], "scale=1920:1080", song(150, 21), V / "t13.mp4", tail=1.4, top=True, label="Ballroom, where Andrii started"))
+    phone = "scale=-2:1000,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=0xf3ede2"
+    segs.append(segment(14, ["-ss", 30, "-t", 30, "-i", V / "venue-test.mp4"], phone, song(156, 30), V / "t14.mp4", label="The venue page on a phone: each line arrives as the dancer moves"))
     e = build.cards["c_end"]
     e = e.replace('<h1 style', '<h1 data-l="1" style', 1).replace('<p style="font-size:52px', '<p data-l="2" style="font-size:52px', 1)
     e = e.replace('<p class="d" style="font-size:46px', '<p data-l="3" class="d" style="font-size:46px', 1)
@@ -227,7 +258,7 @@ def main():
     e = e.replace('<p style="font-size:28px;color:#5e6476', '<p data-l="4" style="font-size:28px;color:#5e6476', 1)
     e = e.replace('<div style="width:440px">', '<div data-l="1" style="width:440px">', 1)
     endv = layered(e, "endcard", [0.2, 0.9, 1.6, 2.3], 6)
-    segs.append(segment(15, ["-i", endv], "scale=1920:1080", song(170, 8), V / "t15.mp4", length=6, music_vol=0.5))
+    segs.append(segment(15, ["-i", endv], "scale=1920:1080", song(170, 8), V / "t15.mp4", length=5.2, music_vol=0.5))
     (V / "list4.txt").write_text("".join(f"file '{x}'\n" for x in segs))
     out = V / "unseen-steps-final.mp4"
     run("ffmpeg", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0", "-i", V / "list4.txt", "-c", "copy", out)
