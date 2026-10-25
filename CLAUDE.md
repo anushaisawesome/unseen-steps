@@ -10,6 +10,14 @@ commit.
 **Hard deadline:** submissions close **Sunday 25 October, 12:00 London time**. Demo video spec:
 `docs/demo-video.md`.
 
+> **ANDRII, NOW (25 Oct ~08:15, from Anusha): record live session 8 for the demo video.** `git pull` first (live now
+> names only the routine's figures, SPEC 15a). Then:
+> `python scripts/live.py --show "Demo: Andrii, waltz" --song "andri walts" --camera 0 --beats-per-bar 3 --style waltz --record clips_public/live_session8.mp4`
+> (or `--song <the music file you used for sessions 6-7>`). Dance ~60-90 s, include one deliberate change from rehearsal.
+> Push **all three**: `clips_public/live_session8.mp4`, `clips_public/live_session8.json` (written next to the recording:
+> each line's latency and checker verdict, used for the video's under-the-hood panel) and the music file you played (in
+> `clips_public/`). The video cut is ready and waiting on these; submission closes 12:00.
+
 ## What works now
 
 | Piece | File | State |
