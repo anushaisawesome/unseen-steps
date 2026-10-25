@@ -9,7 +9,7 @@
   --ink: #16181d;
   --muted: #4a4f5a;          /* 8.4:1 on --bg */
   --line: #d9d6cf;
-  --accent: #6b2fb3;         /* stage-light violet, 7.6:1 on --bg */
+  --accent: #5b21b6;         /* brand violet (logo), 8.6:1 on --bg */
   --accent-ink: #ffffff;
   --accent-soft: #efe7fa;
   --ok: #1d6b3a;
@@ -157,3 +157,71 @@ ol.lines .text { font-size: 1.1rem; }
 
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
 @media (forced-colors: active) { .beats i.on { background: Highlight; } ol.lines > li[aria-current="true"] { outline: 3px solid Highlight; } }
+
+/* ---- Design overhaul (25 Oct): a stage-lit hero, the logo mark, quotes, two-phase how-it-works ---- */
+:root { --stage: #100c1f; --stage-ink: #f4f1fb; --stage-muted: #c9c2dc; --spot: #f6c76b; --radius: 16px; }
+
+.site-head { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px); -webkit-backdrop-filter: saturate(1.4) blur(10px); }
+.brand { font-size: 1.2rem; letter-spacing: -0.01em; }
+.brand svg { width: auto; height: 1.9rem; color: var(--accent); }
+
+/* the hero is always "on stage": dark, with a warm spotlight from above */
+.stage-band { background:
+    radial-gradient(60rem 30rem at 70% -10%, rgba(246, 199, 107, 0.22), transparent 60%),
+    radial-gradient(40rem 26rem at 10% 110%, rgba(140, 92, 246, 0.28), transparent 60%),
+    var(--stage);
+  color: var(--stage-ink); }
+.stage-band .hero { padding-block: clamp(3rem, 8vw, 6rem) clamp(2.5rem, 6vw, 4.5rem); gap: 1.25rem; }
+.stage-band h1 { font-size: clamp(2.3rem, 6.4vw, 4.2rem); max-width: 16ch; letter-spacing: -0.02em; }
+.stage-band .lede { color: var(--stage-muted); font-size: clamp(1.1rem, 2.2vw, 1.3rem); }
+.stage-band .eyebrow { color: var(--spot); }
+.stage-band a:focus-visible, .stage-band button:focus-visible { outline-color: var(--spot); }
+.stage-band .button.primary { background: var(--spot); border-color: var(--spot); color: #1b1407; }
+.stage-band .button.ghost { background: transparent; color: var(--stage-ink); border-color: rgba(244, 241, 251, 0.55); }
+.stage-band .button.ghost:hover { background: rgba(244, 241, 251, 0.1); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 1rem; margin: 1.5rem 0 0; padding-top: 1.5rem;
+  border-top: 1px solid rgba(244, 241, 251, 0.18); max-width: 44rem; }
+.stats div { display: flex; flex-direction: column-reverse; gap: 0.15rem; }
+.stats dd { margin: 0; font-size: clamp(1.6rem, 3.6vw, 2.2rem); font-weight: 700; color: var(--stage-ink); }
+.stats dt { color: var(--stage-muted); font-size: 0.9rem; }
+
+main { gap: clamp(4rem, 9vw, 6.5rem); }
+section > .eyebrow { color: var(--accent); font-weight: 700; margin-bottom: -0.6rem; }
+.button { transition: background-color 180ms ease, filter 180ms ease, transform 180ms ease; }
+.button:active, button:active { transform: scale(0.98); }
+.player, .phase, ol.lines > li { border-radius: var(--radius); }
+.player { box-shadow: 0 1px 2px rgba(16, 12, 31, 0.06), 0 12px 32px -12px rgba(16, 12, 31, 0.18); }
+
+/* example lines */
+.quotes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; }
+.quotes figure { margin: 0; height: 100%; display: grid; gap: 0.9rem; align-content: space-between; padding: 1.25rem 1.25rem 1.1rem;
+  background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: var(--radius); }
+.quotes blockquote { margin: 0; font-size: 1.2rem; line-height: 1.45; font-weight: 700; }
+.quotes blockquote p::before { content: "\201C"; } .quotes blockquote p::after { content: "\201D"; }
+.quotes figcaption { color: var(--muted); font-size: 0.92rem; display: grid; }
+.quotes figcaption b { color: var(--ink); font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* how it works in two phases */
+.phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: 1.25rem; }
+.phase { background: var(--surface); border: 1px solid var(--line); padding: 1.5rem; display: grid; gap: 1.1rem; align-content: start; }
+.phase > h3 { font-size: 1.35rem; display: flex; align-items: center; gap: 0.6rem; }
+.tag { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--accent); color: var(--accent-ink);
+  font-family: var(--mono); font-size: 1rem; }
+.phase .steps { grid-template-columns: 1fr; gap: 0.9rem; }
+.phase .steps li { border-top: 0; border-left: 3px solid var(--accent-soft); padding: 0 0 0 1rem; position: relative; }
+.phase .steps li::before { position: absolute; left: -0.85rem; top: 0; width: 1.4rem; height: 1.4rem; display: grid; place-items: center;
+  background: var(--surface); border: 2px solid var(--accent); border-radius: 50%; font-size: 0.75rem; }
+.phase .steps h4 { margin: 0; font-size: 1.05rem; }
+
+.facts > div { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem; }
+
+.site-foot { background: var(--stage); color: var(--stage-muted); border-top: 0; }
+.site-foot a { color: var(--spot); }
+
+@media (forced-colors: active) { .stage-band { background: Canvas; color: CanvasText; } .tag { border: 1px solid CanvasText; } }
+.stage-band .hero { position: relative; }
+.hero-mark { position: absolute; right: 1rem; top: 50%; translate: 0 -50%; height: min(26rem, 70%); width: auto; color: #b794ff; opacity: 0.9;
+  filter: drop-shadow(0 0 40px rgba(183, 148, 255, 0.35)); pointer-events: none; }
+@media (max-width: 70rem) { .hero-mark { display: none; } }
+section[id], h1[id] { scroll-margin-top: 5.5rem; }
