@@ -998,3 +998,21 @@ pitch clarity 10%.
 **Don't claim:** Robotics-ER, Lyria, Antigravity (none are in the code; Robotics-ER was one manual test). The only
 `background=True` call is the Deep Research glossary job, not Argon.
 **Main risk:** live failure on stage (camera, audio routing, WiFi). Keep a recorded `live.py --record` session as backup.
+
+## The Real World track: where we stand (25 Oct, ~08:00)
+
+Judging: real-world usefulness (a clear user, a problem outside the hackathon); how well it reads the world (accuracy,
+sensible handling of messy inputs, gaps in the data); technical execution (end to end, AI models with real data);
+responsibility (privacy of faces and locations, honesty about uncertainty). Submission: working demo, repo with README
+and setup, a 2 to 4 minute video on real inputs, a note on models and data sources (now in README.md).
+
+| Criterion | Evidence we have | Gap / what to show |
+| --- | --- | --- |
+| Usefulness | Studios' own shows; blind and partially sighted audience; Gerard's blind ballroom dancers; open-sourcing for studios | No blind-user test yet: say it's next, don't imply it happened |
+| Reads the world | Pose checker live; per-line visual check; caption check on every clip; 0.3/0.5 keypoint confidence; checks skipped when unmeasurable; terms only when fully visible; live names only the routine's figures (SPEC 15a) | Show a checker catch on screen in the video |
+| Technical execution | Live camera + real music map + Atlas glossary and shows + 17 real performances | Fine |
+| Responsibility | Live frames not stored unless recording is chosen; narration in each listener's earphones; no other people's clips in the repo; studio edits notes (`scripts/edit_show.py`) | Face blurring for uploads is planned, not built: don't claim it |
+
+Changes made for it: README rewritten (problem, how it works, honesty and privacy, models and data sources, setup and
+the show-night commands); `scripts/edit_show.py` (studios edit show notes in Atlas); live figure names limited to the
+routine's own (SPEC 15a); checker false flags from SPEC 15c fixed.
