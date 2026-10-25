@@ -16,7 +16,8 @@ function sync(force) {
 video.addEventListener("play", () => { sync(true); narration.play().catch(() => {}); setPlaying(true); });
 video.addEventListener("pause", () => { narration.pause(); setPlaying(false); });
 video.addEventListener("seeked", () => sync(true));
-video.addEventListener("ended", () => { narration.pause(); setPlaying(false); });
+// the last line may run a moment past the picture: let it finish rather than cut it off mid-sentence
+video.addEventListener("ended", () => { setPlaying(false); });
 video.addEventListener("timeupdate", () => { if (!video.paused) sync(false); update(); });
 
 function setPlaying(on) {

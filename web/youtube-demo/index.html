@@ -157,7 +157,10 @@ function say(l) {
   voice.volume = Number(voiceVol.value) / 100;
   if (duck.checked) setMusic(true);  // a dip, not a takeover: the music stays the main thing
   voice.src = l.audio; voice.play();
+  const next = demo.lines.find(x => x.audio && x.at > l.at);
+  if (next) { prefetch.src = next.audio; prefetch.load(); }  // so the next line starts on time
 }
+const prefetch = new Audio(); prefetch.preload = "auto";
 voice.addEventListener("ended", () => {
   setMusic(false);
   captionTimer = setTimeout(() => { caption.textContent = ""; }, 600);
@@ -171,9 +174,11 @@ function tick() {
     played = new Set(demo.lines.filter(l => l.at < t));
   }
   lastT = t;
-  if (!playing && !voice.paused) voice.pause();
+  // pause the narration when the viewer pauses; at the end of the clip, let the last line finish
+  if (player.getPlayerState() === YT.PlayerState.PAUSED && !voice.paused) voice.pause();
   if (playing) for (const l of demo.lines) {
-    if (l.audio && !played.has(l) && t >= l.at && t < l.at + 0.8) { say(l); break; }
+    // never cut a line off: while one is speaking the next waits, and plays if it is still within a second of its time
+    if (l.audio && !played.has(l) && t >= l.at && t < l.at + 1.0) { if (voice.paused || voice.ended) say(l); break; }
   }
   const s = demo.sections.find(s => t >= s.start && t < s.end);
   if (s && sectionEl.dataset.label !== s.label) {
