@@ -67,7 +67,8 @@ def check(line: str, features: dict, max_words: int = MAX_WORDS) -> Verdict:
         # A turn's side is the dancer's rotation ("turns left", "turns to his right"): check it against rotation.
         rotating = (rf"\b(turn|spin|pivot|rotat|circl|twirl|whirl)\w*\s+(to\s+)?((his|her|their|the)\s+)?{side}\b"
                     rf"(?!\s+(arm|hand|leg|foot|shoulder|hip|knee|elbow))")
-        if re.search(rotating, text) and features.get("rotation") != side:
+        # A rotation that couldn't be measured is no evidence against the line (a natural turn always turns right).
+        if re.search(rotating, text) and features.get("rotation") not in (side, None):
             measured = features.get("rotation") or "no clear direction"
             return Verdict(False, f"it says the turn goes to the {side}, but the measured rotation was {measured}")
         # Facing, pointing or profile isn't travel either.
@@ -75,6 +76,9 @@ def check(line: str, features: dict, max_words: int = MAX_WORDS) -> Verdict:
                   rf"\b(fac\w*|point\w*|look\w*)\s+(to\s+(the\s+)?)?{side}\b|\bprofile\s+(to\s+the\s+)?{side}\b"
                   rf"|\b{side}\s+profile\b|\bside-on[^.,;]*\b{side}\b")
         rest = re.sub(facing, " ", re.sub(rotating, " ", text))
+        # "right" as an idiom is no direction ("waiting for the right moment", "right on the beat").
+        rest = re.sub(r"\b(the\s+right\s+(moment|time|beat|note|count)|right\s+(away|now|on\s+(cue|the\s+beat))|"
+                      r"all\s+right|just\s+right)\b", " ", rest)
         moving = rf"\b{side}(ward)?s?\b(?!\s+(arm|hand|leg|foot|shoulder|hip|knee|elbow|side))"
         if re.search(moving, rest) and travel != side:
             measured = travel if travel in ("left", "right") else "no clear direction"

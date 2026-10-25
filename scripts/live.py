@@ -82,6 +82,10 @@ words, one idea (a callout on a hit can be shorter). When a movement is clearly 
 (the show notes give the style's vocabulary), and when it returns, say what is different about it or how it feels.
 Dancing a partner dance solo, the dancer holds a frame for an imaginary partner: raised arms held in front are that
 hold, not gestures. The dancer never speaks; screens, slides and furniture behind them are the room, not the dance.
+Name a figure only when you are sure it is that figure: a wrong name sounds authoritative to a listener who can't
+check it, and a vivid description of the body is never wrong. A figure defined by where a partner stands (a promenade
+position, outside partner, a shape made with the partner) can't be seen when the dance is danced solo: describe what
+the dancer's body does instead.
 You may say nothing at all: if nothing new has happened, stay silent and let the music breathe.
 Directions as the audience sees them. The pose measurements in each prompt are a check, not a script: never say
 anything they contradict, and don't narrate them as numbers or mechanics. If you're told a line was wrong, put it
@@ -129,7 +133,9 @@ class LiveEngine:
                        "distinctive and what is coming, but describe what the dancer actually does now: if tonight "
                        "differs from rehearsal, say what you see.\n" + self.live.show_notes)
         if self.live.glossary:
-            system += "\nVocabulary vetted by dancers (use a term only if what you see matches it):\n" + "\n".join(self.live.glossary)
+            system += ("\nFigure names vetted by dancers that this routine contains (name one only when you see it; "
+                       "describe anything else by the body):\n" if self.live.script else
+                       "\nVocabulary vetted by dancers (use a term only if what you see matches it):\n") + "\n".join(self.live.glossary)
         config = {"response_modalities": ["AUDIO"], "output_audio_transcription": {},
                   "speech_config": {"voice_config": {"prebuilt_voice_config": {"voice_name": "Kore"}}},
                   "context_window_compression": {"sliding_window": {}},  # keeps long performances going
@@ -298,6 +304,13 @@ class Live:
         elif args.rehearsal:  # or prepare them now from the studio's rehearsal video
             from show_notes import prepare
             self.plan, self.moments, self.show_notes, self.script = prepare(args.rehearsal, args.style, self.song_map)
+        if self.script and self.glossary:
+            # The routine's own figures: the vetted names the rehearsal describer actually used for this piece. The whole
+            # syllabus read like a menu, and live named figures that weren't danced (SPEC 15a).
+            said = " ".join(line["text"].lower() for line in self.script)
+            self.glossary = [g for g in self.glossary if g.split(":")[0].lower() in said]
+            print(f"figure names this routine contains (from the rehearsal script): "
+                  f"{', '.join(g.split(':')[0] for g in self.glossary) or 'none'}")
         if self.plan:
             gaps = [g for g in self.song_map["clean_spaces"] if g]
             print(f"show notes ready: {self.plan['style']['name']}, {len(self.moments)} key moments, "
