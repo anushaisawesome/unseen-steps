@@ -18,6 +18,9 @@ Argon learns her taste from: what she valued, what she hated, and why.
 - Aquamarine: "70% there for quality, the only one I'm sort of happy with. It doesn't miss a lot. It needs more
   description of texture and pose, but it's almost there."
 - Leiomy: "the description is nice"; hair and hands were caught.
+- Amapiano: "the narration I'm happy with, I could picture it, but maybe that's because I know what amapiano looks
+  like, which the target audience will not." (Describe for someone who has never seen the style: what each step
+  looks like and feels like, not just its name.)
 - "The point is I want Gemini to have my dance eye, to be able to pick out the nuance from everything."
 
 ## What a dancer sees that was missed

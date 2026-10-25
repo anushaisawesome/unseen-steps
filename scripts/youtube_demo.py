@@ -47,7 +47,7 @@ VIDEOS = [
     ("tutting", "oJ6mC4DsOM4", "Sadeck: Murmuration (tutting)", "tutting", 0, 50),
     ("bharatanatyam", "TdYWOr12ONU", "IndianRaga: Vahana Alarippu", "Bharatanatyam", 0, 180),
     ("flamenco", "9JhUBiJPHMM", "Rocío Garrido: soleá", "flamenco", 0, 180),
-    ("amapiano", "GQjf74DJjEc", "CPC Stars: amapiano", "amapiano", 0, 180),
+    ("amapiano", "VV__i-NBNcU", "Amapiano Dance Championship: Gugulethu United We Stand Dancers", "amapiano", 0, 177),
     ("afrobeats", "uWqCqv6pmmU", "HomeBros: Afro dance choreography", "afrobeats", 0, 164),
     ("ballroom", "0GHkCRM8DBc", "WDSF World Open Prague: Standard final, waltz", "ballroom waltz", 0, 141),
 ]
@@ -196,6 +196,9 @@ def main():
         import speech
         director.client(), speech.client()
         video = next(v for v in VIDEOS if v[0] in wanted)
+        if (OUT / "parts" / f"{video[0]}.json").exists():
+            print(f"{video[0]}: already done, skipped")
+            return
         result = build_safely(video)
         if result:
             (OUT / "parts").mkdir(exist_ok=True)
