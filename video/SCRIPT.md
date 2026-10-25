@@ -1,28 +1,33 @@
-# Demo video script (3:00, voice-over by Anusha and Andrii)
+# Demo video script (final, for recording)
 
-Built from Andrii's draft (SPEC 10). Record each numbered part as its own file (a phone voice memo is fine; quiet
-room, phone 20 cm away), named `1-hook.m4a`, `2-now.m4a`, ... and drop them in `video/voice/`. Read naturally, not fast;
-pauses are fine, I cut them. About 320 spoken words, so roughly 2:10 of talking plus the live narration and music.
+Andrii's transcript (SPEC.md) with light fixes. 🟣 = Anusha, 🔵 = Andrii. Record each numbered part as its own phone
+voice memo, named by its number (`1.m4a`, `2.m4a`, ... `15.m4a`), and put them in `video/voice/` (or send them over).
+Quiet room, phone about 20 cm away, read naturally; I trim the pauses. The edit fits itself to your timing.
 
 | # | Who | On screen | Say |
 | --- | --- | --- | --- |
-| 1 | Anusha | Black, then a blurred dance, music only (10 s) | "Close your eyes." |
-| 2 | Andrii | Still blurred; Gemini Live's narration plays (20 s) | "What about now?" |
-| 3 | Anusha | The blur clears: Andrii dancing, skeleton, captions | "You noticed the difference. The first time, you heard what a blind or partially sighted person often gets at a dance show: the music, and nothing of the dance. The second time, you heard Unseen Steps describing Andrii live, in the gaps in the music." |
-| 4 | Andrii | His own dancing | "Back in Ukraine, I did ballroom dancing for five years, and it was a big part of my childhood. So I know what's behind every dance: the steps, the timing, the grace, all the little details that make a performance what it is." |
-| 5 | Anusha | The studio recital print, a studio show | "My tutor, Gerard, works with blind dancers. He told me how often, even though they hear the music, they miss what's actually happening on stage. Andrii brought ballroom. I trained in commercial, contemporary and ballet growing up, and I dance street styles now, so I brought the accessibility problem and the dancer's eye that shaped how it describes every style. Together we built Unseen Steps." |
-| 6 | Andrii | What Argon prepared from his rehearsal (real show notes from Atlas) | "Before the show, Gemini 4 Argon watches the rehearsal with its music, all in one go. It works out the structure, the key moments and what each movement means, not just where someone's arms and legs are. Then it writes show notes the studio can read and edit, stored in MongoDB Atlas." |
-| 7 | Anusha | Andrii live, the under-the-hood panel, the checker catching a wrong line | "During the show, pose tracking follows the dancer, and Gemini Live, holding those notes, describes what's actually happening, in the gaps in the music, in under a second. Every claim is checked against the measured movement. Here it said right when he travelled left, and the next line put it right." |
-| 8 | (no voice) | A 20-dancer crew, every dancer tracked; its own narration plays | |
-| 9 | Andrii | The crowded competition waltz (everyone else blurred), then the 18 styles page | "And it isn't just one dancer. It follows a whole crew, or one couple in a crowded competition, with everyone else blurred for privacy. And it works across eighteen styles so far, from ballet to Bharatanatyam, each in its own vocabulary." |
-| 10 | Anusha | The site, then the end card | "Small studios, schools and competitions are where most people dance, and their shows never get audio description. Unseen Steps is open source, so any studio can use it, and next we're testing it with Gerard's dancers. So that everyone in the audience can experience the dance, not just the music." |
+| 1 | 🟣 | Blurred dance, music only (10 s) | "Close your eyes." |
+| 2 | 🟣 | Still blurred; the live narration plays with subtitles | "What about now?" |
+| 3 | 🟣 | The blur clears: Andrii dancing, skeleton, captions | "You noticed the difference, right? The first clip is what a blind or partially sighted person often gets at a dance show: the music, and nothing of the dance. The second is our answer: dance you can hear." |
+| 4 | 🔵 | Andrii's own dancing | "Back in Ukraine, I did ballroom dancing for five years, and it was a big part of my childhood. So I know everything behind each dance: the steps, the timing, the grace, all the little details that make a performance what it is." |
+| 5 | 🟣 | The studio recital print | "There are over two million people in the UK with sight loss. My tutor, Gerard, works with blind dancers. He told me how often, even though they hear the music, they miss what's actually happening on stage." |
+| 6 | 🔵 | The recital print | "That's how we came up with the idea. I brought the dance experience, and Anusha brought the accessibility problem." |
+| 7 | 🟣 | The recital print, then the site | "And my own training, commercial, contemporary and ballet growing up, and street styles now, shaped how it describes every style. So, we built Unseen Steps." |
+| 8 | 🔵 | Andrii dancing live, then Argon's show notes from his rehearsal | "Before the performance, Gemini 4 Argon watches the rehearsal with its music, at five to eight frames a second, all in one go. It works out the structure, the key moments and what each movement means, not just where someone's arms or legs are. The studio can read and edit these show notes." |
+| 9 | 🟣 | Andrii live with the under-the-hood panel | "During the performance, YOLO pose tracking follows the dancer, while Gemini Live describes what's happening in under a second, even if the dancer changes something from rehearsal." |
+| 10 | 🔵 | The checker catching a wrong line | "But we didn't want the AI to just guess. If the body tracking doesn't support a turn, a direction or a jump, our checker flags it, and the next line puts it right." |
+| 11 | 🟣 | The glossary and shows in MongoDB Atlas | "Dance, like code, has its own language. With Deep Research and MongoDB Atlas, we built a glossary of terms reviewed by dancers, with professional and simpler names, and every show's notes live there too." |
+| 12 | (no voice) | A 20-dancer crew, every dancer tracked; 18 styles | |
+| 13 | 🔵 | Andrii dancing | "For me, dance is five years of my childhood." |
+| 14 | 🟣 | The recital print | "For the people Gerard works with, this could mean getting the whole performance, not just the music. And it's open source, so any studio can use it." |
+| 15 | 🔵🟣 together | End card | "That's what we want Unseen Steps to do." |
 
-Notes on the changes from the draft:
-- Part 3: "how blind people experience performances" became "what a blind or partially sighted person often gets",
-  since sight loss varies and most people keep some sight; the blur is an illustration, not a simulation.
-- Part 6: added "the studio can read and edit" (people stay in control, a DeepMind criterion) and MongoDB Atlas (the
-  MongoDB bounty asks to see it in use).
-- Part 7: names the checker catch that's on screen (the verification loop, DeepMind's 50%).
-- Part 9: privacy and messy inputs (The Real World's criteria).
-- Part 10: open source and the next step with Gerard's dancers (DeepMind: "could it grow into a product or
-  open-source tool").
+What changed from the transcript, and why:
+- 3: "how blind people experience performances" became "what a blind or partially sighted person often gets": sight loss
+  varies, and most people keep some sight. "Such life unfairness" became "our answer: dance you can hear".
+- 5: "There is over 2 million people" became "There are over two million people in the UK with sight loss" (RNIB).
+- 7: Anusha's dance training, and "So, we built Unseen Steps".
+- 8: "the studio can read and edit these show notes" (DeepMind scores people staying in control).
+- 10: the checker flags a line live and the next line corrects it; the studio editing the notes is in part 8.
+- 11: "and every show's notes live there too" so the MongoDB judges hear Atlas holds the shows, not just the glossary.
+- 14: open source (DeepMind asks whether it could become an open-source tool people use).
