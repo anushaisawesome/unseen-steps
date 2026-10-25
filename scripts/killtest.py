@@ -894,6 +894,8 @@ def main():
                         help="Argon writes the whole timed description; pose and music check and time it")
     parser.add_argument("--seed", help="who to follow: time,x,y with x and y as fractions of the frame, e.g. 18,0.6,0.7")
     args = parser.parse_args()
+    import director
+    director.client()  # before any threads: lazily created clients race and the loser gets closed
 
     song = map_song(load_audio(args.clip), beats_per_bar=args.beats_per_bar,
                     bars_per_phrase=args.bars_per_phrase, speech_seconds=3.0 if args.script else 2.5, earliest=True)
