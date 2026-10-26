@@ -36,6 +36,7 @@
   <section class="hero" aria-labelledby="title">
     <div class="wrap">
       <div class="copy">
+        <p class="award"><span aria-hidden="true">🏆 </span>Winner of the Google DeepMind Special Prize for Open Innovation, created for this project at Encode London 2026</p>
         <p class="kicker">For small studios and their audiences</p>
         <h1 id="title">Experience <span class="hl">the dance</span>, not just the music.</h1>
         <p class="lede">Recitals, school shows and competitions almost never get professional audio description. Unseen Steps gives a studio rich description of its own show, so blind and partially sighted people in the audience hear what the dancers are doing, in the style's own words, in the gaps in the music.</p>
@@ -236,7 +237,7 @@
 
 <script src="app.js" type="module"></script>
 <script>
-const LINES = [{"at": 0.8, "len": 3.72, "text": "Staggered lines freeze: hip cocked, right hand framing the head."}, {"at": 10.2, "len": 3.97, "text": "The slow melt snaps\u2014legs flick back into a whipped flat-back fold."}, {"at": 21.1, "len": 3.03, "text": "Explosive hair whips and torso rolls, right arm flung wide!"}, {"at": 25.0, "len": 3.77, "text": "Drop to one knee, arms framing heads, then pike on forearms."}, {"at": 30.8, "len": 3.55, "text": "Hands plant, back legs kick high, melting chests to the floor."}, {"at": 40.5, "len": 4.7, "text": "Rising from kneeling, they sweep arms wide into a suspended high V."}, {"at": 45.4, "len": 3.38, "text": "Arms fold slowly overhead, then snap into sharp tutting frames!"}, {"at": 51.8, "len": 4.32, "text": "Sharp arm slices into staccato hip hits, one hand crowning the head."}, {"at": 56.8, "len": 3.2, "text": "Spinning upstage to reach high, they drop to one hip, whipping heads back."}, {"at": 60.2, "len": 3.17, "text": "Rolling onto forearms to freeze, one leg hovering long."}], LEN = 63.0;
+const LINES = [{"at": 0.8, "len": 3.72, "text": "Staggered lines freeze: hip cocked, right hand framing the head."}, {"at": 10.2, "len": 3.97, "text": "The slow melt snaps; legs flick back into a whipped flat-back fold."}, {"at": 21.1, "len": 3.03, "text": "Explosive hair whips and torso rolls, right arm flung wide!"}, {"at": 25.0, "len": 3.77, "text": "Drop to one knee, arms framing heads, then pike on forearms."}, {"at": 30.8, "len": 3.55, "text": "Hands plant, back legs kick high, melting chests to the floor."}, {"at": 40.5, "len": 4.7, "text": "Rising from kneeling, they sweep arms wide into a suspended high V."}, {"at": 45.4, "len": 3.38, "text": "Arms fold slowly overhead, then snap into sharp tutting frames!"}, {"at": 51.8, "len": 4.32, "text": "Sharp arm slices into staccato hip hits, one hand crowning the head."}, {"at": 56.8, "len": 3.2, "text": "Spinning upstage to reach high, they drop to one hip, whipping heads back."}, {"at": 60.2, "len": 3.17, "text": "Rolling onto forearms to freeze, one leg hovering long."}], LEN = 63.0;
 const segs = [...document.querySelectorAll(".seg")], say = document.getElementById("cap-say"), capT = document.getElementById("cap-t");
 const head = document.querySelector(".playhead"), stage = document.querySelector(".stage");
 const mmss = t => Math.floor(t / 60) + ":" + String(Math.floor(t % 60)).padStart(2, "0");
@@ -252,6 +253,22 @@ segs.forEach((b, n) => {
   b.addEventListener("focus", () => { auto = false; head.style.display = "none"; show(n); });
 });
 show(2);
+// On narrow screens two lines a few seconds apart would share the same 24 px of tap area. When that happens, the segments
+// split into two rows (top and bottom half of the waveform), so every target keeps its full size and nothing overlaps.
+function layoutSegs() {
+  segs.forEach(b => { b.style.top = b.style.bottom = ""; b.querySelector("span").style.bottom = ""; });
+  const r = segs.map(b => b.getBoundingClientRect());
+  if (!r.some((x, k) => k && x.left < r[k - 1].right - 0.5)) return;
+  const end = [-Infinity, -Infinity];
+  segs.forEach((b, k) => {
+    const row = r[k].left >= end[0] - 0.5 ? 0 : 1;
+    end[row] = r[k].right;
+    b.style.top = row ? "50%" : "0"; b.style.bottom = row ? "0" : "50%";
+    if (!row) b.querySelector("span").style.bottom = "calc(-100% - 0.9rem)";
+  });
+}
+layoutSegs();
+addEventListener("resize", layoutSegs);
 // a slow playhead sweeps the piece (63 s shown in 21 s); the caption follows it. Stops on any interaction.
 function tick(now) {
   if (!auto) return;
