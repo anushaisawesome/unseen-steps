@@ -1088,3 +1088,16 @@ blind dance audiences, combining Gemini 4 Argon video understanding with sub-sec
   upload path) is still to be decided by the team.
 - Next step stays the same: test with blind dancers and their audiences (Gerard's dancers first).
 
+
+### Judges' feedback (Giles Mallinson, Encode, 26 Oct)
+
+Submission complete (in at 11:56), entered for The Real World, MongoDB and Gemini.
+- **Worked:** the DeepMind judge gave top marks across the board: *"Multi-tier multimodal handoff by using offline
+  high-frame-rate video reasoning to orchestrate sub-second live speech for an underserved accessibility use case."*
+  Argon on the rehearsal then Gemini Live on the night called clever architecture. Impact was one of the panel's
+  strongest scores; usability scored well (the studio flow is easy to follow); open source (MIT) noted.
+- **Held it back:** MongoDB was the weakest bounty (middle of the pack): Atlas read as a supporting database, not central
+  to the product. Their suggestion: vector search over past shows and moves, or storing pose data for reuse. Innovation
+  was split on the general panel: spell out what audio description exists today and why it fails small studios.
+- **Next time:** open the demo with a real moment (a dancer, then the live line landing in the gap in the music); go deep
+  on one or two bounties, not three; get a real studio or blind dance fan to try it, even once, for a user quote.
