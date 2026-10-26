@@ -25,6 +25,28 @@ show is mostly music. Professional audio description of dance exists, but it is 
 The shows put on by small studios, schools and competitions, where most dancers actually perform, rarely get it. The
 project started with Anusha's robotics tutor, Gerard Canal (KCL), who dances ballroom with blind dancers.
 
+## What's new here
+
+Each building block exists somewhere; what we couldn't find anywhere is all of them together, for dance.
+
+- **Live audio description of a show has been automated before, from sound alone.** NYU research
+  ([Vander Wilt and Farbood, 2019–2021](https://mapaccess.uab.cat/publications/journal-article/new-approach-creating-and-deploying-audio-description-live-theater))
+  follows a musical or play by its audio and triggers description recorded in advance, and theatre apps such as
+  [GalaPro](https://lwtheatres.co.uk/gala-pro) play prepared tracks in time with the show. Unseen Steps watches the
+  dancer instead: it writes new lines live about what they actually do on the night, including where it differs
+  from rehearsal.
+- **AI describers exist, but they're general-purpose.** We found no AI description tool that speaks dance: the
+  steps named in the style's own vocabulary, the piece's signature, canons and formations, the shift from sharp to
+  fluid, the accents on the music. That richness is what Unseen Steps is built around.
+- **The body checks the AI.** Dance coaching apps feed pose measurements to a language model; here the pose
+  measurements also veto or correct any line they contradict, before or straight after it is spoken.
+- **Timed to the music, not to dialogue.** Lines go in the gaps between musical phrases, so the music stays the star.
+- **Open source, for small studios.** The live description products we found are proprietary or human services.
+
+These are "as far as we could find" claims from a literature and product search in October 2026, not a systematic
+review. What isn't done yet: testing with blind audiences, measuring how accurate the step and style names are, and
+live tracking of groups (live is solo today).
+
 ## How it works
 
 It works the way a professional describer does: prepare from a recording, then deliver live in time with the show.

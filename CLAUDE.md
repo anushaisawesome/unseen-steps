@@ -1101,3 +1101,31 @@ Submission complete (in at 11:56), entered for The Real World, MongoDB and Gemin
   was split on the general panel: spell out what audio description exists today and why it fails small studios.
 - **Next time:** open the demo with a real moment (a dancer, then the live line landing in the gap in the music); go deep
   on one or two bounties, not three; get a real studio or blind dance fan to try it, even once, for a user quote.
+
+## Prior art check (26 Oct)
+
+Done because the judges split on innovation. Two searches (a deep research run and a feature-by-feature agent), then
+the arXiv papers read in full on 26 Oct. The README's "What's new here" section is the public version; keep its claims
+inside what's below.
+- **Exists:** automated live AD for theatre, synced to the show by its audio and triggering description recorded in
+  advance (Vander Wilt and Farbood, NYU, 2019–2021; GalaPro; Earcatch); live AI commentary for blind spectators in
+  sport (Dentsu Voice Watch, World Aquatics 2023); Amazon patent US11736775 on AI AD for live events; AD placed in
+  gaps (Rescribe 2010.03667 fits drafts into gaps by dynamic programming; AutoAD II 2310.06838 places movie AD in
+  pauses in dialogue; "What, When, and How" 2609.30121, a Sept 2026 preprint, schedules movie AD with a mixed-integer
+  linear program); human-AI AD editing (DescribePro 2508.01092); user-triggered AI AD (Describe Now 2411.11835,
+  GPT-4V, pre-generated, seven online video genres, none of them dance); per-listener earphone AD apps.
+  Sub-second speech comes from Gemini Live, not from us.
+- **Checked in the papers:** none of the AD papers above produce dance-specific output. AutoAD II and III are movie AD
+  (characters, story). DescribePro and Describe Now are recorded video, not live; DescribePro only cites a 2022 paper
+  on human AD for dance (Patiniotaki). ASSETS '25 (2508.03651, 8 blind participants, ChatGPT live video): good on
+  static scenes, "falls short" on live description in dynamic situations. MVPBench (2603.22756) dance style matching
+  (a reference clip and three candidates, e.g. street, Latin, ballet): Gemini 2.5 Flash and GPT-4o both score 19.38,
+  humans 96.94. These are chance-normalised scores (0 = random guessing), not accuracy; quote them that way. Breakdance
+  (2510.20287): video encoders beat VLMs at classifying footwork, powermoves and toprock. NJIT's ASSETS 2024 spatial
+  AD for a 360° VR dance clip is human-written description, not AI.
+- **Not found anywhere:** AI AD that speaks dance (named steps in the style's vocabulary, signature, canons, texture
+  changes); live dance description written from what the dancer does tonight; lines placed by musical phrase
+  structure; pose measurements vetoing a generative model's narration; an open-source live dance AD tool.
+- **Don't claim:** "first AI AD for live performance", "first to sync AD from a rehearsal recording", accuracy of step
+  or style names (unmeasured), blind-user testing (not done), live group tracking (live is solo). Live style is passed
+  in from the show notes, so live style recognition isn't unprompted (rehearsal and upload analysis is).
