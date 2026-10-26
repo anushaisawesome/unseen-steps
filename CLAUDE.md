@@ -1072,6 +1072,9 @@ as Atlas Search.
 "18 styles" page, green/red/pink shadows on the main page. Details in `SPEC.md` 15, "Immediate website fixes". Not implemented yet.
 Phone fixes (26 Oct): under 30rem the nav puts "Live at the venue" on its own row and the three links aligned below
 (`studio.css`); on the 18 styles page, choosing a style on a narrow screen scrolls to the player and moves focus to it.
+Waveform card on phones: `figure.track` had the default 40 px figure margin; the pressed segment picked up the generic
+`button[aria-pressed]` background (the grey half-height box, since segments split into two half-rows); the highlight now
+spans the full waveform for either row (`data-row`), and the last segment is right-aligned so it stays inside the card.
 
 **ANUSHA: please make a slide / video card on tracking safeguards (25 Oct, ~11:00, from Andrii).** The six layers that
 keep bad body tracking out of the narration (pose confidence, per-phrase coverage, unmeasurable = unchecked, crowded

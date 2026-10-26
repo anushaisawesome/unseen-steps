@@ -263,7 +263,7 @@ function layoutSegs() {
   segs.forEach((b, k) => {
     const row = r[k].left >= end[0] - 0.5 ? 0 : 1;
     end[row] = r[k].right;
-    b.style.top = row ? "50%" : "0"; b.style.bottom = row ? "0" : "50%";
+    b.style.top = row ? "50%" : "0"; b.style.bottom = row ? "0" : "50%"; b.dataset.row = row;
     if (!row) b.querySelector("span").style.bottom = "calc(-100% - 0.9rem)";
   });
 }

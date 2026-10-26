@@ -75,7 +75,7 @@ button, .button { border-radius: 8px; }
 .sec-head p { color: var(--muted); font-size: 1.1rem; }
 
 /* the signature graphic: where the words go */
-.track { background: var(--surface); border: 2px solid var(--navy); border-radius: 14px; padding: clamp(1rem, 2.5vw, 1.75rem); box-shadow: 6px 6px 0 var(--red); }
+.track { margin: 0; background: var(--surface); border: 2px solid var(--navy); border-radius: 14px; padding: clamp(1rem, 2.5vw, 1.75rem); box-shadow: 6px 6px 0 var(--red); }
 .track-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1.5rem; align-items: baseline; }
 .track-title { font-family: var(--display); font-weight: 800; font-size: 1.15rem; }
 .legend { display: flex; gap: 1.25rem; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; list-style: none; margin: 0; padding: 0; }
@@ -88,10 +88,15 @@ button, .button { border-radius: 8px; }
 .wave .duck { fill: var(--red); opacity: 0.9; }
 .segs { position: absolute; inset: 0; }
 .seg { position: absolute; top: 0; bottom: 0; padding: 0; margin: 0; border: 0; background: transparent; cursor: pointer; min-width: 24px; min-height: 0; border-radius: 6px; }
-.seg:hover { background: transparent; }
+.seg:hover, .seg[aria-pressed="true"] { background: transparent; border: 0; }
+/* near the end, the minimum tap width would push the last segment past the card */
+.seg:last-child { left: auto !important; right: 0; }
 .seg span { position: absolute; left: 0; right: 0; bottom: -0.9rem; height: 6px; border-radius: 3px; background: var(--red); transition: transform 160ms ease; }
 .seg:hover span, .seg[aria-pressed="true"] span { transform: scaleY(1.7); }
 .seg[aria-pressed="true"]::before { content: ""; position: absolute; inset: 0; border-radius: 6px; background: color-mix(in srgb, var(--red) 14%, transparent); }
+/* the chosen line's highlight spans the whole waveform, whichever half-row its tap area is in */
+.seg[data-row="0"]::before { bottom: -100%; }
+.seg[data-row="1"]::before { top: -100%; }
 .playhead { position: absolute; top: -0.4rem; bottom: -1.2rem; width: 2px; background: var(--navy); left: 0; pointer-events: none; }
 .sections { list-style: none; margin: 1.9rem 0 0; padding: 0; position: relative; height: 2.6rem; border-top: 2px solid var(--navy); }
 .sections li { position: absolute; top: 0; padding: 0.4rem 0.5rem 0; border-left: 1px solid var(--navy); color: var(--muted); font-size: 0.8rem; line-height: 1.25; }
