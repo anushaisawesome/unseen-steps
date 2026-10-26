@@ -5,14 +5,11 @@ Anusha and Andrii. `SPEC.md` is the full specification; this file is the **curre
 decisions made since**, so read this first. When a decision changes, update this file in the same
 commit.
 
-**Result (25 Oct, finale):** Unseen Steps won the **Google DeepMind Special Prize for Open Innovation** ($2,000 in Google Cloud
-credits). The project is MIT open source; keep it that way and keep the README, site and docs public-ready.
-
 **Standing rule for every Claude on this repo:** anything Anusha and Andrii decide or discuss goes into this file in the same session, so the other person's Claude has it after `git pull`.
 
 **Result (25 Oct, finale):** not in the top 10 pitches, but **Google DeepMind created a Special Prize for Open
 Innovation for Unseen Steps** ($2,000 in Google Cloud credits). Details at the end of this file. The hackathon is over;
-the deadline notes below are history.
+the deadline notes below are history. It's MIT open source: keep it that way, and keep the README, site and docs public-ready.
 
 **Hard deadline (passed):** submissions closed **Sunday 25 October, 12:00 London time**. Demo video spec:
 `docs/demo-video.md`.
