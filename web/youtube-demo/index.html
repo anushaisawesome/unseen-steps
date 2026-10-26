@@ -94,7 +94,7 @@ demos.forEach((d, i) => {
   const small = document.createElement("small");
   small.textContent = `${d.style} · ${d.lines.filter(l => l.audio).length} lines`;
   b.append(d.label, small);
-  b.addEventListener("click", () => choose(i));
+  b.addEventListener("click", () => { choose(i); showPlayer(); });
   li.appendChild(b); list.appendChild(li);
 });
 
@@ -124,6 +124,15 @@ function choose(i) {
   if (demo.review) { const r = document.createElement("p"); r.textContent = "Second describer: " + demo.review; about.appendChild(r); }
   played = new Set(); stopVoice();
   if (player) player.loadVideoById({ videoId: demo.id, startSeconds: demo.start, endSeconds: demo.end });
+}
+
+// On a phone the player sits below the list: bring it into view and move focus to it.
+function showPlayer() {
+  if (!matchMedia("(max-width: 60rem)").matches) return;
+  const now = document.getElementById("now");
+  now.setAttribute("tabindex", "-1");
+  now.focus({ preventScroll: true });
+  now.closest("section").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
 }
 
 function stopVoice() { voice.pause(); caption.textContent = ""; setMusic(false); }
